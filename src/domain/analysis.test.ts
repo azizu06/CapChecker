@@ -88,6 +88,36 @@ describe("ScorecardSchema", () => {
     ).toBe(false);
   });
 
+  it("preserves optional skipped opinion claims outside verifications", () => {
+    const scorecardWithSkippedOpinion = {
+      ...mixedScorecard,
+      skippedClaims: [
+        {
+          id: "opinion-1",
+          text: "I think this is the most exciting stock in the market.",
+          kind: "opinion" as const,
+          checkable: false as const,
+          timestampSeconds: 84,
+        },
+      ],
+    };
+
+    expect(ScorecardSchema.parse(scorecardWithSkippedOpinion)).toEqual(
+      scorecardWithSkippedOpinion,
+    );
+  });
+
+  it("rejects checkable claims in the skipped opinion collection", () => {
+    const factualClaim = mixedScorecard.verifications[0].claim;
+
+    expect(
+      ScorecardSchema.safeParse({
+        ...mixedScorecard,
+        skippedClaims: [factualClaim],
+      }).success,
+    ).toBe(false);
+  });
+
   it("provides a deterministic mixed demo fixture through the frozen contract", () => {
     expect(ScorecardSchema.parse(DEMO_SCORECARDS.mixed)).toEqual(
       DEMO_SCORECARDS.mixed,

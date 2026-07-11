@@ -19,6 +19,11 @@ const ClaimBaseSchema = z.object({
   timestampSeconds: z.number().nonnegative().optional(),
 });
 
+export const OpinionClaimSchema = ClaimBaseSchema.extend({
+  kind: z.literal("opinion"),
+  checkable: z.literal(false),
+});
+
 export const ClaimSchema = z.discriminatedUnion("kind", [
   ClaimBaseSchema.extend({
     kind: z.literal("factual"),
@@ -28,10 +33,7 @@ export const ClaimSchema = z.discriminatedUnion("kind", [
     kind: z.literal("predictive"),
     checkable: z.boolean(),
   }),
-  ClaimBaseSchema.extend({
-    kind: z.literal("opinion"),
-    checkable: z.literal(false),
-  }),
+  OpinionClaimSchema,
 ]);
 
 export const CheckableClaimSchema = z.discriminatedUnion("kind", [
@@ -100,6 +102,7 @@ export const ScorecardSchema = z
     capLabel: z.enum(["no-cap", "some-cap", "full-of-cap"]),
     summary: z.string().min(1),
     verifications: z.array(VerificationSchema),
+    skippedClaims: z.array(OpinionClaimSchema).optional(),
     hypeFindings: z.array(HypeFindingSchema),
     nextActions: z.array(NextActionSchema),
     generatedAt: z.iso.datetime(),
@@ -152,6 +155,7 @@ export const AnalysisEventSchema = z.discriminatedUnion("type", [
 ]);
 
 export type Claim = z.infer<typeof ClaimSchema>;
+export type OpinionClaim = z.infer<typeof OpinionClaimSchema>;
 export type CheckableClaim = z.infer<typeof CheckableClaimSchema>;
 export type Evidence = z.infer<typeof EvidenceSchema>;
 export type Verification = z.infer<typeof VerificationSchema>;
