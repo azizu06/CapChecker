@@ -89,6 +89,6 @@
 - Modify only files already owned by this issue if review finds defects.
 
 - [ ] Commit the issue branch with Aziz's configured identity and no AI co-author trailer.
-- [ ] Run the issue's required minimal `no-mistakes` gate after explicit confirmation.
+- [ ] Run the deterministic local and GitHub CI checks required by the build workflow.
 - [ ] Push, open a PR with `Closes #4`, include red/green evidence and live-smoke truth, and wait for `quality` and `e2e`.
 - [ ] Merge only after required checks and the issue gate pass.

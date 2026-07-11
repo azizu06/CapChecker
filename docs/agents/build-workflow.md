@@ -31,24 +31,21 @@ Every parallel implementation worker follows the TDD workflow in
 for Lane A. Full live-pipeline browser verification waits for issue #10, but
 unit, contract, component, and fixture-backed E2E tests run during development.
 
-## Risk-based no-mistakes gate
+## Deterministic merge gate
 
-Normal planning, repository setup, documentation, and routine UI PRs use focused
-local checks plus GitHub CI. They do not run `no-mistakes`.
+Every implementation PR must provide focused red-green TDD evidence and pass
+lint, typecheck, the full unit suite, and build. UI or routing changes must also
+pass fixture-backed Playwright tests that exercise every affected control,
+route, state, and recovery action on the required desktop and mobile projects.
 
-Use `no-mistakes` only when the issue has the `gate-no-mistakes` label. This is
-for changes where a subtle failure can break the live demo, including video
-ingestion, claim verification, scoring, and final integration. Commit the issue
-work on its feature branch and run:
+External adapters use deterministic fakes in CI. When an issue's acceptance
+criteria require live behavior, run a targeted credentialed smoke test before
+merge and record only the redacted result in the PR. Review the final diff for
+scope, contract drift, secrets, and unsafe fallback behavior.
 
-```bash
-no-mistakes axi run --intent "<the issue goal and relevant constraints>" --skip=document
-```
-
-The minimal gate skips documentation generation and keeps review, tests, lint,
-push, PR creation, and CI. Do not use `--yes`. Escalate `ask-user` findings to a
-human. A `checks-passed` outcome means the PR is ready for human review, not
-automatically approved for merge.
+`no-mistakes` remains available as an optional, token-consuming second opinion.
+Run it only when Aziz explicitly requests it for a specific PR. It is not a
+label-driven check, a default pipeline step, or a merge requirement.
 
 ## Required CI
 
@@ -64,5 +61,5 @@ required script fails CI.
 - Keep one issue per PR.
 - Require both `quality` and `e2e` checks.
 - Never merge a PR with unresolved dependencies.
-- For an issue labeled `gate-no-mistakes`, never bypass a failed gate by pushing
-  the same branch directly to `origin`.
+- Never bypass a failing required local or GitHub CI check by pushing the same
+  branch directly to `origin`.
