@@ -133,6 +133,8 @@ const mixed = buildScorecard({
       category: "guarantee",
       severity: "high",
       explanation: "Absolute safety language hides ordinary market risk.",
+      context: "Buy before earnings. You cannot lose money on this trade.",
+      timestampSeconds: 41,
     },
     {
       id: "mixed-hype-2",
@@ -140,19 +142,22 @@ const mixed = buildScorecard({
       category: "urgency",
       severity: "medium",
       explanation: "The deadline pressures viewers to act before doing research.",
+      context: "Buy before earnings. You cannot lose money on this trade.",
+      timestampSeconds: 41,
     },
   ],
   nextActions: [
     {
       id: "mixed-action-1",
-      label: "Review the latest filing",
-      description: "Compare the creator's claims with the company's latest SEC filing.",
-      url: "https://www.sec.gov/edgar/search/",
+      label: "Read the index factsheet",
+      description: "Verify the stated 2023 return in S&P Dow Jones Indices' own factsheet.",
+      evidenceId: "mixed-evidence-1",
     },
     {
       id: "mixed-action-2",
-      label: "Check your risk tolerance",
-      description: "Decide how much loss you could absorb before acting on a prediction.",
+      label: "Check the loss guarantee",
+      description: "Compare the creator's no-loss promise with FINRA's explanation of investment risk.",
+      evidenceId: "mixed-evidence-3",
     },
   ],
 });
@@ -223,6 +228,8 @@ const scammy = buildScorecard({
       category: "guarantee",
       severity: "high",
       explanation: "The promise removes uncertainty that always exists in speculative assets.",
+      context: "Guaranteed 10x this month—this token cannot miss.",
+      timestampSeconds: 5,
     },
     {
       id: "scammy-hype-2",
@@ -230,19 +237,22 @@ const scammy = buildScorecard({
       category: "urgency",
       severity: "high",
       explanation: "The artificial deadline discourages independent verification.",
+      context: "Only available tonight, so get in before the window closes.",
+      timestampSeconds: 18,
     },
   ],
   nextActions: [
     {
       id: "scammy-action-1",
-      label: "Do not send funds",
-      description: "Pause the transaction until the promoter and offering are independently verified.",
+      label: "Read the SEC scam warning",
+      description: "Match the video's guaranteed-return pitch against the SEC's crypto scam warning signs.",
+      evidenceId: "scammy-evidence-1",
     },
     {
       id: "scammy-action-2",
-      label: "Check the registration",
-      description: "Search the SEC and FINRA databases using the promoter's legal name.",
-      url: "https://brokercheck.finra.org/",
+      label: "Verify the founders' registration",
+      description: "Use the SEC public disclosure record cited here before trusting the registration claim.",
+      evidenceId: "scammy-evidence-2",
     },
   ],
 });
@@ -310,9 +320,15 @@ const legitimate = buildScorecard({
   nextActions: [
     {
       id: "legitimate-action-1",
-      label: "Compare current rates",
-      description: "Review current auction results before choosing a maturity.",
-      url: "https://www.treasurydirect.gov/auctions/announcements-data-results/",
+      label: "Confirm the maturity range",
+      description: "Review TreasuryDirect's bill terms to choose a maturity of 52 weeks or less.",
+      evidenceId: "legitimate-evidence-1",
+    },
+    {
+      id: "legitimate-action-2",
+      label: "Check the maturity payout",
+      description: "Use TreasuryDirect's cited payout terms before comparing a bill with an early sale.",
+      evidenceId: "legitimate-evidence-2",
     },
   ],
 });
@@ -373,13 +389,22 @@ const partialFailure = buildScorecard({
       category: "popularity",
       severity: "medium",
       explanation: "The consensus claim is unsupported by accessible evidence.",
+      context: "Everyone on Wall Street agrees this company will grow revenue 40%.",
+      timestampSeconds: 38,
     },
   ],
   nextActions: [
     {
       id: "partial-action-1",
-      label: "Find the original report",
-      description: "Ask for the report title, author, and publication date before relying on the projection.",
+      label: "Review the filed losses",
+      description: "Open the SEC filing search cited here and compare prior quarterly losses with the video.",
+      evidenceId: "partial-evidence-1",
+    },
+    {
+      id: "partial-action-2",
+      label: "Require the missing report",
+      description: "Use the cited SEC filings as the baseline until the private growth report is available.",
+      evidenceId: "partial-evidence-1",
     },
   ],
 });

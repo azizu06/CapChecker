@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   AnalysisEventSchema,
   EvidenceSchema,
+  HypeFindingSchema,
   NextActionSchema,
   ScorecardSchema,
   SourceVideoSchema,
@@ -138,6 +139,42 @@ describe("ScorecardSchema", () => {
     );
   });
 
+  it("anchors every demo hype finding to transcript context", () => {
+    const findings = Object.values(DEMO_SCORECARDS).flatMap(
+      (scorecard) => scorecard.hypeFindings,
+    );
+
+    expect(findings.length).toBeGreaterThan(0);
+    expect(findings).toEqual(
+      expect.arrayContaining(
+        findings.map((finding) =>
+          expect.objectContaining({
+            context: expect.stringContaining(finding.phrase),
+            timestampSeconds: expect.any(Number),
+          }),
+        ),
+      ),
+    );
+  });
+
+  it("provides two or three demo actions linked to each scorecard's evidence", () => {
+    for (const scorecard of Object.values(DEMO_SCORECARDS)) {
+      const evidenceIds = new Set(
+        scorecard.verifications.flatMap((verification) =>
+          verification.evidence.map((evidence) => evidence.id),
+        ),
+      );
+
+      expect(scorecard.nextActions.length).toBeGreaterThanOrEqual(2);
+      expect(scorecard.nextActions.length).toBeLessThanOrEqual(3);
+      expect(
+        scorecard.nextActions.every(
+          (action) => action.evidenceId && evidenceIds.has(action.evidenceId),
+        ),
+      ).toBe(true);
+    }
+  });
+
   it("covers every evidence trust tier for deterministic UI states", () => {
     const trustTiers = new Set(
       Object.values(DEMO_SCORECARDS).flatMap((scorecard) =>
@@ -150,6 +187,29 @@ describe("ScorecardSchema", () => {
     expect(trustTiers).toEqual(
       new Set(["primary", "high", "medium", "low"]),
     );
+  });
+});
+
+describe("HypeFindingSchema", () => {
+  it("preserves optional transcript context and timestamp anchors", () => {
+    const finding = {
+      ...mixedScorecard.hypeFindings[0],
+      context: "Buy before earnings because this stock cannot lose.",
+      timestampSeconds: 41,
+    };
+
+    expect(HypeFindingSchema.parse(finding)).toEqual(finding);
+  });
+});
+
+describe("NextActionSchema", () => {
+  it("preserves an optional reference to scorecard evidence", () => {
+    const action = {
+      ...mixedScorecard.nextActions[0],
+      evidenceId: "evidence-1",
+    };
+
+    expect(NextActionSchema.parse(action)).toEqual(action);
   });
 });
 
