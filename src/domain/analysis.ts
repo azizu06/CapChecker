@@ -1,5 +1,18 @@
 import { z } from "zod";
 
+export const HttpUrlSchema = z.url().refine(
+  (value) => {
+    const protocol = new URL(value).protocol;
+    return protocol === "http:" || protocol === "https:";
+  },
+  { message: "URL must use HTTP or HTTPS" },
+);
+
+export const UploadFileNameSchema = z
+  .string()
+  .min(1)
+  .regex(/^[^/\\]+$/, "Upload filename must not include a path");
+
 const ClaimBaseSchema = z.object({
   id: z.string().min(1),
   text: z.string().min(1),
@@ -21,11 +34,22 @@ export const ClaimSchema = z.discriminatedUnion("kind", [
   }),
 ]);
 
+export const CheckableClaimSchema = z.discriminatedUnion("kind", [
+  ClaimBaseSchema.extend({
+    kind: z.literal("factual"),
+    checkable: z.literal(true),
+  }),
+  ClaimBaseSchema.extend({
+    kind: z.literal("predictive"),
+    checkable: z.literal(true),
+  }),
+]);
+
 export const EvidenceSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
   publisher: z.string().min(1),
-  url: z.url(),
+  url: HttpUrlSchema,
   trustTier: z.enum(["primary", "high", "medium", "low"]),
   stance: z.enum(["supports", "contradicts", "context"]),
   excerpt: z.string().min(1),
@@ -33,7 +57,7 @@ export const EvidenceSchema = z.object({
 });
 
 export const VerificationSchema = z.object({
-  claim: ClaimSchema,
+  claim: CheckableClaimSchema,
   verdict: z.enum(["true", "mostly-true", "unverifiable", "false"]),
   confidence: z.number().min(0).max(1),
   explanation: z.string().min(1),
@@ -52,18 +76,18 @@ export const NextActionSchema = z.object({
   id: z.string().min(1),
   label: z.string().min(1),
   description: z.string().min(1),
-  url: z.url().optional(),
+  url: HttpUrlSchema.optional(),
 });
 
 export const SourceVideoSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("url"),
-    url: z.url(),
+    url: HttpUrlSchema,
     title: z.string().min(1).optional(),
   }),
   z.object({
     kind: z.literal("upload"),
-    fileName: z.string().min(1),
+    fileName: UploadFileNameSchema,
     title: z.string().min(1).optional(),
   }),
 ]);
@@ -128,6 +152,7 @@ export const AnalysisEventSchema = z.discriminatedUnion("type", [
 ]);
 
 export type Claim = z.infer<typeof ClaimSchema>;
+export type CheckableClaim = z.infer<typeof CheckableClaimSchema>;
 export type Evidence = z.infer<typeof EvidenceSchema>;
 export type Verification = z.infer<typeof VerificationSchema>;
 export type HypeFinding = z.infer<typeof HypeFindingSchema>;

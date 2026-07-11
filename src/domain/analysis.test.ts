@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { AnalysisEventSchema, ScorecardSchema } from "./analysis";
+import {
+  AnalysisEventSchema,
+  EvidenceSchema,
+  NextActionSchema,
+  ScorecardSchema,
+  SourceVideoSchema,
+  VerificationSchema,
+} from "./analysis";
 import {
   DEMO_FATAL_ERROR,
   DEMO_SCORECARDS,
@@ -100,14 +107,78 @@ describe("ScorecardSchema", () => {
       outcomes,
     );
   });
+
+  it("covers every evidence trust tier for deterministic UI states", () => {
+    const trustTiers = new Set(
+      Object.values(DEMO_SCORECARDS).flatMap((scorecard) =>
+        scorecard.verifications.flatMap((verification) =>
+          verification.evidence.map((evidence) => evidence.trustTier),
+        ),
+      ),
+    );
+
+    expect(trustTiers).toEqual(
+      new Set(["primary", "high", "medium", "low"]),
+    );
+  });
 });
 
 describe("AnalysisEventSchema", () => {
-  it("represents a fatal demo outcome as a non-retryable contract-valid error", () => {
+  it("represents a fatal demo outcome as a retryable contract-valid error", () => {
     expect(AnalysisEventSchema.parse(DEMO_FATAL_ERROR)).toEqual(DEMO_FATAL_ERROR);
     expect(DEMO_FATAL_ERROR).toMatchObject({
       type: "error",
-      error: { retryable: false },
+      error: { retryable: true },
     });
   });
+});
+
+describe("VerificationSchema", () => {
+  it("rejects verifications for every kind of non-checkable claim", () => {
+    const verification = mixedScorecard.verifications[0];
+
+    expect(
+      VerificationSchema.safeParse({
+        ...verification,
+        claim: { ...verification.claim, checkable: false },
+      }).success,
+    ).toBe(false);
+    expect(
+      VerificationSchema.safeParse({
+        ...verification,
+        claim: {
+          ...verification.claim,
+          kind: "opinion",
+          checkable: false,
+        },
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("external URL boundaries", () => {
+  it.each(["javascript:alert(1)", "data:text/plain,cap", "file:///tmp/cap", "ftp://example.com/cap"])(
+    "rejects the non-HTTP URL %s everywhere it can leave the app",
+    (url) => {
+      const evidence = mixedScorecard.verifications[0].evidence[0];
+      const action = mixedScorecard.nextActions[0];
+
+      expect(EvidenceSchema.safeParse({ ...evidence, url }).success).toBe(false);
+      expect(NextActionSchema.safeParse({ ...action, url }).success).toBe(false);
+      expect(SourceVideoSchema.safeParse({ kind: "url", url }).success).toBe(
+        false,
+      );
+    },
+  );
+});
+
+describe("SourceVideoSchema", () => {
+  it.each(["/tmp/private/demo.mp4", "C:\\Users\\demo\\video.mp4"])(
+    "rejects an upload path instead of exposing its basename: %s",
+    (fileName) => {
+      expect(
+        SourceVideoSchema.safeParse({ kind: "upload", fileName }).success,
+      ).toBe(false);
+    },
+  );
 });

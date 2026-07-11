@@ -46,7 +46,7 @@ const mixed = buildScorecard({
           title: "S&P 500 factsheet",
           publisher: "S&P Dow Jones Indices",
           url: "https://www.spglobal.com/spdji/en/indices/equity/sp-500/",
-          trustTier: "primary",
+          trustTier: "high",
           stance: "supports",
           excerpt: "The published annual return supports the historical claim.",
         },
@@ -72,6 +72,24 @@ const mixed = buildScorecard({
           trustTier: "primary",
           stance: "context",
           excerpt: "Investors should independently evaluate promotional price predictions.",
+        },
+        {
+          id: "mixed-evidence-2-analysis",
+          title: "Understanding analyst price targets",
+          publisher: "Investopedia",
+          url: "https://www.investopedia.com/terms/p/pricetarget.asp",
+          trustTier: "medium",
+          stance: "context",
+          excerpt: "Price targets are estimates rather than guaranteed future values.",
+        },
+        {
+          id: "mixed-evidence-2-promotion",
+          title: "Creator's promotional price target",
+          publisher: "Unverified creator page",
+          url: "https://example.com/promotional-stock-tip",
+          trustTier: "low",
+          stance: "supports",
+          excerpt: "The page repeats the prediction without methods or independent sourcing.",
         },
       ],
     },
@@ -365,8 +383,8 @@ export const DEMO_SCORECARDS = {
 };
 
 export const DEMO_FATAL_ERROR = buildErrorEvent({
-  code: "SOURCE_UNREADABLE",
+  code: "ANALYSIS_TEMPORARILY_UNAVAILABLE",
   message:
-    "CapCheck could not read enough of this video to produce a trustworthy scorecard.",
-  retryable: false,
+    "CapCheck could not finish this analysis. Your input is safe to retry.",
+  retryable: true,
 });
