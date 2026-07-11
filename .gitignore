@@ -3,7 +3,33 @@ graphify-out/*
 !graphify-out/graph.json
 !graphify-out/GRAPH_REPORT.md
 
+# Dependencies
+/node_modules/
+
+# Next.js output
+/.next/
+/out/
+/build/
+
+# Test coverage
+/coverage/
+
 # Test artifacts
 playwright-report/
 test-results/
 output/playwright/
+
+# Local environment files (the documented fixture-mode default is safe to commit)
+.env*
+!.env.example
+
+# Local and generated files
+.DS_Store
+*.pem
+*.tsbuildinfo
+next-env.d.ts
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.vercel/

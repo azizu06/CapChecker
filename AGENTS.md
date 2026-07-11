@@ -5,6 +5,13 @@ Bloomberg's Best FinTech Hack and Google's Best Use of Gemini during a 12-hour
 hackathon. The planning repository is the source of truth for product scope:
 <https://github.com/azizu06/bloom-plan>.
 
+## Current foundation handoff
+
+After issue #2, start with `docs/handoffs/issue-2-foundation.md`. It maps the
+frozen contracts, fixture/live adapter seam, implemented UI, verification
+baseline, and the remaining deltas for issues #3, #4, and #5. Audit that handoff
+before creating new intake, progress, or scorecard components.
+
 ## Build lanes
 
 - Lane A, assigned to `azizu06`, owns video ingestion and the Gemini pipeline.
