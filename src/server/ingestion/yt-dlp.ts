@@ -1,7 +1,10 @@
 import { spawn } from "node:child_process";
+import { stat } from "node:fs/promises";
 import path from "node:path";
 
 import { BoundaryError, type VideoIngestionDependencies } from "./video-ingestion";
+
+type FileSizeReader = (filePath: string) => Promise<number>;
 
 type ProcessResult = {
   exitCode: number | null;
@@ -23,7 +26,11 @@ type YtDlpDownloaderOptions = {
   executable?: string;
   maxFileSize?: string;
   run?: ProcessRunner;
+  fileSize?: FileSizeReader;
 };
+
+const statFileSize: FileSizeReader = async (filePath) =>
+  (await stat(filePath)).size;
 
 const runProcess: ProcessRunner = ({
   executable,
@@ -60,6 +67,7 @@ export function createYtDlpDownloader({
   executable = "yt-dlp",
   maxFileSize = "50M",
   run = runProcess,
+  fileSize = statFileSize,
 }: YtDlpDownloaderOptions = {}): VideoIngestionDependencies["ytDlp"] {
   return {
     async download({ url, directory, signal }) {
@@ -117,6 +125,7 @@ export function createYtDlpDownloader({
       return {
         path: downloadedPath,
         fileName: path.basename(downloadedPath),
+        size: await fileSize(downloadedPath),
       };
     },
   };

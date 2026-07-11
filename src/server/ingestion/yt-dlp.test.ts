@@ -14,10 +14,12 @@ describe("createYtDlpDownloader", () => {
       stderr: "",
     });
     const signal = new AbortController().signal;
+    const fileSize = vi.fn().mockResolvedValue(1024);
     const downloader = createYtDlpDownloader({
       executable: "/opt/homebrew/bin/yt-dlp",
       maxFileSize: "50M",
       run,
+      fileSize,
     });
 
     await expect(
@@ -29,7 +31,9 @@ describe("createYtDlpDownloader", () => {
     ).resolves.toEqual({
       path: path.join(directory, "creator-123.mp4"),
       fileName: "creator-123.mp4",
+      size: 1024,
     });
+    expect(fileSize).toHaveBeenCalledWith(path.join(directory, "creator-123.mp4"));
 
     expect(run).toHaveBeenCalledWith({
       executable: "/opt/homebrew/bin/yt-dlp",
@@ -48,6 +52,33 @@ describe("createYtDlpDownloader", () => {
       cwd: directory,
       shell: false,
       signal,
+    });
+  });
+
+  it("reports the on-disk byte size when the filesize guard is bypassed", async () => {
+    const directory = "/private/tmp/capcheck-demo";
+    const run: ProcessRunner = vi.fn().mockResolvedValue({
+      exitCode: 0,
+      stdout: `${directory}/creator-123.mp4\n`,
+      stderr: "",
+    });
+    const fileSize = vi.fn().mockResolvedValue(50 * 1024 * 1024 + 1);
+    const downloader = createYtDlpDownloader({
+      maxFileSize: "50M",
+      run,
+      fileSize,
+    });
+
+    await expect(
+      downloader.download({
+        url: "https://www.youtube.com/shorts/demo123",
+        directory,
+        signal: new AbortController().signal,
+      }),
+    ).resolves.toEqual({
+      path: path.join(directory, "creator-123.mp4"),
+      fileName: "creator-123.mp4",
+      size: 50 * 1024 * 1024 + 1,
     });
   });
 

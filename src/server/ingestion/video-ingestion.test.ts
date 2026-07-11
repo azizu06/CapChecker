@@ -31,6 +31,7 @@ const makeHarness = (
     download: vi.fn().mockResolvedValue({
       path: "/private/tmp/capcheck-123/short.mp4",
       fileName: "short.mp4",
+      size: 1024,
     }),
   };
   const mime = {
@@ -221,6 +222,37 @@ describe("createVideoIngestor", () => {
     );
     expect(temporaryFiles.createDirectory).not.toHaveBeenCalled();
     expect(geminiFiles.upload).not.toHaveBeenCalled();
+  });
+
+  it("rejects an oversized download that slipped past the yt-dlp filesize guard", async () => {
+    const { geminiFiles, ingestor, mime, temporaryFiles, ytDlp } = makeHarness({
+      maxVideoBytes: 50 * 1024 * 1024,
+    });
+    ytDlp.download.mockResolvedValue({
+      path: "/private/tmp/capcheck-123/short.mp4",
+      fileName: "short.mp4",
+      size: 50 * 1024 * 1024 + 1,
+    });
+
+    await expect(
+      ingestor.withActiveFile(
+        { kind: "url", url: "https://www.youtube.com/shorts/demo123" },
+        { signal: new AbortController().signal, onProgress: vi.fn() },
+        async () => undefined,
+      ),
+    ).rejects.toEqual(
+      new IngestionError({
+        code: "SOURCE_VIDEO_TOO_LARGE",
+        message: "Choose a video that is 50 MB or smaller.",
+        retryable: false,
+        offerUploadFallback: true,
+      }),
+    );
+    expect(mime.detect).not.toHaveBeenCalled();
+    expect(geminiFiles.upload).not.toHaveBeenCalled();
+    expect(temporaryFiles.removeDirectory).toHaveBeenCalledWith(
+      "/private/tmp/capcheck-123",
+    );
   });
 
   it("rejects unsupported or spoofed URLs with an upload fallback before download", async () => {

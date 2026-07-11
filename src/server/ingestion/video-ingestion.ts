@@ -117,7 +117,7 @@ export type VideoIngestionDependencies = {
       url: string;
       directory: string;
       signal: AbortSignal;
-    }): Promise<{ path: string; fileName: string }>;
+    }): Promise<{ path: string; fileName: string; size: number }>;
   };
   mime: {
     detect(path: string, declaredType?: string): Promise<SupportedVideoMimeType>;
@@ -260,8 +260,9 @@ export function createVideoIngestor(
 
         let localFile: { path: string; fileName: string };
         if (source.kind === "url") {
+          let downloaded: { path: string; fileName: string; size: number };
           try {
-            localFile = await dependencies.ytDlp.download({
+            downloaded = await dependencies.ytDlp.download({
               url: source.url,
               directory,
               signal: options.signal,
@@ -276,6 +277,15 @@ export function createVideoIngestor(
               offerUploadFallback: true,
             });
           }
+          if (downloaded.size > policy.maxVideoBytes) {
+            throw new IngestionError({
+              code: "SOURCE_VIDEO_TOO_LARGE",
+              message: "Choose a video that is 50 MB or smaller.",
+              retryable: false,
+              offerUploadFallback: true,
+            });
+          }
+          localFile = downloaded;
         } else {
           localFile = await dependencies.temporaryFiles.stageUpload({
             directory,

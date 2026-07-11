@@ -1,16 +1,16 @@
 # Graph Report - 01KX96RAK9H2YDVQY1WWYGZRWY  (2026-07-11)
 
 ## Corpus Check
-- 60 files · ~26,855 words
+- 60 files · ~27,107 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 421 nodes · 542 edges · 33 communities (28 shown, 5 thin omitted)
+- 423 nodes · 544 edges · 31 communities (26 shown, 5 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.9)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `28f1d5d9`
+- Built from commit: `27e047c8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -22,14 +22,12 @@
 - [[_COMMUNITY_Community 4|Community 4]]
 - [[_COMMUNITY_Community 5|Community 5]]
 - [[_COMMUNITY_Community 6|Community 6]]
-- [[_COMMUNITY_Community 7|Community 7]]
 - [[_COMMUNITY_Community 8|Community 8]]
 - [[_COMMUNITY_Community 9|Community 9]]
 - [[_COMMUNITY_Community 11|Community 11]]
 - [[_COMMUNITY_Community 12|Community 12]]
 - [[_COMMUNITY_Community 13|Community 13]]
 - [[_COMMUNITY_Community 17|Community 17]]
-- [[_COMMUNITY_Community 18|Community 18]]
 - [[_COMMUNITY_Community 19|Community 19]]
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 21|Community 21]]
@@ -77,19 +75,19 @@
 - **Independent Lane Contract Flow** — plans_2026_07_11_capcheck_foundation_frozen_contracts, plans_2026_07_11_capcheck_foundation_fixture_route, plans_2026_07_11_capcheck_foundation_frontend_tracer, agents_testing_independent_lane_seam [EXTRACTED 1.00]
 - **Verdict-First UI Composition** — design_capcheck_ui_spec_intake_panel, design_capcheck_ui_spec_progress_timeline, design_capcheck_ui_spec_score_header, design_capcheck_ui_spec_claim_evidence_card [EXTRACTED 1.00]
 
-## Communities (33 total, 5 thin omitted)
+## Communities (31 total, 5 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.06
 Nodes (39): FixtureAnalysisInput, FixtureScenario, progress, errorResponse(), parseScenario(), POST(), safeStreamError, scenarios (+31 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.14
-Nodes (15): allowedScenarios, CapCheckApp(), allowedExtensions, allowedUploadTypes, formatSize(), IntakePanel(), Props, validateSubmission() (+7 more)
+Cohesion: 0.08
+Nodes (27): allowedScenarios, CapCheckApp(), ClaimCard(), ClaimCardProps, ClaimTimestamp(), verdictLabels, allowedExtensions, allowedUploadTypes (+19 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.05
-Nodes (36): ErrorEventSchema, ProgressEvent, ProgressEventSchema, createGeminiFilesClient(), GeminiFilesClientOptions, ReadFile, transientStatuses, createNodeTemporaryFiles() (+28 more)
+Nodes (37): ErrorEventSchema, ProgressEvent, ProgressEventSchema, createGeminiFilesClient(), GeminiFilesClientOptions, ReadFile, transientStatuses, createNodeTemporaryFiles() (+29 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.06
@@ -104,12 +102,8 @@ Cohesion: 0.12
 Nodes (24): CapCheck, Architecture Decision Records, Canonical Domain Language, Consumer Trust Visual Hierarchy, Cap Score, CapCheck, CapCheck domain glossary, Checkable claim (+16 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.11
-Nodes (17): dependencies, lucide-react, next, react, react-dom, zod, name, private (+9 more)
-
-### Community 7 - "Community 7"
-Cohesion: 0.12
-Nodes (16): devDependencies, eslint, eslint-config-next, jsdom, @playwright/test, tailwindcss, @tailwindcss/postcss, @testing-library/jest-dom (+8 more)
+Cohesion: 0.06
+Nodes (33): dependencies, lucide-react, next, react, react-dom, zod, devDependencies, eslint (+25 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.08
@@ -122,10 +116,6 @@ Nodes (3): geistMono, geistSans, metadata
 ### Community 17 - "Community 17"
 Cohesion: 0.17
 Nodes (12): DetectedVideoMimeType, detectFromSignature(), detectVideoMimeType(), EXTENSION_TYPES, hasWebMDocType(), MIME_TYPES, MP4_BRANDS, normalizeDeclaredType() (+4 more)
-
-### Community 18 - "Community 18"
-Cohesion: 0.18
-Nodes (12): ClaimCard(), ClaimCardProps, ClaimTimestamp(), verdictLabels, explanations, labels, ScorecardView(), trustRank (+4 more)
 
 ### Community 19 - "Community 19"
 Cohesion: 0.18
@@ -176,7 +166,7 @@ Cohesion: 0.50
 Nodes (3): Build ownership, Conventions, Issue tracker: GitHub
 
 ## Knowledge Gaps
-- **198 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+193 more)
+- **199 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+194 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -190,10 +180,10 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `CapCheck agent guide` connect `Community 3` to `Community 8`?**
   _High betweenness centrality (0.014) - this node is a cross-community bridge._
 - **What connects `eslintConfig`, `nextConfig`, `name` to the rest of the system?**
-  _202 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _203 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05552617662612375 - nodes in this community are weakly interconnected._
 - **Should `Community 1` be split into smaller, more focused modules?**
-  _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08253968253968254 - nodes in this community are weakly interconnected._
 - **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.05423728813559322 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05182443151771549 - nodes in this community are weakly interconnected._
