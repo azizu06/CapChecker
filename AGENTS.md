@@ -66,13 +66,17 @@ the evidence required in each PR.
 2. Assign the issue before coding and move it to In Progress on the project.
 3. Create one branch for that issue using `issue-<number>/<short-name>`.
 4. Keep the change scoped to the issue and add `Closes #<number>` to the PR.
-5. Run the relevant local checks. Run `no-mistakes` only when the issue has the
-   `gate-no-mistakes` label.
+5. Run focused tests plus lint, typecheck, unit tests, and build. UI or routing
+   changes also require fixture-backed Playwright coverage. External-service
+   behavior requires a targeted live smoke test when the issue calls for it.
 6. Open one PR into `main`. Merge only after `quality` and `e2e` are green.
 7. Move the issue to Done after the PR merges.
 
 See `docs/agents/build-workflow.md` for the dependency rule, PR gate command,
 required CI, and merge policy.
+
+`no-mistakes` is an optional, token-consuming review tool. Run it only when
+Aziz explicitly requests it for a specific PR; it is never a merge requirement.
 
 Do not commit secrets, downloaded demo videos, or cached creator content unless
 the event rules and licensing allow it. Commits are authored only as Aziz or the
