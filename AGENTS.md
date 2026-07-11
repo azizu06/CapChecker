@@ -19,7 +19,8 @@ hackathon. The planning repository is the source of truth for product scope:
 2. Assign the issue before coding and move it to In Progress on the project.
 3. Create one branch for that issue using `issue-<number>/<short-name>`.
 4. Keep the change scoped to the issue and add `Closes #<number>` to the PR.
-5. Run the relevant local checks, then run the minimal `no-mistakes` gate.
+5. Run the relevant local checks. Run `no-mistakes` only when the issue has the
+   `gate-no-mistakes` label.
 6. Open one PR into `main`. Merge only after the `quality` check is green.
 7. Move the issue to Done after the PR merges.
 
