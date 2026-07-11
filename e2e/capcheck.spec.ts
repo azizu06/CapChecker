@@ -17,7 +17,7 @@ function captureRuntimeErrors(page: Page) {
 }
 
 async function submitUrl(page: Page, scenario = "mixed") {
-  await gotoReady(page, `/?fixture=${scenario}`);
+  await gotoReady(page, `/analyze?fixture=${scenario}`);
   await page.getByLabel("Video URL").fill(demoUrl);
   await page.getByRole("button", { name: "Check it" }).click();
 }
@@ -56,10 +56,12 @@ test("loads the fixture-ready CapCheck intake without runtime errors", async ({
   page,
 }) => {
   const runtimeErrors = captureRuntimeErrors(page);
-  await gotoReady(page, "/");
+  await gotoReady(page, "/analyze");
 
-  await expect(page).toHaveTitle("CapCheck — Financial advice, fact-checked");
-  await expect(page.getByText("CapCheck", { exact: true })).toBeVisible();
+  await expect(page).toHaveTitle(/CapCheck/);
+  await expect(
+    page.locator(".app-header").getByText("CapCheck", { exact: true }),
+  ).toBeVisible();
   await expect(page.getByText("Financial advice, fact-checked")).toBeVisible();
   await expect(
     page.getByRole("heading", {
@@ -87,7 +89,7 @@ test("validates URL input, prevents duplicate work, and exposes truthful progres
     }
   });
 
-  await gotoReady(page, "/?fixture=mixed");
+  await gotoReady(page, "/analyze?fixture=mixed");
   const input = page.getByLabel("Video URL");
   await input.fill("definitely not a URL");
   await input.press("Enter");
@@ -154,7 +156,7 @@ test("validates URL input, prevents duplicate work, and exposes truthful progres
 });
 
 test("progress kicker meets the compact metadata minimum", async ({ page }) => {
-  await gotoReady(page, "/?fixture=mixed");
+  await gotoReady(page, "/analyze?fixture=mixed");
   await page.getByLabel("Video URL").fill(demoUrl);
   await page.getByRole("button", { name: "Check it" }).click();
 
@@ -410,7 +412,7 @@ test("verdict pills pair readable semantic ink with labels and status dots", asy
 test("upload can be selected, removed, reselected, and analyzed through multipart", async ({
   page,
 }) => {
-  await gotoReady(page, "/");
+  await gotoReady(page, "/analyze");
   const chooser = page.getByLabel(/Choose a video file/);
   const sample = "e2e/fixtures/sample-video.mp4";
   await page.getByLabel("Video URL").fill("not a url");
@@ -508,9 +510,11 @@ test("keyboard order, focus treatment, and loading state prevent duplicate submi
       analysisRequests += 1;
     }
   });
-  await gotoReady(page, "/");
+  await gotoReady(page, "/analyze");
   const input = page.getByLabel("Video URL");
   const analyze = page.getByRole("button", { name: "Check it" });
+  // The shared site header owns the first tab stops; tab from it into the app.
+  await page.getByRole("link", { name: "Analyze" }).focus();
   await page.keyboard.press("Tab");
   await expect(input).toBeFocused();
   await expect(input).toHaveCSS("outline-style", "solid");
@@ -529,7 +533,7 @@ test("mobile layout contains long content and keeps controls usable", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium", "mobile-only QA");
-  await gotoReady(page, "/");
+  await gotoReady(page, "/analyze");
   const urlInput = page.getByLabel("Video URL");
   const uploadTarget = page.locator("label.drop-zone");
   for (const [name, control] of [

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Baloo_2, Geist_Mono, Nunito } from "next/font/google";
 import "./globals.css";
 
+import { SiteHeader } from "@/components/site-header";
+
 const balooDisplay = Baloo_2({
   variable: "--font-display",
   subsets: ["latin"],
@@ -34,7 +36,10 @@ export default function RootLayout({
       lang="en"
       className={`${balooDisplay.variable} ${nunitoBody.variable} ${geistMono.variable} antialiased`}
     >
-      <body>{children}</body>
+      <body>
+        <SiteHeader />
+        {children}
+      </body>
     </html>
   );
 }
