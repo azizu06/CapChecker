@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect application scaffold
+        id: app
+        shell: bash
+        run: |
+          if [[ -f package.json ]]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No package.json yet. Application checks will begin after scaffold issue lands."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Node.js
+        if: steps.app.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Require lockfile and scripts
+        if: steps.app.outputs.exists == 'true'
+        shell: bash
+        run: |
+          test -f package-lock.json
+          node -e 'const p=require("./package.json"); for (const s of ["lint","typecheck","build"]) if (!p.scripts?.[s]) throw new Error(`Missing script: ${s}`)'
+
+      - name: Install dependencies
+        if: steps.app.outputs.exists == 'true'
+        run: npm ci
+
+      - name: Lint
+        if: steps.app.outputs.exists == 'true'
+        run: npm run lint
+
+      - name: Typecheck
+        if: steps.app.outputs.exists == 'true'
+        run: npm run typecheck
+
+      - name: Build
+        if: steps.app.outputs.exists == 'true'
+        run: npm run build
