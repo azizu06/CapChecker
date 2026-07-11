@@ -36,8 +36,10 @@ pipeline failure.
   TikTok links on exact allowlisted hosts. Suffix spoofs are rejected before
   yt-dlp runs.
 - yt-dlp runs through `spawn` with an argument array, `shell: false`,
-  `--no-playlist`, a 50 MB limit, restricted filenames, and an output path
-  constrained to the unique temporary directory.
+  `--no-playlist`, a policy-driven 50 MB limit, restricted filenames, a
+  120-second process deadline, and an output path constrained to the unique
+  temporary directory. The downloaded file is measured again on disk before
+  Gemini upload because remote Content-Length metadata can be absent or wrong.
 - Upload names must be basenames on both POSIX and Windows path rules.
 - Direct uploads are rejected above 50 MB before a temporary directory is
   allocated, matching the route and yt-dlp limits.
@@ -45,12 +47,14 @@ pipeline failure.
   against extension and declared MIME. Mismatches fail before upload.
 - Gemini uses the documented resumable Files REST protocol, with the API key
   sent in a header. No new package or framework dependency was added.
-- Upload receives two attempts total. Only network, 408, 429, and 5xx-style
-  boundary failures are retryable.
+- Upload receives two attempts total. Only failures known to occur before an
+  upload is finalized are retryable; an ambiguous finalize timeout is never
+  retried because doing so could orphan a second Gemini file.
 - Files are polled from `PROCESSING` or `STATE_UNSPECIFIED` to `ACTIVE`;
   `FAILED` stops immediately.
-  Defaults are a 2-second interval, 60 polls, a 120-second activation deadline,
-  and a 30-second deadline per HTTP request.
+  Defaults are a 2-second interval, 60 polls, a hard 120-second activation
+  deadline, 30 seconds for metadata requests, and 300 seconds for the bulk
+  upload. Remote cleanup retries transient failures up to three times.
 - `mapIngestionError` converts known failures into the frozen `ErrorEvent`.
   Unsupported/private/failed links explicitly direct the user to upload the
   video file. Abort returns no client error event.
@@ -72,9 +76,10 @@ The first red test failed because `video-ingestion.ts` did not exist. The first
 green tracer proved URL download, MIME propagation, `PROCESSING` to `ACTIVE`,
 contract-valid progress, downstream lease use, and both cleanup boundaries.
 Subsequent red-green cycles covered direct upload, spoofed/failed URL fallback,
-retry classification, poll count and wall-clock bounds, `FAILED`, safe error
-mapping, cleanup precedence, MIME signatures, path containment, REST request
-shapes, and stalled-request timeout.
+retry classification, process/request/activation deadlines, ambiguous-finalize
+safety, cleanup retries, `FAILED`, cancellation, safe error mapping, MIME
+signatures, path containment, post-download size enforcement, and REST request
+shapes.
 
 Run the deterministic suite:
 
@@ -102,5 +107,6 @@ Credentialed smoke evidence recorded on 2026-07-11:
   downloaded through the real yt-dlp adapter and reached Gemini `ACTIVE`.
 - Upload: the separately prepared 6.56 MB `mRpuGPCYhAg.webm` file was staged
   through the direct-upload path and reached Gemini `ACTIVE`.
-- Both tests passed in 26.20 seconds, and each remote file was deleted after
+- The final hardened implementation reran both tests successfully in 28.70
+  seconds, and each remote file was deleted after
   its ACTIVE-file callback completed.
