@@ -199,7 +199,7 @@ describe("createGeminiFilesClient", () => {
     }
   });
 
-  it("gives the bulk upload leg a longer budget than metadata requests", async () => {
+  it("does not retry when a finalized upload times out ambiguously", async () => {
     vi.useFakeTimers();
     try {
       const fetchMock = vi
@@ -237,7 +237,7 @@ describe("createGeminiFilesClient", () => {
         signal: new AbortController().signal,
       });
       const expectation = expect(upload).rejects.toEqual(
-        new BoundaryError("Gemini Files request timed out", true),
+        new BoundaryError("Gemini upload outcome is unknown", false),
       );
 
       await vi.advanceTimersByTimeAsync(1_001);

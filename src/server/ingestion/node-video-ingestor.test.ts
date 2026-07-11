@@ -66,9 +66,12 @@ describe("createNodeVideoIngestor", () => {
       fetch: vi.fn() as unknown as typeof fetch,
       policy: {
         uploadAttempts: 2,
+        downloadTimeoutMs: 120_000,
         pollIntervalMs: 2_000,
         maxPollAttempts: 60,
         activationTimeoutMs: 120_000,
+        cleanupAttempts: 3,
+        cleanupRetryDelayMs: 1_000,
         maxVideoBytes: 10 * 1024 * 1024,
       },
       ytDlpRun,

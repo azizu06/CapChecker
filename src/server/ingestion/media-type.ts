@@ -98,7 +98,9 @@ function detectFromSignature(header: Buffer): DetectedVideoMimeType | undefined 
   if (header.toString("ascii", 4, 8) === "ftyp") {
     const brand = header.toString("ascii", 8, 12);
     if (brand === "qt  ") return "video/quicktime";
-    if (MP4_BRANDS.has(brand)) return "video/mp4";
+    if (MP4_BRANDS.has(brand) || /^iso[3-9]$/u.test(brand)) {
+      return "video/mp4";
+    }
   }
 
   const hasEbmlSignature =

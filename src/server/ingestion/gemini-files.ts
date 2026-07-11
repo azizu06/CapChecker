@@ -133,27 +133,34 @@ export function createGeminiFilesClient({
       if (!uploadUrl) {
         throw new BoundaryError("Gemini Files returned invalid data", false);
       }
-      const finalized = await request(
-        uploadUrl,
-        {
-          method: "POST",
-          headers: {
-            "Content-Length": String(bytes.byteLength),
-            "Content-Type": mimeType satisfies SupportedVideoMimeType,
-            "X-Goog-Upload-Offset": "0",
-            "X-Goog-Upload-Command": "upload, finalize",
+      try {
+        const finalized = await request(
+          uploadUrl,
+          {
+            method: "POST",
+            headers: {
+              "Content-Length": String(bytes.byteLength),
+              "Content-Type": mimeType satisfies SupportedVideoMimeType,
+              "X-Goog-Upload-Offset": "0",
+              "X-Goog-Upload-Command": "upload, finalize",
+            },
+            body: new NodeBlob([Uint8Array.from(bytes)], {
+              type: mimeType,
+            }) as unknown as BodyInit,
           },
-          body: new NodeBlob([Uint8Array.from(bytes)], {
-            type: mimeType,
-          }) as unknown as BodyInit,
-        },
-        signal,
-        uploadTimeoutMs,
-      );
-      if (!finalized.ok) throw requestError(finalized.status);
+          signal,
+          uploadTimeoutMs,
+        );
+        if (!finalized.ok) {
+          throw new BoundaryError("Gemini upload outcome is unknown", false);
+        }
 
-      const payload = (await finalized.json()) as { file?: unknown };
-      return parseFile(payload.file);
+        const payload = (await finalized.json()) as { file?: unknown };
+        return parseFile(payload.file);
+      } catch (cause) {
+        if (signal.aborted) throw cause;
+        throw new BoundaryError("Gemini upload outcome is unknown", false);
+      }
     },
     async get(name, signal) {
       const response = await request(

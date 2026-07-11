@@ -39,6 +39,34 @@ describe("detectVideoMimeType", () => {
     ).resolves.toBe("video/mp4");
   });
 
+  it.each(["iso3", "iso4", "iso5", "iso6", "iso7", "iso8", "iso9"])(
+    "recognizes the registered %s ISO Base Media brand",
+    async (brand) => {
+      const path = await stageFile(
+        `${brand}.mp4`,
+        Uint8Array.from([
+          0x00,
+          0x00,
+          0x00,
+          0x18,
+          0x66,
+          0x74,
+          0x79,
+          0x70,
+          ...Buffer.from(brand, "ascii"),
+          0x00,
+          0x00,
+          0x02,
+          0x00,
+        ]),
+      );
+
+      await expect(detectVideoMimeType(path, "video/mp4")).resolves.toBe(
+        "video/mp4",
+      );
+    },
+  );
+
   it("recognizes QuickTime content from its signature and MOV extension", async () => {
     const path = await stageFile(
       "clip.mov",

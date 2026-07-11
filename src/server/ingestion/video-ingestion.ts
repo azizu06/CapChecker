@@ -33,6 +33,14 @@ export class BoundaryError extends Error {
   }
 }
 
+const cancellationFor = (signal: AbortSignal) => {
+  const reason = signal.reason;
+  return (reason instanceof DOMException || reason instanceof Error) &&
+    reason.name === "AbortError"
+    ? reason
+    : new DOMException("The operation was aborted", "AbortError");
+};
+
 export function mapIngestionError(cause: unknown): ErrorEvent | undefined {
   if (
     cause instanceof DOMException
@@ -134,21 +142,28 @@ export type VideoIngestionDependencies = {
   };
   now(): number;
   sleep(milliseconds: number, signal: AbortSignal): Promise<void>;
+  reportCleanupFailure(failure: IngestionError): void;
 };
 
 export type VideoIngestionPolicy = {
   uploadAttempts: number;
+  downloadTimeoutMs: number;
   pollIntervalMs: number;
   maxPollAttempts: number;
   activationTimeoutMs: number;
+  cleanupAttempts: number;
+  cleanupRetryDelayMs: number;
   maxVideoBytes: number;
 };
 
 export const DEFAULT_VIDEO_INGESTION_POLICY: VideoIngestionPolicy = {
   uploadAttempts: 2,
+  downloadTimeoutMs: 120_000,
   pollIntervalMs: 2_000,
   maxPollAttempts: 60,
   activationTimeoutMs: 120_000,
+  cleanupAttempts: 3,
+  cleanupRetryDelayMs: 1_000,
   maxVideoBytes: 50 * 1024 * 1024,
 };
 
@@ -261,11 +276,22 @@ export function createVideoIngestor(
         let localFile: { path: string; fileName: string };
         if (source.kind === "url") {
           let downloaded: { path: string; fileName: string; size: number };
+          const downloadDeadline = new AbortController();
+          const downloadTimer = setTimeout(
+            () =>
+              downloadDeadline.abort(
+                new DOMException("Download timed out", "TimeoutError"),
+              ),
+            policy.downloadTimeoutMs,
+          );
           try {
             downloaded = await dependencies.ytDlp.download({
               url: source.url,
               directory,
-              signal: options.signal,
+              signal: AbortSignal.any([
+                options.signal,
+                downloadDeadline.signal,
+              ]),
             });
           } catch (cause) {
             if (options.signal.aborted) throw cause;
@@ -276,6 +302,8 @@ export function createVideoIngestor(
               retryable: false,
               offerUploadFallback: true,
             });
+          } finally {
+            clearTimeout(downloadTimer);
           }
           if (downloaded.size > policy.maxVideoBytes) {
             throw new IngestionError({
@@ -337,43 +365,79 @@ export function createVideoIngestor(
         remoteName = file.name;
         rejectFailedProcessing(file);
         const activationStartedAt = dependencies.now();
+        const activationDeadline = new AbortController();
+        const activationTimer = setTimeout(
+          () =>
+            activationDeadline.abort(
+              new DOMException("Activation timed out", "TimeoutError"),
+            ),
+          policy.activationTimeoutMs,
+        );
+        const activationSignal = AbortSignal.any([
+          options.signal,
+          activationDeadline.signal,
+        ]);
 
-        for (
-          let attempt = 0;
-          file.state !== "ACTIVE" && attempt < policy.maxPollAttempts;
-          attempt += 1
-        ) {
-          if (
-            dependencies.now() - activationStartedAt >=
-            policy.activationTimeoutMs
+        try {
+          for (
+            let attempt = 0;
+            file.state !== "ACTIVE" && attempt < policy.maxPollAttempts;
+            attempt += 1
           ) {
-            throwProcessingTimeout();
+            if (
+              dependencies.now() - activationStartedAt >=
+              policy.activationTimeoutMs
+            ) {
+              throwProcessingTimeout();
+            }
+            try {
+              await dependencies.sleep(
+                policy.pollIntervalMs,
+                activationSignal,
+              );
+            } catch (cause) {
+              if (options.signal.aborted) throw cause;
+              if (activationDeadline.signal.aborted) throwProcessingTimeout();
+              throw cause;
+            }
+            if (
+              dependencies.now() - activationStartedAt >=
+              policy.activationTimeoutMs
+            ) {
+              throwProcessingTimeout();
+            }
+            if (!remoteName) {
+              throw new Error("Gemini upload returned no file name");
+            }
+            try {
+              file = await dependencies.geminiFiles.get(
+                remoteName,
+                activationSignal,
+              );
+            } catch (cause) {
+              if (options.signal.aborted) throw cause;
+              if (activationDeadline.signal.aborted) throwProcessingTimeout();
+              if (cause instanceof BoundaryError && cause.retryable) continue;
+              throw new IngestionError({
+                code: "GEMINI_PROCESSING_FAILED",
+                message:
+                  "Gemini could not prepare this video. Try another file.",
+                retryable:
+                  cause instanceof BoundaryError ? cause.retryable : true,
+                offerUploadFallback: true,
+              });
+            }
+            if (
+              activationDeadline.signal.aborted ||
+              dependencies.now() - activationStartedAt >=
+                policy.activationTimeoutMs
+            ) {
+              throwProcessingTimeout();
+            }
+            rejectFailedProcessing(file);
           }
-          await dependencies.sleep(policy.pollIntervalMs, options.signal);
-          if (
-            dependencies.now() - activationStartedAt >=
-            policy.activationTimeoutMs
-          ) {
-            throwProcessingTimeout();
-          }
-          if (!remoteName) throw new Error("Gemini upload returned no file name");
-          try {
-            file = await dependencies.geminiFiles.get(
-              remoteName,
-              options.signal,
-            );
-          } catch (cause) {
-            if (cause instanceof BoundaryError && cause.retryable) continue;
-            if (options.signal.aborted) throw cause;
-            throw new IngestionError({
-              code: "GEMINI_PROCESSING_FAILED",
-              message: "Gemini could not prepare this video. Try another file.",
-              retryable:
-                cause instanceof BoundaryError ? cause.retryable : true,
-              offerUploadFallback: true,
-            });
-          }
-          rejectFailedProcessing(file);
+        } finally {
+          clearTimeout(activationTimer);
         }
 
         if (file.state !== "ACTIVE") {
@@ -394,26 +458,57 @@ export function createVideoIngestor(
           mimeType: file.mimeType,
         });
       } catch (cause) {
-        primaryFailure = cause;
-        throw cause;
+        const failure = options.signal.aborted
+          ? cancellationFor(options.signal)
+          : cause;
+        primaryFailure = failure;
+        throw failure;
       } finally {
         const cleanupSignal = new AbortController().signal;
+        const deleteRemoteFile = async () => {
+          if (!remoteName) return;
+
+          for (
+            let attempt = 1;
+            attempt <= policy.cleanupAttempts;
+            attempt += 1
+          ) {
+            try {
+              await dependencies.geminiFiles.delete(remoteName, cleanupSignal);
+              return;
+            } catch (cause) {
+              if (
+                !(cause instanceof BoundaryError) ||
+                !cause.retryable ||
+                attempt === policy.cleanupAttempts
+              ) {
+                throw cause;
+              }
+              await dependencies.sleep(
+                policy.cleanupRetryDelayMs,
+                cleanupSignal,
+              );
+            }
+          }
+        };
         const cleanupResults = await Promise.allSettled([
-          remoteName
-            ? dependencies.geminiFiles.delete(remoteName, cleanupSignal)
-            : Promise.resolve(),
+          deleteRemoteFile(),
           dependencies.temporaryFiles.removeDirectory(directory),
         ]);
         const cleanupFailed = cleanupResults.some(
           (result) => result.status === "rejected",
         );
-        if (primaryFailure === undefined && cleanupFailed) {
-          throw new IngestionError({
+        if (cleanupFailed) {
+          const cleanupFailure = new IngestionError({
             code: "INGESTION_CLEANUP_FAILED",
             message: "The video was processed, but cleanup did not finish.",
             retryable: false,
             offerUploadFallback: false,
           });
+          try {
+            dependencies.reportCleanupFailure(cleanupFailure);
+          } catch {}
+          if (primaryFailure === undefined) throw cleanupFailure;
         }
       }
     },

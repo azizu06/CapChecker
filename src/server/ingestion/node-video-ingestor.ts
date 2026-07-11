@@ -58,6 +58,7 @@ export function createNodeVideoIngestor({
       geminiFiles: createGeminiFilesClient({ apiKey, fetch }),
       now: Date.now,
       sleep: abortableSleep,
+      reportCleanupFailure: (failure) => console.error(failure.message),
     },
     resolvedPolicy,
   );

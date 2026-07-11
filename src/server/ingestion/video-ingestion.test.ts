@@ -12,6 +12,9 @@ import {
 const makeHarness = (
   policyOverrides: Partial<{
     activationTimeoutMs: number;
+    cleanupAttempts: number;
+    cleanupRetryDelayMs: number;
+    downloadTimeoutMs: number;
     maxPollAttempts: number;
     maxVideoBytes: number;
     pollIntervalMs: number;
@@ -52,13 +55,25 @@ const makeHarness = (
   };
   const now = vi.fn().mockReturnValue(0);
   const sleep = vi.fn().mockResolvedValue(undefined);
+  const reportCleanupFailure = vi.fn();
   const ingestor = createVideoIngestor(
-    { temporaryFiles, ytDlp, mime, geminiFiles, now, sleep },
+    {
+      temporaryFiles,
+      ytDlp,
+      mime,
+      geminiFiles,
+      now,
+      sleep,
+      reportCleanupFailure,
+    },
     {
       uploadAttempts: 2,
+      downloadTimeoutMs: 100,
       pollIntervalMs: 1,
       maxPollAttempts: 3,
       activationTimeoutMs: 100,
+      cleanupAttempts: 3,
+      cleanupRetryDelayMs: 1,
       maxVideoBytes: 50 * 1024 * 1024,
       ...policyOverrides,
     },
@@ -70,6 +85,7 @@ const makeHarness = (
     mime,
     now,
     progress,
+    reportCleanupFailure,
     sleep,
     temporaryFiles,
     ytDlp,
@@ -196,6 +212,35 @@ describe("createVideoIngestor", () => {
     ]);
   });
 
+  it("preserves caller cancellation when upload staging wraps the abort", async () => {
+    const { ingestor, temporaryFiles } = makeHarness();
+    const controller = new AbortController();
+    const cancellation = new DOMException(
+      "The operation was aborted",
+      "AbortError",
+    );
+    temporaryFiles.stageUpload.mockImplementation(async () => {
+      controller.abort(cancellation);
+      throw new Error("UPLOAD_STAGING_ABORTED");
+    });
+
+    const failure = await ingestor
+      .withActiveFile(
+        {
+          kind: "upload",
+          fileName: "upload.mp4",
+          mimeType: "video/mp4",
+          bytes: new Uint8Array([1, 2, 3]),
+        },
+        { signal: controller.signal, onProgress: vi.fn() },
+        async () => undefined,
+      )
+      .catch((cause: unknown) => cause);
+
+    expect(failure).toBe(cancellation);
+    expect(mapIngestionError(failure)).toBeUndefined();
+  });
+
   it("rejects an oversized direct upload before allocating temporary storage", async () => {
     const { geminiFiles, ingestor, temporaryFiles } = makeHarness({
       maxVideoBytes: 2,
@@ -306,6 +351,38 @@ describe("createVideoIngestor", () => {
     );
   });
 
+  it("aborts a stalled yt-dlp download at the policy deadline", async () => {
+    vi.useFakeTimers();
+    try {
+      const { ingestor, temporaryFiles, ytDlp } = makeHarness({
+        downloadTimeoutMs: 100,
+      });
+      ytDlp.download.mockImplementation(
+        async ({ signal }: { signal: AbortSignal }) =>
+          new Promise((_resolve, reject) => {
+            signal.addEventListener("abort", () => reject(signal.reason), {
+              once: true,
+            });
+          }),
+      );
+
+      const ingestion = ingestor.withActiveFile(
+        { kind: "url", url: "https://www.youtube.com/shorts/demo123" },
+        { signal: new AbortController().signal, onProgress: vi.fn() },
+        async () => undefined,
+      );
+      const expectation = expect(ingestion).rejects.toMatchObject({
+        code: "SOURCE_VIDEO_UNAVAILABLE",
+      });
+
+      await vi.advanceTimersByTimeAsync(101);
+      await expectation;
+      expect(temporaryFiles.removeDirectory).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("retries one transient Gemini upload failure", async () => {
     const { geminiFiles, ingestor, sleep } = makeHarness();
     geminiFiles.upload
@@ -413,6 +490,39 @@ describe("createVideoIngestor", () => {
     expect(geminiFiles.get).not.toHaveBeenCalled();
   });
 
+  it("aborts an in-flight Files request at the activation deadline", async () => {
+    vi.useFakeTimers();
+    try {
+      const { geminiFiles, ingestor, now } = makeHarness({
+        activationTimeoutMs: 100,
+      });
+      now.mockImplementation(() => Date.now());
+      geminiFiles.get.mockImplementation(
+        async (_name: string, signal: AbortSignal) =>
+          new Promise((_resolve, reject) => {
+            signal.addEventListener("abort", () => reject(signal.reason), {
+              once: true,
+            });
+          }),
+      );
+
+      const ingestion = ingestor.withActiveFile(
+        { kind: "url", url: "https://www.youtube.com/shorts/demo123" },
+        { signal: new AbortController().signal, onProgress: vi.fn() },
+        async () => undefined,
+      );
+      const expectation = expect(ingestion).rejects.toMatchObject({
+        code: "GEMINI_PROCESSING_TIMEOUT",
+      });
+
+      await vi.advanceTimersByTimeAsync(101);
+      await expectation;
+      expect(geminiFiles.get).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("stops immediately when Gemini marks processing as FAILED", async () => {
     const { geminiFiles, ingestor } = makeHarness();
     geminiFiles.upload.mockResolvedValue({
@@ -442,14 +552,22 @@ describe("createVideoIngestor", () => {
   });
 
   it("attempts all cleanup without masking the primary failure", async () => {
-    const { geminiFiles, ingestor, temporaryFiles } = makeHarness();
+    const {
+      geminiFiles,
+      ingestor,
+      reportCleanupFailure,
+      sleep,
+      temporaryFiles,
+    } = makeHarness();
     geminiFiles.upload.mockResolvedValue({
       name: "files/active",
       uri: "https://generativelanguage.googleapis.com/v1beta/files/active",
       mimeType: "video/mp4",
       state: "ACTIVE",
     });
-    geminiFiles.delete.mockRejectedValue(new Error("remote cleanup failed"));
+    geminiFiles.delete.mockRejectedValue(
+      new BoundaryError("remote cleanup failed", true),
+    );
     temporaryFiles.removeDirectory.mockRejectedValue(
       new Error("local cleanup failed"),
     );
@@ -464,8 +582,12 @@ describe("createVideoIngestor", () => {
         },
       ),
     ).rejects.toBe(primary);
-    expect(geminiFiles.delete).toHaveBeenCalledTimes(1);
+    expect(geminiFiles.delete).toHaveBeenCalledTimes(3);
+    expect(sleep).toHaveBeenCalledTimes(2);
     expect(temporaryFiles.removeDirectory).toHaveBeenCalledTimes(1);
+    expect(reportCleanupFailure).toHaveBeenCalledWith(
+      expect.objectContaining({ code: "INGESTION_CLEANUP_FAILED" }),
+    );
   });
 
   it("keeps bounded polling after one transient Gemini get failure", async () => {
