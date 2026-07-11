@@ -13,6 +13,11 @@ hackathon. The planning repository is the source of truth for product scope:
 - Shared issues are coordinated by both lanes. Do not change a frozen contract
   without updating both owners and the dependent issues.
 
+Lane A and Lane B develop independently against the frozen contracts. Lane B
+must not wait for the live Gemini pipeline. It uses the fixture-backed analysis
+adapter described in `docs/agents/testing.md`, while Lane A verifies the same
+contracts through unit and integration tests.
+
 ## Parallel execution
 
 Do not work through independent issues sequentially. At every scheduling point,
@@ -26,6 +31,28 @@ claim the same surface. If independent issues would edit the same shared file,
 give that file one owner or serialize those edits. The coordinator reviews all
 returned work and runs the combined checks before integration.
 
+## Test-driven development
+
+TDD is mandatory for every implementation issue. Work in vertical
+red-green-refactor cycles:
+
+1. Write one test for one observable behavior and run it to prove it fails.
+2. Write the smallest implementation that makes that test pass.
+3. Refactor only while the suite is green, then start the next behavior.
+
+Do not write production behavior first and add tests afterward. Tests use public
+interfaces and mock only external boundaries such as Gemini, Finnhub, yt-dlp,
+time, or the filesystem.
+
+Lane A requires unit and contract tests for pipeline behavior. Lane B requires
+unit or component tests plus Playwright E2E tests against deterministic fixture
+mode. Every implemented button, link, route, input, progress transition, result
+state, and recovery action must be exercised. Issue #10 reruns the fixture suite
+against the combined app and adds one live local pipeline smoke test.
+
+See `docs/agents/testing.md` for the independent-lane testing architecture and
+the evidence required in each PR.
+
 ## Issue to PR workflow
 
 1. Pick one issue labeled `ready-for-agent` whose blockers are closed.
@@ -34,7 +61,7 @@ returned work and runs the combined checks before integration.
 4. Keep the change scoped to the issue and add `Closes #<number>` to the PR.
 5. Run the relevant local checks. Run `no-mistakes` only when the issue has the
    `gate-no-mistakes` label.
-6. Open one PR into `main`. Merge only after the `quality` check is green.
+6. Open one PR into `main`. Merge only after `quality` and `e2e` are green.
 7. Move the issue to Done after the PR merges.
 
 See `docs/agents/build-workflow.md` for the dependency rule, PR gate command,
@@ -72,3 +99,8 @@ commit. Query an existing graph first and refresh it only at the milestones in
 Lane B must design from real reference screens. Use Mobbin when its MCP is
 available, then fall back to focused web image searches. Use Impeccable when
 available to critique and refine implemented UI. See `docs/agents/ui-design.md`.
+
+### Testing
+
+Use test-first vertical slices, fixture-backed Playwright for Lane B, and live
+integration only at the shared convergence issue. See `docs/agents/testing.md`.
