@@ -88,6 +88,9 @@ describe("Gemini claim generator", () => {
     expect(body.contents[0].parts[1].text).toContain(
       "Preserve each quantitative field that is present",
     );
+    expect(body.contents[0].parts[1].text).toContain(
+      "Every claim containing a number",
+    );
     expect(body.generationConfig).toMatchObject({
       responseMimeType: "application/json",
       responseJsonSchema: {

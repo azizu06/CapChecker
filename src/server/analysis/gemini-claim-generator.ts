@@ -8,7 +8,7 @@ const extractionPrompt = `Transcribe this financial video and extract every dist
 
 For each transcript segment, preserve the spoken wording and its non-negative start time in seconds.
 For each claim, assign a unique sequential id such as claim-1, preserve the claim as stated and its timestamp, and classify it as factual, predictive, or opinion. Mark a claim checkable only when external evidence can verify it. Do not turn opinions into checkable claims.
-Preserve each quantitative field that is present in quant: ticker, metric, value, and period. Do not invent missing fields. Omit quant only when none of those fields are present. Return only the requested JSON structure.`;
+Preserve each quantitative field that is present in quant: ticker, metric, value, and period. Every claim containing a number, percentage, currency amount, multiple, date, year, quarter, or quantitative comparison must include quant with every known field, even when only one field is available. Preserve the exact spoken number or amount in value when present. Do not invent missing fields. Omit quant only when none of those fields are present. Before returning, check every numeric claim for quant. Return only the requested JSON structure.`;
 
 const transcriptSegmentSchema = {
   type: "object",

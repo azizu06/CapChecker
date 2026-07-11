@@ -68,6 +68,7 @@ describe("live Gemini claim extraction", () => {
           claim.text,
         ),
       );
+      expect(claimsWithNumbers.length).toBeGreaterThan(0);
       for (const claim of claimsWithNumbers) {
         expect(claim.quant).toBeDefined();
         expect(

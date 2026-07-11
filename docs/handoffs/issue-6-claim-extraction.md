@@ -73,12 +73,25 @@ npm run typecheck
 An opt-in prepared-video test lives at
 `src/server/analysis/claim-extraction.live.test.ts`. It requires
 `GEMINI_API_KEY` plus either `CAPCHECK_LIVE_UPLOAD_PATH` or
-`CAPCHECK_LIVE_SHORT_URL`, asserts a non-empty transcript and useful checkable
-claims, checks that claims containing numeric details retain non-empty `quant`
-metadata, and observes one production-ingestor remote delete after extraction.
-Those variables were unavailable in this worktree during implementation, so a
-credentialed run remains required before the final live acceptance checkbox can
-be claimed.
+`CAPCHECK_LIVE_SHORT_URL`, asserts a non-empty transcript and at least one useful
+checkable claim, checks that claims containing numeric details retain non-empty
+`quant` metadata, and observes one production-ingestor remote delete after
+extraction. The Yahoo Finance Buffett advice Short is an opinion-heavy negative
+example and does not satisfy this positive acceptance gate. The positive gate
+was completed with the factual financial-news source below.
+
+Credentialed positive evidence recorded on 2026-07-11:
+
+- Public source: CNBC Television, `Recent retail earnings reports fall short`
+  (<https://youtu.be/Kg0Vlq4g128>), 1 minute 46 seconds.
+- The strengthened live test passed in 35.61 seconds with a non-empty
+  timestamped transcript, at least one checkable numeric claim, non-empty
+  partial quantitative metadata for numeric claims, and an observed Gemini
+  Files remote delete after extraction.
+- The Yahoo Finance Buffett advice Short
+  (<https://www.youtube.com/shorts/mRpuGPCYhAg>) produced structured but
+  opinion-only claims and remains a negative classification example rather
+  than positive acceptance evidence.
 
 ## Issue #7 direction
 
