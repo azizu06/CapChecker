@@ -33,7 +33,10 @@ evidenceId: z.string().min(1).optional()
 - **Evidence references stay inside the scorecard.** `evidenceId`, when present,
   should equal an `Evidence.id` in one of the same scorecard's `verifications`.
   Issue #8 does not make that cross-reference a schema-level requirement so older
-  and partially enriched producers remain valid.
+  and partially enriched producers remain valid. If the ID does not resolve within
+  that completed scorecard, the UI still renders the action and falls back to its
+  `url` when present; without a `url`, it renders no source link. Producers for
+  issues #9 and #10 should always reference an `Evidence.id` in the same scorecard.
 - **Existing safety rules are unchanged.** Evidence and action URLs remain
   HTTP(S)-only, opinions remain outside `verifications`, score bands are unchanged,
   the UI does not import adapters, and fixture mode remains disabled in production.

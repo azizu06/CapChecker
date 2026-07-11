@@ -450,6 +450,46 @@ describe("CapCheckApp", () => {
     );
   });
 
+  it("renders an action without a link when its evidence ID is unresolved and no URL exists", async () => {
+    const scorecard = {
+      ...DEMO_SCORECARDS.mixed,
+      nextActions: [
+        {
+          id: "unresolved-action",
+          label: "Review the unsupported claim",
+          description: "Wait for evidence that directly supports the claim.",
+          evidenceId: "missing-evidence",
+        },
+      ],
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        sseResponse({ type: "complete", scorecard }),
+      ),
+    );
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await user.type(
+      screen.getByLabelText(/video url/i),
+      "https://example.com/video",
+    );
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+    const label = await screen.findByText("Review the unsupported claim");
+    const action = label.closest("li");
+
+    expect(label).toBeInTheDocument();
+    expect(action).not.toBeNull();
+    expect(
+      within(action!).getByText(
+        "Wait for evidence that directly supports the claim.",
+      ),
+    ).toBeInTheDocument();
+    expect(within(action!).queryByText(/evidence source/i)).not.toBeInTheDocument();
+    expect(within(action!).queryByText(/open resource/i)).not.toBeInTheDocument();
+    expect(within(action!).queryByRole("link")).not.toBeInTheDocument();
+  });
+
   it("keeps legacy hype findings and action URLs usable without new anchors", async () => {
     const finding = DEMO_SCORECARDS.mixed.hypeFindings[0];
     const legacyScorecard = {
