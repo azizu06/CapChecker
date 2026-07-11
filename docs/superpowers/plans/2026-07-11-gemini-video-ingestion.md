@@ -81,7 +81,7 @@
 - [x] Add an opt-in smoke runner that requires `GEMINI_API_KEY`, accepts explicit local input, prints only safe status, and deletes the remote smoke file in `finally`.
 - [x] Run the URL and upload smoke paths when credentials and test media are available; otherwise record the exact remaining issue #10 verification without claiming success.
 - [x] Document public interfaces, retry/timeout defaults, cleanup ownership, commands, and issue #6 wiring direction.
-- [ ] Run lint, typecheck, unit tests, build, and Playwright to prove the frozen frontend remains intact.
+- [x] Run lint, typecheck, unit tests, build, and Playwright to prove the frozen frontend remains intact.
 
 ### Task 5: Review and delivery
 

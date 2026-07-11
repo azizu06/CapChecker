@@ -94,8 +94,13 @@ npm run test:unit -- src/server/ingestion/video-ingestion.live.test.ts
 ```
 
 Both live cases use the real yt-dlp/filesystem/Gemini boundaries and delete the
-Gemini file after it reaches ACTIVE. They are skipped in normal CI. At PR time,
-this worktree had no `GEMINI_API_KEY`, short URL, or prepared upload path, so no
-live pass is claimed; the deterministic adapter and composition tests remain
-the PR gate, and the credentialed evidence must be recorded before checking the
-two real-input acceptance boxes or during issue #10's planned live smoke.
+Gemini file after it reaches ACTIVE. They are skipped in normal CI.
+
+Credentialed smoke evidence recorded on 2026-07-11:
+
+- URL: Yahoo Finance's public YouTube Short, `mRpuGPCYhAg` (47 seconds), was
+  downloaded through the real yt-dlp adapter and reached Gemini `ACTIVE`.
+- Upload: the separately prepared 6.56 MB `mRpuGPCYhAg.webm` file was staged
+  through the direct-upload path and reached Gemini `ACTIVE`.
+- Both tests passed in 26.20 seconds, and each remote file was deleted after
+  its ACTIVE-file callback completed.

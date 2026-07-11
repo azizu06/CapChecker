@@ -1,3 +1,4 @@
+import { Blob as NodeBlob } from "node:buffer";
 import { readFile as nodeReadFile } from "node:fs/promises";
 
 import { BoundaryError } from "./video-ingestion";
@@ -139,7 +140,9 @@ export function createGeminiFilesClient({
             "X-Goog-Upload-Offset": "0",
             "X-Goog-Upload-Command": "upload, finalize",
           },
-          body: new Blob([Uint8Array.from(bytes)], { type: mimeType }),
+          body: new NodeBlob([Uint8Array.from(bytes)], {
+            type: mimeType,
+          }) as unknown as BodyInit,
         },
         signal,
       );

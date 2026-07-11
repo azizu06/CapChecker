@@ -1,3 +1,5 @@
+import { Blob as NodeBlob } from "node:buffer";
+
 import { describe, expect, it, vi } from "vitest";
 
 import { BoundaryError } from "./video-ingestion";
@@ -78,14 +80,14 @@ describe("createGeminiFilesClient", () => {
           "X-Goog-Upload-Command": "upload, finalize",
           "X-Goog-Upload-Offset": "0",
         }),
-        body: expect.any(Blob),
+        body: expect.any(NodeBlob),
       }),
     );
     const uploadedBody = fetchMock.mock.calls[1]?.[1]?.body;
-    expect(uploadedBody).toBeInstanceOf(Blob);
+    expect(uploadedBody).toBeInstanceOf(NodeBlob);
     expect(
       Array.from(
-        new Uint8Array(await (uploadedBody as Blob).arrayBuffer()),
+        new Uint8Array(await (uploadedBody as NodeBlob).arrayBuffer()),
       ),
     ).toEqual([1, 2, 3]);
   });
