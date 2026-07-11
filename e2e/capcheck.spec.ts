@@ -143,13 +143,23 @@ test("mixed result exposes every claim and safe evidence destination, then reset
     ),
   ).toBeVisible();
 
-  const disclosureNames = [
-    "The S&P 500 gained more than 20% in 2023.",
-    "This semiconductor stock will double before December.",
-    "You cannot lose money if you buy before earnings.",
+  const checkedClaims = [
+    {
+      text: "The S&P 500 gained more than 20% in 2023.",
+      timestamp: "0:07",
+    },
+    {
+      text: "This semiconductor stock will double before December.",
+      timestamp: "0:22",
+    },
+    {
+      text: "You cannot lose money if you buy before earnings.",
+      timestamp: "0:41",
+    },
   ];
-  for (const claim of disclosureNames) {
-    const card = page.getByRole("article").filter({ hasText: claim });
+  for (const claim of checkedClaims) {
+    const card = page.getByRole("article").filter({ hasText: claim.text });
+    await expect(card.getByText(claim.timestamp, { exact: true })).toBeVisible();
     const disclosure = card.getByRole("button", { name: "View evidence" });
     await expect(disclosure).toHaveAttribute("aria-expanded", "false");
     await disclosure.click();
@@ -167,6 +177,17 @@ test("mixed result exposes every claim and safe evidence destination, then reset
       "false",
     );
   }
+
+  const skippedOpinion = page.getByRole("article").filter({
+    hasText: "I think this is the most exciting stock in the market.",
+  });
+  await expect(skippedOpinion).toBeVisible();
+  await expect(
+    skippedOpinion.getByText("Opinion — not fact-checked"),
+  ).toBeVisible();
+  await expect(skippedOpinion.getByText("0:54", { exact: true })).toBeVisible();
+  await expect(skippedOpinion.getByRole("button")).toHaveCount(0);
+  await expect(page.getByText("3 fact-checked · 1 skipped")).toBeVisible();
 
   await expectSafeExternalLink(
     page.getByRole("link", { name: /Open strongest source/ }),
