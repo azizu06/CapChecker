@@ -26,6 +26,11 @@ required checks, and the expected handoff summary. Before merging the returned
 PRs, the coordinating agent reviews for contract drift and runs the combined
 quality checks.
 
+Every parallel implementation worker follows the TDD workflow in
+`docs/agents/testing.md`. Lane B runs fixture-backed Playwright without waiting
+for Lane A. Full live-pipeline browser verification waits for issue #10, but
+unit, contract, component, and fixture-backed E2E tests run during development.
+
 ## Risk-based no-mistakes gate
 
 Normal planning, repository setup, documentation, and routine UI PRs use focused
@@ -47,16 +52,17 @@ automatically approved for merge.
 
 ## Required CI
 
-The `quality` job runs install, lint, typecheck, and build. Before the Next.js
-scaffold exists, the job intentionally reports that there is no application to
-validate. Once `package.json` exists, a missing lockfile or missing required
-script fails CI.
+The `quality` job runs install, lint, typecheck, unit tests, and build. The
+`e2e` job installs Chromium and runs the fixture-backed Playwright suite. Before
+the Next.js scaffold exists, both jobs intentionally report that there is no
+application to validate. Once `package.json` exists, a missing lockfile or any
+required script fails CI.
 
 ## Merge policy
 
 - Target `main`.
 - Keep one issue per PR.
-- Require the `quality` check.
+- Require both `quality` and `e2e` checks.
 - Never merge a PR with unresolved dependencies.
 - For an issue labeled `gate-no-mistakes`, never bypass a failed gate by pushing
   the same branch directly to `origin`.
