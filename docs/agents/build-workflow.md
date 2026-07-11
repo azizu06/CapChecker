@@ -6,6 +6,26 @@ An issue can move from Todo to In Progress only when every issue in its
 `Blocked by` section is closed. Agents may prepare notes for blocked work but
 must not merge dependent code early.
 
+## Parallel scheduling
+
+The coordinator recomputes the ready frontier whenever a blocking issue closes.
+If two or more ready issues do not depend on each other and do not own the same
+files, dispatch them in one batch to separate agents or subagents.
+
+Current core frontiers are:
+
+- After issue #2 closes, issues #3, #4, and #5 can run concurrently.
+- Issues #3 and #5 are both Lane B but are independent. They may be split
+  between the teammate's main agent and one isolated subagent.
+- Issue #6 waits for #4. Issue #8 waits for both #3 and #5.
+- Issue #10 waits for both Lane A issue #9 and Lane B issue #8.
+
+Parallel workers must use separate worktrees and must not share a feature
+branch. Give each worker the issue body, relevant domain docs, ownership limits,
+required checks, and the expected handoff summary. Before merging the returned
+PRs, the coordinating agent reviews for contract drift and runs the combined
+quality checks.
+
 ## Risk-based no-mistakes gate
 
 Normal planning, repository setup, documentation, and routine UI PRs use focused
