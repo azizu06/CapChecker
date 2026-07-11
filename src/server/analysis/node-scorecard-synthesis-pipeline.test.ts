@@ -12,7 +12,10 @@ describe("Node scorecard synthesis pipeline", () => {
               parts: [
                 {
                   text: JSON.stringify({
-                    summary: "The video contains no checkable financial claims.",
+                    summary: {
+                      text: "The video contains no checkable financial claims.",
+                      claimIds: [],
+                    },
                     hypeFindings: [],
                     nextActions: [],
                   }),

@@ -44,6 +44,34 @@ describe("scorecard synthesis", () => {
     expect(calculateCapScore(predictions)).toBe(30);
   });
 
+  it("uses extracted non-opinion claims to detect prediction-heavy content", () => {
+    const extractedClaims = [
+      {
+        id: "prediction-1",
+        text: "This stock will double next year.",
+        timestampSeconds: 2,
+        kind: "predictive" as const,
+        checkable: false,
+      },
+      {
+        id: "prediction-2",
+        text: "The market will rally next quarter.",
+        timestampSeconds: 5,
+        kind: "predictive" as const,
+        checkable: false,
+      },
+      {
+        id: "claim-true",
+        text: "The company reported record revenue.",
+        timestampSeconds: 8,
+        kind: "factual" as const,
+        checkable: true,
+      },
+    ];
+
+    expect(calculateCapScore([verification("true")], extractedClaims)).toBe(30);
+  });
+
   it("handles empty input, verdict extrema, and the prediction ratio boundary", () => {
     const predictive = {
       ...verification("true"),
@@ -69,10 +97,53 @@ describe("scorecard synthesis", () => {
     ).toBe(0);
   });
 
+  it("applies the prediction floor when extracted predictions have no verifications", async () => {
+    const pipeline = createScorecardSynthesisPipeline({
+      synthesizer: {
+        synthesize: vi.fn().mockResolvedValue({
+          summary: {
+            text: "The video consists of unsupported predictions.",
+            claimIds: [],
+          },
+          hypeFindings: [],
+          nextActions: [],
+        }),
+      },
+    });
+
+    const result = await pipeline.synthesize(
+      {
+        id: "scorecard-unverified-predictions",
+        source: { kind: "upload", fileName: "predictions.mp4" },
+        extraction: {
+          transcript: [
+            { timestampSeconds: 0, text: "This stock will double next year." },
+          ],
+          claims: [
+            {
+              id: "prediction-1",
+              text: "This stock will double next year.",
+              timestampSeconds: 0,
+              kind: "predictive",
+              checkable: false,
+            },
+          ],
+        },
+        verifications: [],
+      },
+      { signal: new AbortController().signal, onProgress: vi.fn() },
+    );
+
+    expect(result).toMatchObject({ capScore: 30, capLabel: "some-cap" });
+  });
+
   it("synthesizes a frozen scorecard from verified claims and model prose", async () => {
     const synthesize = vi.fn().mockResolvedValue({
       capScore: 0,
-      summary: "One claim is false and one future prediction is unsupported.",
+      summary: {
+        text: "One claim is false and one future prediction is unsupported.",
+        claimIds: ["claim-false"],
+      },
       hypeFindings: [
         {
           id: "hype-1",
@@ -80,6 +151,7 @@ describe("scorecard synthesis", () => {
           category: "guarantee",
           severity: "high",
           explanation: "The absolute promise hides investment risk.",
+          claimId: "claim-false",
         },
       ],
       nextActions: [
@@ -98,6 +170,11 @@ describe("scorecard synthesis", () => {
     const progress: unknown[] = [];
     const falseVerification: Verification = {
       ...verification("false"),
+      claim: {
+        ...verification("false").claim,
+        text: "You cannot lose on this stock.",
+        timestampSeconds: 4,
+      },
       evidence: [
         {
           id: "evidence-1",
@@ -126,7 +203,7 @@ describe("scorecard synthesis", () => {
             },
           ],
           claims: [
-            { ...falseVerification.claim, timestampSeconds: 1 },
+            { ...falseVerification.claim, timestampSeconds: 4 },
             {
               id: "claim-opinion",
               text: "This is my favorite stock.",
@@ -149,6 +226,7 @@ describe("scorecard synthesis", () => {
       id: "scorecard-live-1",
       capScore: 100,
       capLabel: "full-of-cap",
+      summary: "One claim is false and one future prediction is unsupported.",
       generatedAt: "2026-07-11T20:00:00.000Z",
       skippedClaims: [{ id: "claim-opinion", kind: "opinion" }],
       hypeFindings: [
@@ -160,6 +238,7 @@ describe("scorecard synthesis", () => {
       ],
       nextActions: [{ evidenceId: "evidence-1" }],
     });
+    expect(result.hypeFindings[0]).not.toHaveProperty("claimId");
     expect(synthesize).toHaveBeenCalledWith(
       expect.objectContaining({
         transcript: expect.any(Array),
@@ -180,7 +259,7 @@ describe("scorecard synthesis", () => {
     const pipeline = createScorecardSynthesisPipeline({
       synthesizer: {
         synthesize: vi.fn().mockResolvedValue({
-          summary: "No checkable claims were found.",
+          summary: { text: "No checkable claims were found.", claimIds: [] },
           hypeFindings: [
             {
               id: "hype-1",
@@ -188,6 +267,7 @@ describe("scorecard synthesis", () => {
               category: "guarantee",
               severity: "high",
               explanation: "This phrase does not appear in the transcript.",
+              claimId: "missing-claim",
             },
           ],
           nextActions: [
@@ -220,6 +300,106 @@ describe("scorecard synthesis", () => {
 
     expect(result.hypeFindings).toEqual([]);
     expect(result.nextActions).toEqual([]);
+  });
+
+  it("rejects a summary that cites an invented verification claim", async () => {
+    const verified = verification("true");
+    const pipeline = createScorecardSynthesisPipeline({
+      synthesizer: {
+        synthesize: vi.fn().mockResolvedValue({
+          summary: {
+            text: "An invented claim is supported.",
+            claimIds: ["invented-claim"],
+          },
+          hypeFindings: [],
+          nextActions: [],
+        }),
+      },
+    });
+
+    await expect(
+      pipeline.synthesize(
+        {
+          id: "scorecard-invented-summary",
+          source: { kind: "upload", fileName: "summary.mp4" },
+          extraction: {
+            transcript: [
+              { timestampSeconds: 1, text: verified.claim.text },
+            ],
+            claims: [{ ...verified.claim, timestampSeconds: 1 }],
+          },
+          verifications: [verified],
+        },
+        { signal: new AbortController().signal, onProgress: vi.fn() },
+      ),
+    ).rejects.toMatchObject({
+      name: "ScorecardSynthesisError",
+      code: "MALFORMED_SCORECARD_NARRATIVE",
+    });
+  });
+
+  it("drops hype prose that references an unrelated verified claim", async () => {
+    const relevant = {
+      ...verification("false"),
+      claim: {
+        ...verification("false").claim,
+        id: "claim-risk",
+        text: "You cannot lose on this stock.",
+        timestampSeconds: 4,
+      },
+    };
+    const unrelated = {
+      ...verification("true"),
+      claim: {
+        ...verification("true").claim,
+        id: "claim-revenue",
+        timestampSeconds: 12,
+      },
+    };
+    const pipeline = createScorecardSynthesisPipeline({
+      synthesizer: {
+        synthesize: vi.fn().mockResolvedValue({
+          summary: {
+            text: "The loss guarantee is false.",
+            claimIds: ["claim-risk"],
+          },
+          hypeFindings: [
+            {
+              id: "hype-unrelated",
+              phrase: "cannot lose",
+              category: "guarantee",
+              severity: "high",
+              explanation: "This explanation cites an unrelated revenue claim.",
+              claimId: "claim-revenue",
+            },
+          ],
+          nextActions: [],
+        }),
+      },
+    });
+
+    const result = await pipeline.synthesize(
+      {
+        id: "scorecard-unrelated-hype",
+        source: { kind: "upload", fileName: "hype.mp4" },
+        extraction: {
+          transcript: [
+            {
+              timestampSeconds: 4,
+              text: "Buy now because you cannot lose on this stock.",
+            },
+          ],
+          claims: [
+            { ...relevant.claim, timestampSeconds: 4 },
+            { ...unrelated.claim, timestampSeconds: 12 },
+          ],
+        },
+        verifications: [relevant, unrelated],
+      },
+      { signal: new AbortController().signal, onProgress: vi.fn() },
+    );
+
+    expect(result.hypeFindings).toEqual([]);
   });
 
   it("fails clearly when the prose boundary returns a malformed narrative", async () => {
