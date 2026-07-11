@@ -32,6 +32,17 @@ describe("streamFixtureAnalysis", () => {
       type: "complete",
       scorecard: DEMO_SCORECARDS.mixed,
     });
+    expect(events.at(-1)).toMatchObject({
+      type: "complete",
+      scorecard: {
+        skippedClaims: [
+          {
+            kind: "opinion",
+            checkable: false,
+          },
+        ],
+      },
+    });
   });
 
   it("stops before later stages after its signal is aborted", async () => {

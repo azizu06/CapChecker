@@ -1,4 +1,8 @@
-import type { AnalysisEvent, AnalysisStage } from "@/domain/analysis";
+import {
+  AnalysisEventSchema,
+  type AnalysisEvent,
+  type AnalysisStage,
+} from "@/domain/analysis";
 import { DEMO_FATAL_ERROR, DEMO_SCORECARDS } from "@/fixtures/scorecards";
 
 export type FixtureScenario = keyof typeof DEMO_SCORECARDS | "fatal";
@@ -53,5 +57,8 @@ export async function* streamFixtureAnalysis(
     return;
   }
 
-  yield { type: "complete", scorecard: DEMO_SCORECARDS[scenario] };
+  yield AnalysisEventSchema.parse({
+    type: "complete",
+    scorecard: DEMO_SCORECARDS[scenario],
+  });
 }

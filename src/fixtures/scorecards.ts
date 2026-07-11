@@ -117,6 +117,15 @@ const mixed = buildScorecard({
       ],
     },
   ],
+  skippedClaims: [
+    {
+      id: "mixed-opinion-1",
+      text: "I think this is the most exciting stock in the market.",
+      kind: "opinion",
+      checkable: false,
+      timestampSeconds: 54,
+    },
+  ],
   hypeFindings: [
     {
       id: "mixed-hype-1",
