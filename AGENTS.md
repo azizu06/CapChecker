@@ -47,3 +47,15 @@ See `docs/agents/triage-labels.md`.
 
 This is a single-context project. Read `CONTEXT.md` and relevant files under
 `docs/adr/` before changing domain behavior. See `docs/agents/domain.md`.
+
+### Codebase graph
+
+Graphify is available for architecture navigation, but do not run it on every
+commit. Query an existing graph first and refresh it only at the milestones in
+`docs/agents/graphify.md`.
+
+### UI design
+
+Lane B must design from real reference screens. Use Mobbin when its MCP is
+available, then fall back to focused web image searches. Use Impeccable when
+available to critique and refine implemented UI. See `docs/agents/ui-design.md`.
