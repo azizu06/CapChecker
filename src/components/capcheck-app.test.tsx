@@ -325,6 +325,69 @@ describe("CapCheckApp", () => {
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
   });
 
+  it("shows each available claim timestamp in minutes and seconds", async () => {
+    const timestampedScorecard = {
+      ...DEMO_SCORECARDS.mixed,
+      verifications: DEMO_SCORECARDS.mixed.verifications.map(
+        (verification, index) =>
+          index === 0
+            ? {
+                ...verification,
+                claim: { ...verification.claim, timestampSeconds: 84 },
+              }
+            : verification,
+      ),
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        sseResponse({ type: "complete", scorecard: timestampedScorecard }),
+      ),
+    );
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await user.type(
+      screen.getByLabelText(/video url/i),
+      "https://example.com/video",
+    );
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+    const claimText = await screen.findByText(
+      "The S&P 500 gained more than 20% in 2023.",
+    );
+    const claim = claimText.closest("article");
+
+    expect(claim).not.toBeNull();
+    expect(within(claim!).getByText("1:24")).toBeInTheDocument();
+  });
+
+  it("renders skipped opinions as non-verified claim cards", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.mixed }),
+      ),
+    );
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await user.type(
+      screen.getByLabelText(/video url/i),
+      "https://example.com/video",
+    );
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+    const opinionText = await screen.findByText(
+      "I think this is the most exciting stock in the market.",
+    );
+    const opinion = opinionText.closest("article");
+
+    expect(opinion).not.toBeNull();
+    expect(
+      within(opinion!).getByText("Opinion — not fact-checked"),
+    ).toBeInTheDocument();
+    expect(within(opinion!).getByText("0:54")).toBeInTheDocument();
+    expect(within(opinion!).queryByRole("button")).not.toBeInTheDocument();
+    expect(within(opinion!).queryByText(/confidence/i)).not.toBeInTheDocument();
+  });
+
   it("renders partial failure, hype findings, and next actions without losing results", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
       sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.partialFailure }),
