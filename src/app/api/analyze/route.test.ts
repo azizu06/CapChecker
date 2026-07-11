@@ -4,9 +4,12 @@ import { AnalysisEventSchema, type AnalysisEvent } from "@/domain/analysis";
 import { DEMO_FATAL_ERROR, DEMO_SCORECARDS } from "@/fixtures/scorecards";
 import { parseAnalysisStream } from "@/lib/analysis-stream";
 
+import { createAnalyzeHandler } from "./route-handler";
 import { POST } from "./route";
 
 const ORIGINAL_MODE = process.env.CAPCHECK_ANALYSIS_MODE;
+const ORIGINAL_GEMINI_KEY = process.env.GEMINI_API_KEY;
+const ORIGINAL_FINNHUB_KEY = process.env.FINNHUB_KEY;
 
 const request = (body: unknown) =>
   new Request("http://127.0.0.1:3000/api/analyze", {
@@ -27,6 +30,10 @@ describe("POST /api/analyze", () => {
     } else {
       process.env.CAPCHECK_ANALYSIS_MODE = ORIGINAL_MODE;
     }
+    if (ORIGINAL_GEMINI_KEY === undefined) delete process.env.GEMINI_API_KEY;
+    else process.env.GEMINI_API_KEY = ORIGINAL_GEMINI_KEY;
+    if (ORIGINAL_FINNHUB_KEY === undefined) delete process.env.FINNHUB_KEY;
+    else process.env.FINNHUB_KEY = ORIGINAL_FINNHUB_KEY;
   });
 
   it.each([
@@ -245,6 +252,96 @@ describe("POST /api/analyze", () => {
     });
     expect(JSON.stringify(body)).not.toContain("fixture");
     expect(JSON.stringify(body)).not.toContain(process.cwd());
+  });
+
+  it("streams the live adapter outside fixture mode with the parsed URL source", async () => {
+    delete process.env.CAPCHECK_ANALYSIS_MODE;
+    const liveStream = vi.fn(async function* () {
+      yield { type: "complete", scorecard: DEMO_SCORECARDS.mixed } as const;
+    });
+    const livePost = createAnalyzeHandler({
+      createLiveStream: () => liveStream,
+    });
+
+    const response = await livePost(
+      request({ url: "https://www.youtube.com/shorts/demo" }),
+    );
+    const events: AnalysisEvent[] = [];
+    for await (const event of parseAnalysisStream(response)) events.push(event);
+
+    expect(liveStream).toHaveBeenCalledWith(
+      { kind: "url", url: "https://www.youtube.com/shorts/demo" },
+      expect.any(AbortSignal),
+    );
+    expect(events.at(-1)).toEqual({
+      type: "complete",
+      scorecard: DEMO_SCORECARDS.mixed,
+    });
+  });
+
+  it("passes live multipart bytes and MIME type without exposing them in the scorecard source", async () => {
+    delete process.env.CAPCHECK_ANALYSIS_MODE;
+    const liveStream = vi.fn(async function* () {
+      yield { type: "complete", scorecard: DEMO_SCORECARDS.mixed } as const;
+    });
+    const livePost = createAnalyzeHandler({
+      createLiveStream: () => liveStream,
+    });
+    const form = {
+      get(key: string) {
+        if (key === "file") {
+          return {
+            name: "prepared.mp4",
+            type: "video/mp4",
+            size: 3,
+            arrayBuffer: async () => new Uint8Array([1, 2, 3]).buffer,
+          };
+        }
+        return null;
+      },
+    } as FormData;
+    const uploadRequest = {
+      headers: new Headers({
+        "content-type": "multipart/form-data; boundary=live-test",
+      }),
+      formData: async () => form,
+      signal: new AbortController().signal,
+    } as Request;
+
+    const response = await livePost(uploadRequest);
+    await response.text();
+
+    expect(liveStream).toHaveBeenCalledWith(
+      {
+        kind: "upload",
+        fileName: "prepared.mp4",
+        mimeType: "video/mp4",
+        bytes: new Uint8Array([1, 2, 3]),
+      },
+      expect.any(AbortSignal),
+    );
+  });
+
+  it("returns a sanitized unavailable response when live credentials are missing", async () => {
+    delete process.env.CAPCHECK_ANALYSIS_MODE;
+    delete process.env.GEMINI_API_KEY;
+    delete process.env.FINNHUB_KEY;
+
+    const response = await POST(
+      request({ url: "https://www.youtube.com/shorts/demo" }),
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(body).toEqual({
+      error: {
+        code: "ANALYSIS_UNAVAILABLE",
+        message: "Analysis is unavailable right now. Please try again later.",
+        retryable: false,
+      },
+    });
+    expect(JSON.stringify(body)).not.toContain("GEMINI_API_KEY");
+    expect(JSON.stringify(body)).not.toContain("FINNHUB_KEY");
   });
 
   it("emits no frames when the request signal is already aborted", async () => {
