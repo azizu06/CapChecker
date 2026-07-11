@@ -3,13 +3,19 @@
 These Mobbin screens informed the shared visual contract in
 [`../design/capcheck-ui-spec.md`](../design/capcheck-ui-spec.md). Agents should
 use this inventory to understand the source pattern, then implement the exact
-CapCheck tokens and component rules from the design specification.
+CapCheck tokens and component rules from the design specification. The theme
+these patterns render in is the locked cream light theme in
+[`../agents/ui-design.md`](../agents/ui-design.md#locked-design-decisions), not
+the dark navy canvas some of the source screens use — treat every entry below
+as a layout/interaction reference only, never a color reference. See that file
+for the additional cream-light-specific references gathered for the score
+header and tabbed results layout.
 
 ## Intake and upload
 
 - [Revolut Business upload](https://mobbin.com/screens/2a7be71f-2e9a-404c-9c56-c846d8616783)
-  informed the dark navy canvas, centered intake focus, quiet upload surface,
-  and visible selected-file state.
+  informed the centered intake focus, quiet upload surface, and visible
+  selected-file state.
 - [Fireflies upload](https://mobbin.com/screens/b11ca206-fbe6-4042-8b1c-42cf2089427a)
   informed the obvious drop target, supported-format guidance, single primary
   action, and upload status placed directly below the control.

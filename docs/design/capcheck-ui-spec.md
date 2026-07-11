@@ -8,13 +8,20 @@ patterns, and responsive rules unless a coordinated issue changes this spec.
 
 CapCheck is a calm consumer trust tool for evaluating short-form financial
 claims. It should feel credible, legible from a projector, and approachable on
-a phone. The interface is dark and focused, with color reserved for status and
-verdict meaning. It is not a trading terminal and should not imitate another
-product's brand, copy, or proprietary artwork.
+a phone. The interface uses the locked cream light theme (see
+[`docs/agents/ui-design.md`](../agents/ui-design.md) for the authoritative
+tokens, fonts, accent rule, and results layout), with color reserved for
+status and verdict meaning. It is not a trading terminal and should not
+imitate another product's brand, copy, or proprietary artwork.
 
 ## Mobbin reference composite
 
-- [Revolut Business upload](https://mobbin.com/screens/2a7be71f-2e9a-404c-9c56-c846d8616783): dark navy canvas, centered intake, quiet upload surface, and visible file state.
+The intake, progress, and evidence patterns below still apply; ignore any
+"dark navy" framing in the borrowed pattern descriptions — CapCheck now
+renders these patterns on the cream light canvas defined in
+`docs/agents/ui-design.md`.
+
+- [Revolut Business upload](https://mobbin.com/screens/2a7be71f-2e9a-404c-9c56-c846d8616783): centered intake, quiet upload surface, and visible file state.
 - [Fireflies upload](https://mobbin.com/screens/b11ca206-fbe6-4042-8b1c-42cf2089427a): obvious drop target, supported-format guidance, one primary action, and upload status below the control.
 - [WRITER research process](https://mobbin.com/screens/c1bf8d44-7bea-4b68-b47c-1acbe324389e): named research stages and a visible current activity instead of an invented percentage.
 - [Rox research stepper](https://mobbin.com/screens/107c729c-a68d-48e3-8ece-51d43eff4215): thin progress rail, step count, and concise nested activity details.
@@ -31,30 +38,24 @@ reference's navigation, labels, logo, or exact layout.
 
 ### Color
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `canvas` | `#07111F` | page background |
-| `surface` | `#0D1A2B` | primary panels |
-| `surface-raised` | `#122238` | controls, expanded cards |
-| `border` | `#24364D` | default boundaries |
-| `border-strong` | `#3A506B` | hover and selected boundaries |
-| `text` | `#F7F3E8` | primary warm-white text |
-| `text-muted` | `#A8B3C3` | supporting copy |
-| `text-subtle` | `#718096` | metadata only |
-| `trust` | `#65E6B4` | primary action, supported state |
-| `trust-ink` | `#06271D` | text on trust background |
-| `warning` | `#F6C760` | mixed or needs-attention state |
-| `danger` | `#FF7A7A` | contradicted, fatal error |
-| `info` | `#7EB6FF` | neutral progress and unverifiable |
+Full token table, the single interactive accent rule, and the verdict color
+mapping are defined once in
+[`docs/agents/ui-design.md`](../agents/ui-design.md#locked-design-decisions)
+and are locked. Summary: `canvas #faf8f3`, `surface #ffffff`,
+`surface-raised #f5f2ea`, `border #e7e2d6`/`#cfc9ba`, `text #211f1b`,
+`text-muted #6b675f`, `text-subtle #98928a`; accent `#2f66d0`; verdict green
+`#1d8a55`/`#e2f3e9`, amber `#9c6a0a`/`#f8eed4`, red `#c23f3e`/`#fbe7e4`.
 
 Do not use decorative gradients. Semantic color must always be paired with an
-icon or label. Avoid large saturated red, green, or yellow fills; use tinted
-surface backgrounds with strong foreground text.
+icon or label. Avoid large saturated fills; use tinted surface backgrounds
+with strong foreground text. The accent blue appears only on interactive
+elements, never as decoration.
 
 ### Typography
 
-- Font family: Geist Sans for UI and content; Geist Mono only for URLs, source
-  domains, timestamps, and compact technical metadata.
+- Font family: Baloo 2 for display and headings, Nunito for body and UI copy
+  (both via `next/font/google`); Geist Mono only for URLs, source domains,
+  timestamps, confidence percentages, counts, and other compact data.
 - Display score: `clamp(3.5rem, 12vw, 7rem)`, weight 650, line-height 0.9.
 - Page title: `clamp(2rem, 5vw, 4.5rem)`, weight 600, line-height 1.02.
 - Section title: 1.25rem desktop and 1.125rem mobile, weight 600.
@@ -66,7 +67,8 @@ surface backgrounds with strong foreground text.
 - Spacing scale: `4, 8, 12, 16, 24, 32, 48, 64px` only.
 - Panel and card radius: 16px. Inputs and buttons: 12px. Pills: 999px.
 - Standard border: 1px solid `border`; selected/focus border: `border-strong`.
-- Shadow: `0 18px 48px rgb(0 0 0 / 0.22)` on the one primary raised panel only.
+- Shadow: a soft, warm, low-opacity shadow (not black) on the one primary
+  raised panel only — see the locked spec for the exact treatment.
 - Content width: 1180px maximum, 24px desktop gutters, 16px mobile gutters.
 - Interactive controls: at least 44px tall; primary actions are 48px tall.
 
@@ -111,13 +113,22 @@ Use a compact wordmark row: shield/check icon, `CapCheck`, and the descriptor
 
 ### Score header
 
+- The results screen is a compact score header (no long scroll), followed by
+  tabbed sections — see the locked results layout in
+  [`docs/agents/ui-design.md`](../agents/ui-design.md#locked-design-decisions).
 - The Cap Score is the strongest visual element, followed by verdict label and
-  a one-sentence explanation.
+  a one-sentence explanation. The one animated hero moment (score count-up and
+  meter pin sweep) lives here; every other transition is a short functional
+  crossfade or expand/collapse.
 - Cap Score measures how much misleading or unsupported content is present, so
   higher is worse: 0-29 `No cap`, 30-69 `Some cap`, 70-100 `Full of cap`.
   Always print the label and short explanation; color alone is insufficient.
+  Verdict pills are bold uppercase Nunito with a status dot, not a colored
+  card-border stripe.
 - Show the strongest citation or takeaway within the same result header area.
 - Reset and retry are secondary actions, visually quieter than Analyze.
+- Claims reviewed, hype language, and next actions render as tabs with count
+  badges beneath the header, not as stacked full-width sections.
 
 ### Claim and evidence card
 
@@ -134,7 +145,7 @@ Use a compact wordmark row: shield/check icon, `CapCheck`, and the descriptor
 ## Interaction, accessibility, and motion
 
 - Keyboard order follows visual order. All interactive elements have visible
-  `2px` trust-colored focus rings with a `2px` offset.
+  `2px` accent-colored (`#2f66d0`) focus rings with a `2px` offset.
 - Text and controls meet WCAG AA contrast. Muted text is not used below 14px.
 - Buttons use verbs and preserve width while loading. Disabled state remains
   readable and explains itself through adjacent status text.
