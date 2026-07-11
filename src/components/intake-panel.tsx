@@ -1,4 +1,4 @@
-import { FileVideo, Link2, RotateCcw, Upload, X } from "lucide-react";
+import { FileVideo, RotateCcw, Upload, X } from "lucide-react";
 import {
   useEffect,
   useId,
@@ -105,14 +105,10 @@ export function IntakePanel({
   };
 
   return (
-    <section className="intake-panel panel" aria-labelledby="intake-title">
-      <div className="panel-heading">
-        <div>
-          <p className="step-label">Start a check</p>
-          <h2 id="intake-title">Analyze a financial video</h2>
-        </div>
-        <Link2 aria-hidden="true" />
-      </div>
+    <section className="panel intake" aria-labelledby="intake-title">
+      <h2 id="intake-title" className="visually-hidden">
+        Start a check
+      </h2>
       <form onSubmit={submit} noValidate>
         <label htmlFor={inputId}>Video URL</label>
         <div className="url-row">
@@ -123,15 +119,15 @@ export function IntakePanel({
             disabled={loading || Boolean(file)}
             aria-invalid={Boolean(validation)}
             aria-describedby={describedBy}
-            placeholder="https://youtube.com/shorts/..."
+            placeholder="https://www.youtube.com/shorts/…"
             onChange={(event) => onUrlChange(event.target.value)}
           />
-          <button className="primary-button" type="submit" disabled={loading}>
-            {loading ? "Analyzing…" : "Analyze video"}
+          <button className="primary" type="submit" disabled={loading}>
+            {loading ? "Checking…" : "Check it"}
           </button>
         </div>
         <p id={`${inputId}-help`} className="helper">
-          YouTube Shorts and TikTok links using HTTP or HTTPS.
+          YouTube, TikTok, and Reels links work. Analysis takes about a minute.
         </p>
         {validation && (
           <p id={`${inputId}-error`} className="field-error" role="alert">
@@ -139,7 +135,7 @@ export function IntakePanel({
           </p>
         )}
 
-        <div className="divider"><span>or upload a video</span></div>
+        <div className="divider">or upload a video</div>
         <label
           className={`drop-zone${file ? " selected" : ""}${loading ? " disabled" : ""}`}
           htmlFor={fileId}
@@ -170,9 +166,13 @@ export function IntakePanel({
         {file && (
           <div className="selected-file">
             <FileVideo aria-hidden="true" />
-            <span><strong>{file.name}</strong><small>{formatSize(file.size)} · ready</small></span>
+            <span>
+              <strong>{file.name}</strong>
+              <small>{formatSize(file.size)} · ready</small>
+            </span>
             <button
               type="button"
+              className="icon-button"
               aria-label={`Remove ${file.name}`}
               disabled={loading}
               onClick={removeFile}
@@ -184,10 +184,20 @@ export function IntakePanel({
       </form>
       {error && (
         <div className="error-banner" role="alert">
-          <div><strong>Analysis stopped</strong><p>{error.message}</p></div>
+          <div>
+            <strong>Analysis stopped</strong>
+            <p>{error.message}</p>
+          </div>
           <div className="error-actions">
-            {error.retryable && <button type="button" onClick={onRetry}>Retry</button>}
-            <button type="button" onClick={onReset}><RotateCcw aria-hidden="true" />Reset</button>
+            {error.retryable && (
+              <button type="button" className="ghost" onClick={onRetry}>
+                Retry
+              </button>
+            )}
+            <button type="button" className="ghost" onClick={onReset}>
+              <RotateCcw aria-hidden="true" />
+              Reset
+            </button>
           </div>
         </div>
       )}

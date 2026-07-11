@@ -1,4 +1,4 @@
-import { Check, Circle } from "lucide-react";
+import { Check, Circle, Loader2 } from "lucide-react";
 
 import type { AnalysisStage } from "@/domain/analysis";
 
@@ -28,20 +28,29 @@ export function ProgressTimeline({ progress }: { progress: UiProgress[] }) {
       aria-labelledby="progress-title"
       aria-live="polite"
     >
-      <p className="step-label">Research process</p>
+      <p className="kicker">Research process</p>
       <h2 id="progress-title">
         {isComplete ? "Analysis complete" : "Checking the claims"}
       </h2>
       <ol>
         {stages.map((stage, index) => {
-          const complete = index < currentIndex || (isComplete && index === currentIndex);
+          const complete =
+            index < currentIndex || (isComplete && index === currentIndex);
           const current = index === currentIndex && !isComplete;
           return (
             <li
               key={stage.key}
               className={complete ? "complete" : current ? "current" : "future"}
             >
-              {complete ? <Check aria-hidden="true" /> : <Circle aria-hidden="true" />}
+              <span className="step-dot">
+                {complete ? (
+                  <Check aria-hidden="true" />
+                ) : current ? (
+                  <Loader2 aria-hidden="true" />
+                ) : (
+                  <Circle aria-hidden="true" />
+                )}
+              </span>
               <span>
                 <strong>{stage.label}</strong>
                 <small>
