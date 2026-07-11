@@ -106,4 +106,20 @@ describe("parseAnalysisStream", () => {
 
     await expect(consume()).rejects.toEqual(new AnalysisStreamError());
   });
+
+  it.each([
+    'data: {"type":"progress","stage":"fetching"',
+    ': comment\nid: 9\ndata: {not-json',
+  ])("rejects a non-whitespace final frame truncated across chunks", async (wire) => {
+    const bytes = new TextEncoder().encode(wire);
+    const response = responseFromChunks(
+      Array.from(bytes, (byte) => Uint8Array.of(byte)),
+    );
+
+    const consume = async () => {
+      for await (const event of parseAnalysisStream(response)) void event;
+    };
+
+    await expect(consume()).rejects.toEqual(new AnalysisStreamError());
+  });
 });

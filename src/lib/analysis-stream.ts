@@ -65,6 +65,8 @@ export async function* parseAnalysisStream(
 
       if (done) break;
     }
+
+    if (buffer.trim().length > 0) throw new AnalysisStreamError();
   } catch (error) {
     if (error instanceof AnalysisStreamError) throw error;
     throw new AnalysisStreamError();

@@ -16,6 +16,8 @@ const scenarios = new Set<FixtureScenario>([
   "partialFailure",
   "fatal",
 ]);
+const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
+const UPLOAD_TOO_LARGE_MESSAGE = "Video uploads must be 50 MB or smaller.";
 
 const errorResponse = (
   status: number,
@@ -24,7 +26,13 @@ const errorResponse = (
 ) =>
   Response.json(
     { error: { code, message, retryable: false } },
-    { status, headers: { "cache-control": "no-store" } },
+    {
+      status,
+      headers: {
+        "cache-control": "no-store",
+        "x-content-type-options": "nosniff",
+      },
+    },
   );
 
 const parseScenario = (
@@ -88,6 +96,22 @@ export async function POST(request: Request): Promise<Response> {
       return errorResponse(400, "Enter a valid HTTP or HTTPS video URL.");
     }
   } else if (contentType.includes("multipart/form-data")) {
+    const contentLength = request.headers.get("content-length");
+    if (
+      contentLength !== null &&
+      /^\d+$/.test(contentLength) &&
+      Number(contentLength) > MAX_UPLOAD_BYTES
+    ) {
+      return errorResponse(
+        413,
+        UPLOAD_TOO_LARGE_MESSAGE,
+        "PAYLOAD_TOO_LARGE",
+      );
+    }
+
+    // Chunked requests have no trustworthy length to preflight. The Web
+    // Request API buffers multipart parsing, so the post-parse file check is a
+    // fallback; deployments should also enforce this limit at their edge.
     let form: FormData;
     try {
       form = await request.formData();
@@ -100,6 +124,14 @@ export async function POST(request: Request): Promise<Response> {
 
     if (!file || typeof file === "string" || file.size === 0) {
       return errorResponse(400, "Choose a video file.");
+    }
+
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return errorResponse(
+        413,
+        UPLOAD_TOO_LARGE_MESSAGE,
+        "PAYLOAD_TOO_LARGE",
+      );
     }
 
     if (!UploadFileNameSchema.safeParse(file.name).success) {
@@ -118,6 +150,9 @@ export async function POST(request: Request): Promise<Response> {
 
   const analysisController = new AbortController();
   const abortAnalysis = () => analysisController.abort();
+  let streamCancelled = false;
+
+  if (request.signal.aborted) abortAnalysis();
   request.signal.addEventListener("abort", abortAnalysis, { once: true });
 
   const stream = new ReadableStream<Uint8Array>({
@@ -130,15 +165,16 @@ export async function POST(request: Request): Promise<Response> {
           controller.enqueue(encodeEvent(event));
         }
       } catch {
-        if (!analysisController.signal.aborted) {
+        if (!analysisController.signal.aborted && !streamCancelled) {
           controller.enqueue(encodeEvent(safeStreamError));
         }
       } finally {
         request.signal.removeEventListener("abort", abortAnalysis);
-        controller.close();
+        if (!streamCancelled) controller.close();
       }
     },
     cancel() {
+      streamCancelled = true;
       analysisController.abort();
       request.signal.removeEventListener("abort", abortAnalysis);
     },
@@ -150,6 +186,7 @@ export async function POST(request: Request): Promise<Response> {
       connection: "keep-alive",
       "content-type": "text/event-stream; charset=utf-8",
       "x-accel-buffering": "no",
+      "x-content-type-options": "nosniff",
     },
   });
 }

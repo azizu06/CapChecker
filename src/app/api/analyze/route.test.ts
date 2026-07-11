@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AnalysisEventSchema, type AnalysisEvent } from "@/domain/analysis";
-import { DEMO_SCORECARDS } from "@/fixtures/scorecards";
+import { DEMO_FATAL_ERROR, DEMO_SCORECARDS } from "@/fixtures/scorecards";
 import { parseAnalysisStream } from "@/lib/analysis-stream";
 
 import { POST } from "./route";
@@ -37,6 +37,7 @@ describe("POST /api/analyze", () => {
     const response = await POST(request(body));
 
     expect(response.status).toBe(400);
+    expect(response.headers.get("x-content-type-options")).toBe("nosniff");
     expect(await response.json()).toEqual({
       error: {
         code: "INVALID_INPUT",
@@ -81,6 +82,53 @@ describe("POST /api/analyze", () => {
     },
   );
 
+  it("rejects an oversized multipart request before parsing its body", async () => {
+    const response = await POST(
+      new Request("http://127.0.0.1:3000/api/analyze", {
+        method: "POST",
+        headers: {
+          "content-length": String(50 * 1024 * 1024 + 1),
+          "content-type": "multipart/form-data; boundary=unused",
+        },
+        body: "not parsed",
+      }),
+    );
+
+    expect(response.status).toBe(413);
+    expect(await response.json()).toEqual({
+      error: {
+        code: "PAYLOAD_TOO_LARGE",
+        message: "Video uploads must be 50 MB or smaller.",
+        retryable: false,
+      },
+    });
+  });
+
+  it("rejects an oversized file after multipart parsing when length is absent", async () => {
+    const form = {
+      get(key: string) {
+        if (key === "file") {
+          return { name: "large.mp4", size: 50 * 1024 * 1024 + 1 };
+        }
+        return null;
+      },
+    } as FormData;
+    const requestBoundary = {
+      headers: new Headers({
+        "content-type": "multipart/form-data; boundary=chunked",
+      }),
+      formData: async () => form,
+      signal: new AbortController().signal,
+    } as Request;
+
+    const response = await POST(requestBoundary);
+
+    expect(response.status).toBe(413);
+    expect(await response.json()).toMatchObject({
+      error: { code: "PAYLOAD_TOO_LARGE", retryable: false },
+    });
+  });
+
   it.each([
     {
       label: "HTTPS URL",
@@ -115,6 +163,7 @@ describe("POST /api/analyze", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("text/event-stream");
     expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(response.headers.get("x-content-type-options")).toBe("nosniff");
 
     const events: AnalysisEvent[] = [];
     for await (const event of parseAnalysisStream(response)) {
@@ -124,6 +173,57 @@ describe("POST /api/analyze", () => {
     expect(events.at(-1)).toEqual({
       type: "complete",
       scorecard: expectedScorecard,
+    });
+  });
+
+  it.each([
+    ["mixed", { type: "complete", scorecard: DEMO_SCORECARDS.mixed }],
+    ["scammy", { type: "complete", scorecard: DEMO_SCORECARDS.scammy }],
+    [
+      "legitimate",
+      { type: "complete", scorecard: DEMO_SCORECARDS.legitimate },
+    ],
+    [
+      "partialFailure",
+      { type: "complete", scorecard: DEMO_SCORECARDS.partialFailure },
+    ],
+    ["fatal", DEMO_FATAL_ERROR],
+  ] as const)(
+    "streams the expected terminal event for the %s scenario",
+    async (scenario, expectedTerminal) => {
+      const response = await POST(
+        request({ url: "https://www.youtube.com/shorts/demo", scenario }),
+      );
+      const events: AnalysisEvent[] = [];
+
+      for await (const event of parseAnalysisStream(response)) events.push(event);
+
+      expect(events.at(-1)).toEqual(expectedTerminal);
+      expect(events.slice(0, -1).map((event) => event.type)).toEqual([
+        "progress",
+        "progress",
+        "progress",
+        "progress",
+        "progress",
+      ]);
+    },
+  );
+
+  it("rejects an unknown fixture scenario", async () => {
+    const response = await POST(
+      request({
+        url: "https://www.youtube.com/shorts/demo",
+        scenario: "private-debug-mode",
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({
+      error: {
+        code: "INVALID_INPUT",
+        message: "Choose a valid analysis scenario.",
+        retryable: false,
+      },
     });
   });
 
@@ -145,5 +245,51 @@ describe("POST /api/analyze", () => {
     });
     expect(JSON.stringify(body)).not.toContain("fixture");
     expect(JSON.stringify(body)).not.toContain(process.cwd());
+  });
+
+  it("emits no frames when the request signal is already aborted", async () => {
+    const controller = new AbortController();
+    controller.abort();
+    const abortedRequest = new Request(
+      "http://127.0.0.1:3000/api/analyze",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          url: "https://www.youtube.com/shorts/demo",
+          scenario: "mixed",
+        }),
+        signal: controller.signal,
+      },
+    );
+
+    const response = await POST(abortedRequest);
+
+    expect(await response.text()).toBe("");
+  });
+
+  it("cancels the response body without a rejected stream start or later frames", async () => {
+    const response = await POST(
+      request({
+        url: "https://www.youtube.com/shorts/demo",
+        scenario: "mixed",
+      }),
+    );
+    const reader = response.body!.getReader();
+    const unhandled: unknown[] = [];
+    const recordUnhandled = (reason: unknown) => unhandled.push(reason);
+    process.on("unhandledRejection", recordUnhandled);
+
+    try {
+      await expect(reader.cancel()).resolves.toBeUndefined();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(unhandled).toEqual([]);
+      await expect(reader.read()).resolves.toEqual({
+        done: true,
+        value: undefined,
+      });
+    } finally {
+      process.off("unhandledRejection", recordUnhandled);
+    }
   });
 });
