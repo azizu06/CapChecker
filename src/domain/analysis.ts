@@ -72,6 +72,8 @@ export const HypeFindingSchema = z.object({
   category: z.enum(["guarantee", "urgency", "popularity", "fear", "authority"]),
   severity: z.enum(["low", "medium", "high"]),
   explanation: z.string().min(1),
+  context: z.string().min(1).optional(),
+  timestampSeconds: z.number().nonnegative().optional(),
 });
 
 export const NextActionSchema = z.object({
@@ -79,6 +81,7 @@ export const NextActionSchema = z.object({
   label: z.string().min(1),
   description: z.string().min(1),
   url: HttpUrlSchema.optional(),
+  evidenceId: z.string().min(1).optional(),
 });
 
 export const SourceVideoSchema = z.discriminatedUnion("kind", [

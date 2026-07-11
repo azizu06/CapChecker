@@ -35,6 +35,17 @@ describe("streamFixtureAnalysis", () => {
     expect(events.at(-1)).toMatchObject({
       type: "complete",
       scorecard: {
+        hypeFindings: expect.arrayContaining([
+          expect.objectContaining({
+            context: expect.any(String),
+            timestampSeconds: expect.any(Number),
+          }),
+        ]),
+        nextActions: expect.arrayContaining([
+          expect.objectContaining({
+            evidenceId: expect.any(String),
+          }),
+        ]),
         skippedClaims: [
           {
             kind: "opinion",

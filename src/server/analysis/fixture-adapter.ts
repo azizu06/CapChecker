@@ -39,6 +39,12 @@ const waitForNextStage = (signal: AbortSignal, delayMs = 100) =>
     signal.addEventListener("abort", abort, { once: true });
   });
 
+const buildCompletionEvent = (scenario: keyof typeof DEMO_SCORECARDS) =>
+  AnalysisEventSchema.parse({
+    type: "complete",
+    scorecard: DEMO_SCORECARDS[scenario],
+  });
+
 export async function* streamFixtureAnalysis(
   input: FixtureAnalysisInput,
   signal: AbortSignal,
@@ -57,8 +63,5 @@ export async function* streamFixtureAnalysis(
     return;
   }
 
-  yield AnalysisEventSchema.parse({
-    type: "complete",
-    scorecard: DEMO_SCORECARDS[scenario],
-  });
+  yield buildCompletionEvent(scenario);
 }
