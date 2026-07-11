@@ -1,12 +1,12 @@
 "use client";
 
-import { ShieldCheck } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 import type { AnalysisStage, ErrorEvent, Scorecard } from "@/domain/analysis";
 import { parseAnalysisStream } from "@/lib/analysis-stream";
 
 import { IntakePanel, validateSubmission } from "./intake-panel";
+import { HowItWorks } from "./how-it-works";
 import { ProgressTimeline, type UiProgress } from "./progress-timeline";
 import { ScorecardView } from "./scorecard";
 
@@ -153,9 +153,7 @@ export function CapCheckApp() {
     return (
       <main className="app app--results">
         <header className="results-header">
-          <span className="brand-mark" aria-hidden="true">
-            <ShieldCheck />
-          </span>
+          <span className="brand-mark" aria-hidden="true" />
           <strong>CapCheck</strong>
           <span className="tagline">Financial advice, fact-checked</span>
           <form className="mini-intake" onSubmit={analyzeNext} noValidate>
@@ -178,19 +176,11 @@ export function CapCheckApp() {
             {miniError}
           </p>
         )}
-        <div className="result-actions" aria-label="Completed result actions">
-          <button className="ghost" type="button" onClick={reset}>
-            Check another
-          </button>
-          <button
-            className="ghost"
-            type="button"
-            onClick={() => void performAnalysis(url, file)}
-          >
-            Run again
-          </button>
-        </div>
-        <ScorecardView scorecard={scorecard} />
+        <ScorecardView
+          scorecard={scorecard}
+          onRunAgain={() => void performAnalysis(url, file)}
+          onCheckAnother={reset}
+        />
       </main>
     );
   }
@@ -198,36 +188,38 @@ export function CapCheckApp() {
   return (
     <main className="app app--landing">
       <header className="app-header">
-        <span className="brand-mark" aria-hidden="true">
-          <ShieldCheck />
-        </span>
+        <span className="brand-mark" aria-hidden="true" />
         <strong>CapCheck</strong>
         <span className="tagline">Financial advice, fact-checked</span>
       </header>
-      <section className="hero" aria-labelledby="page-title">
-        <h1 id="page-title">
-          Is that stock tip <em>cap</em>? Check before you act.
-        </h1>
-        <p>
-          Paste a finance video. CapCheck pulls out the claims, verifies each one
-          against available evidence, and shows you exactly what holds up.
-        </p>
-      </section>
-      <IntakePanel
-        url={url}
-        file={file}
-        loading={loading}
-        error={error}
-        validation={validation}
-        onUrlChange={changeUrl}
-        onFileChange={changeFile}
-        onSubmit={analyze}
-        onRetry={analyze}
-        onReset={reset}
-      />
+      <div className="landing-grid">
+        <section className="hero" aria-labelledby="page-title">
+          <h1 id="page-title">
+            <span>Is that stock tip <em>cap</em>?</span>{" "}
+            <span>Check before you act.</span>
+          </h1>
+          <p>
+            Paste a finance video. CapCheck pulls out the claims, verifies each one
+            against available evidence, and shows you exactly what holds up.
+          </p>
+        </section>
+        <IntakePanel
+          url={url}
+          file={file}
+          loading={loading}
+          error={error}
+          validation={validation}
+          onUrlChange={changeUrl}
+          onFileChange={changeFile}
+          onSubmit={analyze}
+          onRetry={analyze}
+          onReset={reset}
+        />
+      </div>
       {(loading || progress.length > 0) && (
         <ProgressTimeline progress={progress} />
       )}
+      <HowItWorks />
     </main>
   );
 }
