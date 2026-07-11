@@ -275,6 +275,14 @@ test("result tabs support the complete keyboard navigation pattern", async ({ pa
   await expect(page.locator('[role="tabpanel"][hidden]')).toHaveCount(2);
 });
 
+test("reduced motion renders the score and meter at their final state", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await submitUrl(page);
+  await expect(page.locator(".score-num")).toHaveText("52");
+  await expect(page.locator(".meter .pin")).toHaveAttribute("style", /left: 52%/);
+  await expect(page.locator(".meter .pin")).toHaveCSS("transition-duration", "0s");
+});
+
 test("upload can be selected, removed, reselected, and analyzed through multipart", async ({
   page,
 }) => {
