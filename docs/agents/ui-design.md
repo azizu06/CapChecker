@@ -26,7 +26,8 @@ following surface and text tokens.
 | `border-strong` | `#cfc9ba` | hover/selected boundaries |
 | `text` | `#211f1b` | ink, primary text |
 | `text-muted` | `#6b675f` | supporting copy |
-| `text-subtle` | `#98928a` | metadata only |
+| `text-subtle` | `#706b63` | essential small metadata |
+| `decorative-subtle` | `#98928a` | nonessential decoration only |
 
 Shadows are soft and warm (not black drop shadows) — think a low-opacity warm
 brown/grey, short blur radius, used sparingly on the one primary raised panel.
@@ -41,14 +42,16 @@ brown/grey, short blur radius, used sparingly on the one primary raised panel.
 
 ### Accent and semantic color
 
-- Single interactive accent: cool blue `#2f66d0` (hover `#2857b4`, dim/tint
-  `#e8effb`). Use it only on interactive elements — links, primary buttons,
-  focus states, active tabs. It does not appear elsewhere.
+- Primary accent: cool blue `#2f66d0` (hover `#2857b4`, dim/tint `#e8effb`).
+  Use it for interactive elements and the approved small decorative identity
+  accents (the brand mark, emphasized `cap`, and compact methodology icons).
 - Verdict/semantic colors are reserved for verdicts and must not be reused for
   decoration or generic interactivity:
-  - Green (`No cap`): ink `#1d8a55`, tint `#e2f3e9`.
-  - Amber (`Some cap`): ink `#9c6a0a`, tint `#f8eed4`.
-  - Red (`Full of cap`): ink `#c23f3e`, tint `#fbe7e4`.
+  - Green (`No cap`): ink `#1d8a55`, pill ink `#19784a`, tint `#e2f3e9`.
+  - Amber (`Some cap`): ink `#9c6a0a`, pill ink `#8e6009`, tint `#f8eed4`.
+  - Red (`Full of cap`): ink `#c23f3e`, pill ink `#b83c3b`, tint `#fbe7e4`.
+  The darker pill inks are used for compact verdict text and status dots against
+  their matching tints; headings and meter bands keep the standard semantic inks.
 - Minimal color is the anti-"mental clutter" rule. If a new element seems to
   need a new color, it probably needs restraint instead.
 
@@ -58,6 +61,10 @@ Sober and financial-grade, with exactly one wink: the verdict labels stay
 `No cap`, `Some cap`, `Full of cap`. Everything else — labels, errors, empty
 states, methodology copy — reads like a credible fintech product, not a meme
 account.
+
+The approved identity descriptor is `Financial advice, fact-checked`; the page
+title is `Is that stock tip cap? Check before you act.` and the primary action
+is `Check it`.
 
 ### Motion budget
 
@@ -77,10 +84,10 @@ No long scroll. The results screen is:
    act", each with a count badge on its tab.
 3. A persistent mini-intake in the app header while in the results state, so a
    user can start a new check without losing place.
-4. A "How the Cap Score works" three-column strip plus a footer (Methodology /
-   Sources we trust / Report a bad verdict / "isn't financial advice"
-   disclaimer), so the results never float alone on the page with nothing
-   underneath.
+4. A "How the Cap Score works" three-column strip plus a simple footer stating
+   that CapCheck verifies claims and is not financial advice. Do not render
+   dead footer links or invent destinations, so the results never float alone
+   on the page with nothing underneath.
 
 Verdict pills are bold, uppercase Nunito with a status dot — no colored
 left-border card stripes, and no monospace pills.

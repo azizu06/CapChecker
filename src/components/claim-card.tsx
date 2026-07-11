@@ -1,133 +1,116 @@
-import {
-  ChevronDown,
-  ExternalLink,
-  MessageCircle,
-  ShieldCheck,
-  TriangleAlert,
-} from "lucide-react";
-import { useState } from "react";
+import { ChevronDown, ExternalLink, TriangleAlert } from "lucide-react";
 
-import type { OpinionClaim, Verification } from "@/domain/analysis";
+import type { Evidence, OpinionClaim, Verification } from "@/domain/analysis";
 import { formatTimestamp } from "@/lib/format-timestamp";
 
-const verdictLabels = {
-  true: "Supported",
-  "mostly-true": "Mostly supported",
-  false: "Contradicted",
-  unverifiable: "Unverifiable",
+const verdictPills = {
+  true: { label: "True", tone: "v-true" },
+  "mostly-true": { label: "Mostly true", tone: "v-mostly" },
+  unverifiable: { label: "Unverifiable", tone: "v-unv" },
+  false: { label: "False", tone: "v-false" },
 } as const;
 
-const ClaimTimestamp = ({ timestampSeconds }: { timestampSeconds?: number }) =>
-  timestampSeconds === undefined ? null : (
-    <time dateTime={`PT${timestampSeconds}S`}>
-      {formatTimestamp(timestampSeconds)}
-    </time>
-  );
+const tierLabels = {
+  primary: "Primary source",
+  high: "High trust",
+  medium: "Medium trust",
+  low: "Low trust",
+} as const;
+
+const Chevron = () => <ChevronDown className="chev" aria-hidden="true" />;
+
+const ClaimMeta = ({
+  timestampSeconds,
+  trailing,
+}: {
+  timestampSeconds?: number;
+  trailing: string;
+}) => (
+  <span className="claim-meta">
+    {timestampSeconds !== undefined && (
+      <>
+        <time dateTime={`PT${timestampSeconds}S`}>
+          {formatTimestamp(timestampSeconds)}
+        </time>
+        {" · "}
+      </>
+    )}
+    {trailing}
+  </span>
+);
+
+const EvidenceBlock = ({ evidence }: { evidence: Evidence }) => (
+  <div className="evidence">
+    <blockquote>“{evidence.excerpt}”</blockquote>
+    <footer>
+      <span className={`tier${evidence.trustTier === "low" ? " tier-low" : ""}`}>
+        {tierLabels[evidence.trustTier]}
+      </span>
+      <a
+        href={evidence.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Open source: ${evidence.title} (opens in new tab)`}
+      >
+        {evidence.publisher} — {evidence.title}
+        <ExternalLink aria-hidden="true" />
+      </a>
+    </footer>
+  </div>
+);
 
 type ClaimCardProps =
   | { verification: Verification; skippedClaim?: never }
   | { verification?: never; skippedClaim: OpinionClaim };
 
 export function ClaimCard(props: ClaimCardProps) {
-  const [expanded, setExpanded] = useState(false);
-
   if (props.skippedClaim) {
     const claim = props.skippedClaim;
     return (
-      <article className="claim-card opinion">
+      <article className="claim opinion">
         <div className="claim-summary">
-          <div className="claim-copy">
-            <span className="status-pill">
-              <MessageCircle aria-hidden="true" />
-              Opinion — not fact-checked
-            </span>
-            <h3>{claim.text}</h3>
-            <p className="claim-meta">
-              <ClaimTimestamp timestampSeconds={claim.timestampSeconds} />
-            </p>
-          </div>
+          <span className="verdict-pill v-skip">Opinion</span>
+          <span className="claim-text">{claim.text}</span>
+          <ClaimMeta
+            timestampSeconds={claim.timestampSeconds}
+            trailing="skipped"
+          />
         </div>
       </article>
     );
   }
 
   const { verification } = props;
-  const id = `claim-${verification.claim.id}`;
-  const tone =
-    verification.verdict === "false"
-      ? "danger"
-      : verification.verdict === "unverifiable"
-        ? "info"
-        : verification.verdict === "mostly-true"
-          ? "warning"
-          : "trust";
+  const pill = verdictPills[verification.verdict];
 
   return (
-    <article className={`claim-card ${tone}`}>
-      <div className="claim-summary">
-        <div className="claim-copy">
-          <span className="status-pill">
-            {tone === "danger" ? (
-              <TriangleAlert aria-hidden="true" />
-            ) : (
-              <ShieldCheck aria-hidden="true" />
-            )}
-            {verdictLabels[verification.verdict]}
-          </span>
-          <h3>{verification.claim.text}</h3>
-          <p className="claim-meta">
-            <ClaimTimestamp
-              timestampSeconds={verification.claim.timestampSeconds}
-            />
-            <span>{Math.round(verification.confidence * 100)}% confidence</span>
-          </p>
-        </div>
-        <button
-          type="button"
-          aria-expanded={expanded}
-          aria-controls={id}
-          onClick={() => setExpanded((value) => !value)}
-        >
-          <span>{expanded ? "Hide evidence" : "View evidence"}</span>
-          <ChevronDown aria-hidden="true" />
-        </button>
+    <details className="claim">
+      <summary>
+        <span className={`verdict-pill ${pill.tone}`}>{pill.label}</span>
+        <span className="claim-text">{verification.claim.text}</span>
+        <ClaimMeta
+          timestampSeconds={verification.claim.timestampSeconds}
+          trailing={`${Math.round(verification.confidence * 100)}%`}
+        />
+        <Chevron />
+      </summary>
+      <div className="claim-body">
+        <p>{verification.explanation}</p>
+        {verification.evidence.length ? (
+          verification.evidence.map((evidence) => (
+            <EvidenceBlock key={evidence.id} evidence={evidence} />
+          ))
+        ) : (
+          <div className="partial-note" role="note">
+            <TriangleAlert aria-hidden="true" />
+            <span>
+              <strong>Source unavailable</strong>
+              This claim could not be fully verified. The rest of the analysis is
+              complete.
+            </span>
+          </div>
+        )}
       </div>
-      {expanded && (
-        <div id={id} className="claim-details">
-          <p>{verification.explanation}</p>
-          {verification.evidence.length ? (
-            verification.evidence.map((evidence) => (
-              <div className="evidence" key={evidence.id}>
-                <span className="trust-tier">{evidence.trustTier} trust</span>
-                <blockquote>{evidence.excerpt}</blockquote>
-                <p>
-                  <strong>{evidence.title}</strong>
-                  <span>
-                    {evidence.publisher} · {new URL(evidence.url).hostname}
-                  </span>
-                </p>
-                <a
-                  href={evidence.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Open source: ${evidence.title} (opens in new tab)`}
-                >
-                  Open source <ExternalLink aria-hidden="true" />
-                </a>
-              </div>
-            ))
-          ) : (
-            <div className="partial-note" role="note">
-              <TriangleAlert aria-hidden="true" />
-              <span>
-                <strong>Source unavailable</strong>
-                This claim could not be fully verified. The rest of the analysis
-                is complete.
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-    </article>
+    </details>
   );
 }
