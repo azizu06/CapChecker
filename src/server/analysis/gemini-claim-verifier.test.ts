@@ -3,6 +3,88 @@ import { describe, expect, it, vi } from "vitest";
 import { createGeminiClaimVerifier } from "./gemini-claim-verifier";
 
 describe("Gemini claim verifier", () => {
+  it("aborts a stalled Gemini request at its implementation-owned deadline", async () => {
+    vi.useFakeTimers();
+    try {
+      let requestSignal: AbortSignal | undefined;
+      const caller = new AbortController();
+      const fetch = vi.fn(
+        (_input: RequestInfo | URL, init?: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            requestSignal = init?.signal ?? undefined;
+            requestSignal?.addEventListener("abort", () => reject(requestSignal?.reason), {
+              once: true,
+            });
+          }),
+      );
+      const verifier = createGeminiClaimVerifier({
+        apiKey: "test-gemini-key",
+        fetch: fetch as typeof globalThis.fetch,
+        requestTimeoutMs: 1_000,
+      });
+
+      const request = verifier.verifyClaim(
+        {
+          id: "claim-timeout",
+          text: "A stalled claim.",
+          timestampSeconds: 0,
+          kind: "factual",
+          checkable: true,
+        },
+        { signal: caller.signal },
+      );
+      const outcome = request.catch((caught: unknown) => caught);
+      await vi.advanceTimersByTimeAsync(1_001);
+      const deadlineAborted = requestSignal?.aborted ?? false;
+      if (!deadlineAborted) caller.abort(new DOMException("cleanup", "AbortError"));
+      const error = await outcome;
+
+      expect(deadlineAborted).toBe(true);
+      expect(error).toEqual(
+        expect.objectContaining({
+          name: "ClaimVerificationRequestError",
+          code: "CLAIM_VERIFICATION_UNAVAILABLE",
+          retryable: true,
+        }),
+      );
+      expect(caller.signal.aborted).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("preserves the caller abort reason instead of converting it to a timeout", async () => {
+    const caller = new AbortController();
+    const reason = new DOMException("caller stopped verification", "AbortError");
+    const fetch = vi.fn(
+      (_input: RequestInfo | URL, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => reject(init.signal?.reason), {
+            once: true,
+          });
+        }),
+    );
+    const verifier = createGeminiClaimVerifier({
+      apiKey: "test-gemini-key",
+      fetch: fetch as typeof globalThis.fetch,
+      requestTimeoutMs: 60_000,
+    });
+
+    const request = verifier.verifyClaim(
+      {
+        id: "claim-abort",
+        text: "A cancelled claim.",
+        timestampSeconds: 0,
+        kind: "factual",
+        checkable: true,
+      },
+      { signal: caller.signal },
+    );
+    caller.abort(reason);
+
+    await expect(request).rejects.toBe(reason);
+  });
+
   it("grounds a general claim with Search-supported displayable citations", async () => {
     const signedSearchTurn = {
       role: "model",
@@ -83,7 +165,7 @@ describe("Gemini claim verifier", () => {
           publisher: "sec.gov",
           url: "https://www.sec.gov/Archives/edgar/data/example",
           trustTier: "primary",
-          stance: "supports",
+          stance: "context",
           excerpt: "Revenue increased by five percent.",
         },
       ],
@@ -108,7 +190,86 @@ describe("Gemini claim verifier", () => {
     ]);
   });
 
-  it("replays the complete signed model turn before returning get_stock_data", async () => {
+  it("does not grant authority from hostile page titles or substring hostnames", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(
+        Response.json({
+          candidates: [
+            {
+              content: {
+                role: "model",
+                parts: [{ text: "Two pages repeat the claim." }],
+              },
+              groundingMetadata: {
+                groundingChunks: [
+                  {
+                    web: {
+                      uri: "https://unknown.example/article",
+                      title: "SEC.gov official filing",
+                    },
+                  },
+                  {
+                    web: {
+                      uri: "https://sec.gov.attacker.example/article",
+                      title: "Unknown mirror",
+                    },
+                  },
+                ],
+                groundingSupports: [
+                  {
+                    segment: { text: "The pages repeat the claim." },
+                    groundingChunkIndices: [0, 1],
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({
+          candidates: [
+            {
+              content: {
+                role: "model",
+                parts: [
+                  {
+                    text: JSON.stringify({
+                      verdict: "mostly-true",
+                      confidence: 0.5,
+                      explanation: "The claim is repeated but lacks an authoritative source.",
+                    }),
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      );
+    const verifier = createGeminiClaimVerifier({
+      apiKey: "test-gemini-key",
+      fetch,
+    });
+
+    const result = await verifier.verifyClaim(
+      {
+        id: "claim-hostile-title",
+        text: "A regulatory claim.",
+        timestampSeconds: 0,
+        kind: "factual",
+        checkable: true,
+      },
+      { signal: new AbortController().signal },
+    );
+
+    expect(result.evidence.map(({ trustTier }) => trustTier)).toEqual([
+      "low",
+      "low",
+    ]);
+  });
+
+  it("uses get_stock_data for an explicitly current quote-compatible claim", async () => {
     const signedModelTurn = {
       role: "model",
       parts: [
@@ -164,7 +325,7 @@ describe("Gemini claim verifier", () => {
         timestamp: "2026-07-11T16:00:00.000Z",
       },
       source: {
-        title: "Stock quote",
+        title: "Finnhub quote API documentation",
         publisher: "Finnhub",
         url: "https://finnhub.io/docs/api/quote",
         trustTier: "high" as const,
@@ -193,9 +354,13 @@ describe("Gemini claim verifier", () => {
       verdict: "true",
       evidence: [
         {
+          title: "Finnhub quote API documentation",
           publisher: "Finnhub",
           trustTier: "high",
           url: "https://finnhub.io/docs/api/quote",
+          excerpt: expect.stringContaining(
+            "The linked documentation describes the endpoint but does not reproduce this request-specific value.",
+          ),
         },
       ],
     });
@@ -226,6 +391,86 @@ describe("Gemini claim verifier", () => {
         },
       ],
     });
+  });
+
+  it("routes an unsupported ticker metric and historical period directly to Search", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(
+        Response.json({
+          candidates: [
+            {
+              content: {
+                role: "model",
+                parts: [{ text: "The filing reports quarterly revenue." }],
+              },
+              groundingMetadata: {
+                groundingChunks: [
+                  {
+                    web: {
+                      uri: "https://www.sec.gov/Archives/edgar/data/example",
+                      title: "Quarterly filing",
+                    },
+                  },
+                ],
+                groundingSupports: [
+                  {
+                    segment: { text: "Quarterly revenue was reported in the filing." },
+                    groundingChunkIndices: [0],
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({
+          candidates: [
+            {
+              content: {
+                role: "model",
+                parts: [
+                  {
+                    text: JSON.stringify({
+                      verdict: "true",
+                      confidence: 0.9,
+                      explanation: "The quarterly filing supports the revenue claim.",
+                    }),
+                  },
+                ],
+              },
+            },
+          ],
+        }),
+      );
+    const getStockData = vi.fn();
+    const verifier = createGeminiClaimVerifier({
+      apiKey: "test-gemini-key",
+      fetch,
+      marketData: { getStockData },
+    });
+
+    await expect(
+      verifier.verifyClaim(
+        {
+          id: "claim-revenue",
+          text: "AAPL revenue rose in Q1 2026.",
+          timestampSeconds: 10,
+          kind: "factual",
+          checkable: true,
+          quant: { ticker: "AAPL", metric: "revenue", period: "Q1 2026" },
+        },
+        { signal: new AbortController().signal },
+      ),
+    ).resolves.toMatchObject({
+      verdict: "true",
+      evidence: [expect.objectContaining({ publisher: "sec.gov" })],
+    });
+
+    expect(getStockData).not.toHaveBeenCalled();
+    const firstBody = JSON.parse(String(fetch.mock.calls[0][1]?.body));
+    expect(firstBody.tools).toEqual([{ googleSearch: {} }]);
   });
 
   it("falls back to Search grounding when quantitative market data is unavailable", async () => {
@@ -326,7 +571,12 @@ describe("Gemini claim verifier", () => {
           timestampSeconds: 4,
           kind: "factual",
           checkable: true,
-          quant: { ticker: "NVDA", value: "$100" },
+          quant: {
+            ticker: "NVDA",
+            metric: "price",
+            value: "$100",
+            period: "current",
+          },
         },
         { signal: new AbortController().signal },
       ),

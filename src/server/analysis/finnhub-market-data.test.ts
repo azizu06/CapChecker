@@ -3,6 +3,76 @@ import { describe, expect, it, vi } from "vitest";
 import { createFinnhubMarketData } from "./finnhub-market-data";
 
 describe("Finnhub market data", () => {
+  it("aborts a stalled quote request at its implementation-owned deadline", async () => {
+    vi.useFakeTimers();
+    try {
+      let requestSignal: AbortSignal | undefined;
+      const caller = new AbortController();
+      const fetch = vi.fn(
+        (_input: RequestInfo | URL, init?: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            requestSignal = init?.signal ?? undefined;
+            requestSignal?.addEventListener("abort", () => reject(requestSignal?.reason), {
+              once: true,
+            });
+          }),
+      );
+      const marketData = createFinnhubMarketData({
+        apiKey: "test-finnhub-key",
+        fetch: fetch as typeof globalThis.fetch,
+        requestTimeoutMs: 1_000,
+      });
+
+      const request = marketData.getStockData({
+        ticker: "AAPL",
+        signal: caller.signal,
+      });
+      const outcome = request.catch((caught: unknown) => caught);
+      await vi.advanceTimersByTimeAsync(1_001);
+      const deadlineAborted = requestSignal?.aborted ?? false;
+      if (!deadlineAborted) caller.abort(new DOMException("cleanup", "AbortError"));
+      const error = await outcome;
+
+      expect(deadlineAborted).toBe(true);
+      expect(error).toEqual(
+        expect.objectContaining({
+          name: "MarketDataError",
+          code: "MARKET_DATA_UNAVAILABLE",
+          retryable: true,
+        }),
+      );
+      expect(caller.signal.aborted).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("preserves a caller abort instead of converting it to market unavailability", async () => {
+    const caller = new AbortController();
+    const reason = new DOMException("caller stopped quote lookup", "AbortError");
+    const fetch = vi.fn(
+      (_input: RequestInfo | URL, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => reject(init.signal?.reason), {
+            once: true,
+          });
+        }),
+    );
+    const marketData = createFinnhubMarketData({
+      apiKey: "test-finnhub-key",
+      fetch: fetch as typeof globalThis.fetch,
+      requestTimeoutMs: 60_000,
+    });
+
+    const request = marketData.getStockData({
+      ticker: "AAPL",
+      signal: caller.signal,
+    });
+    caller.abort(reason);
+
+    await expect(request).rejects.toBe(reason);
+  });
+
   it("returns a normalized quote with a displayable source citation", async () => {
     const fetch = vi.fn().mockResolvedValue(
       Response.json({
@@ -44,7 +114,7 @@ describe("Finnhub market data", () => {
         timestamp: "2026-07-11T16:00:00.000Z",
       },
       source: {
-        title: "Stock quote",
+        title: "Finnhub quote API documentation",
         publisher: "Finnhub",
         url: "https://finnhub.io/docs/api/quote",
         trustTier: "high",

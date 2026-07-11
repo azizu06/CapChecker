@@ -74,13 +74,21 @@ const publisherForSource = (url: string, title: string) => {
     : publisher;
 };
 
-const trustTierFor = (url: string, title: string) => {
-  const source = `${publisherFor(url)} ${title}`.toLowerCase();
+const isHostWithin = (hostname: string, domain: string) =>
+  hostname === domain || hostname.endsWith(`.${domain}`);
+
+const trustTierFor = (url: string) => {
+  const hostname = publisherFor(url).toLowerCase().replace(/\.$/, "");
   if (
-    source.includes(".gov") ||
-    source.includes("sec.gov") ||
-    source.includes("finra.org") ||
-    source.includes("federalreserve.gov")
+    [
+      "sec.gov",
+      "investor.gov",
+      "federalreserve.gov",
+      "bls.gov",
+      "irs.gov",
+      "treasury.gov",
+      "finra.org",
+    ].some((domain) => isHostWithin(hostname, domain))
   ) {
     return "primary" as const;
   }
@@ -92,11 +100,14 @@ const trustTierFor = (url: string, title: string) => {
       "ft.com",
       "cnbc.com",
       "finnhub.io",
-    ].some((domain) => source.includes(domain))
+      "nasdaq.com",
+      "nyse.com",
+      "morningstar.com",
+    ].some((domain) => isHostWithin(hostname, domain))
   ) {
     return "high" as const;
   }
-  return "medium" as const;
+  return "low" as const;
 };
 
 const readCandidate = (value: unknown) => {
@@ -225,6 +236,51 @@ const functionDeclaration = {
   },
 };
 
+const normalizeQuantLabel = (value: string | undefined) =>
+  value?.trim().toLowerCase().replace(/[\s_-]+/g, " ");
+
+const currentQuoteMetrics = new Set([
+  "current price",
+  "current share price",
+  "current stock price",
+  "latest price",
+  "latest share price",
+  "latest stock price",
+  "real time price",
+  "current quote",
+  "latest quote",
+]);
+
+const quoteMetrics = new Set([
+  "price",
+  "share price",
+  "stock price",
+  "quote",
+  "market price",
+  "trading price",
+]);
+
+const currentPeriods = new Set([
+  "current",
+  "now",
+  "today",
+  "latest",
+  "present",
+  "real time",
+]);
+
+const isCurrentQuoteClaim = (claim: ExtractedClaim) => {
+  if (!claim.quant?.ticker) return false;
+  const metric = normalizeQuantLabel(claim.quant.metric);
+  const period = normalizeQuantLabel(claim.quant.period);
+  if (!metric) return false;
+  if (period && !currentPeriods.has(period)) return false;
+  return (
+    currentQuoteMetrics.has(metric) ||
+    (quoteMetrics.has(metric) && Boolean(period && currentPeriods.has(period)))
+  );
+};
+
 const sleepWithSignal = (milliseconds: number, signal: AbortSignal) =>
   new Promise<void>((resolve, reject) => {
     const onAbort = () => {
@@ -248,6 +304,7 @@ export function createGeminiClaimVerifier({
   sleep = sleepWithSignal,
   baseBackoffMs = 300,
   maxAttempts = 3,
+  requestTimeoutMs = 30_000,
 }: {
   apiKey: string;
   baseUrl?: string;
@@ -257,6 +314,7 @@ export function createGeminiClaimVerifier({
   sleep?: (milliseconds: number, signal: AbortSignal) => Promise<void>;
   baseBackoffMs?: number;
   maxAttempts?: number;
+  requestTimeoutMs?: number;
 }) {
   if (!Number.isInteger(maxAttempts) || maxAttempts < 1) {
     throw new TypeError("maxAttempts must be a positive integer");
@@ -265,6 +323,11 @@ export function createGeminiClaimVerifier({
   const request = async (body: unknown, signal: AbortSignal) => {
     let response: Response | undefined;
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      const timeout = new AbortController();
+      const timer = setTimeout(
+        () => timeout.abort(new DOMException("Request timed out", "TimeoutError")),
+        requestTimeoutMs,
+      );
       try {
         response = await fetchImpl(
           `${baseUrl}/v1beta/models/${encodeURIComponent(model)}:generateContent`,
@@ -275,12 +338,14 @@ export function createGeminiClaimVerifier({
               "X-Goog-Api-Key": apiKey,
             },
             body: JSON.stringify(body),
-            signal,
+            signal: AbortSignal.any([signal, timeout.signal]),
           },
         );
       } catch (cause) {
         if (signal.aborted) throw cause;
         throw new ClaimVerificationRequestError();
+      } finally {
+        clearTimeout(timer);
       }
       if (response.status !== 429 || attempt === maxAttempts) break;
       await sleep(baseBackoffMs * 2 ** (attempt - 1), signal);
@@ -349,12 +414,6 @@ export function createGeminiClaimVerifier({
         }
       }
     }
-    const stance =
-      draft.verdict === "false"
-        ? ("contradicts" as const)
-        : draft.verdict === "unverifiable"
-          ? ("context" as const)
-          : ("supports" as const);
     const evidence = [...supportedIndices].flatMap((chunkIndex, citationIndex) => {
       const web = chunks[chunkIndex]?.web;
       if (typeof web?.uri !== "string" || typeof web.title !== "string") return [];
@@ -370,8 +429,8 @@ export function createGeminiClaimVerifier({
           title: web.title,
           publisher,
           url: web.uri,
-          trustTier: trustTierFor(web.uri, web.title),
-          stance,
+          trustTier: trustTierFor(web.uri),
+          stance: "context" as const,
           excerpt: excerpts.get(chunkIndex) ?? draft.explanation,
         },
       ];
@@ -471,7 +530,7 @@ export function createGeminiClaimVerifier({
           url: stockData.source.url,
           trustTier: stockData.source.trustTier,
           stance,
-          excerpt: `${stockData.ticker} current: ${stockData.quote.current}; previous close: ${stockData.quote.previousClose}; change: ${stockData.quote.change} (${stockData.quote.percentChange}%). Retrieved ${stockData.quote.timestamp}.`,
+          excerpt: `Observed request-specific Finnhub quote for ${stockData.ticker}: current ${stockData.quote.current}; previous close ${stockData.quote.previousClose}; change ${stockData.quote.change} (${stockData.quote.percentChange}%). Retrieved ${stockData.quote.timestamp}. The linked documentation describes the endpoint but does not reproduce this request-specific value.`,
         },
       ],
     };
@@ -482,7 +541,7 @@ export function createGeminiClaimVerifier({
       claim: ExtractedClaim,
       { signal }: { signal: AbortSignal },
     ): Promise<VerificationDraft> {
-      if (!claim.quant?.ticker || !marketData) {
+      if (!isCurrentQuoteClaim(claim) || !marketData) {
         return verifyWithSearch(claim, signal);
       }
       try {

@@ -32,18 +32,30 @@ General claims use two Gemini turns. The first turn is dedicated to Google
 Search evidence retrieval so the response contains `groundingChunks` and
 `groundingSupports`. The second turn replays the complete signed model content
 and classifies the grounded evidence with schema-constrained output. Only chunks
-referenced by grounding supports become displayable evidence.
+referenced by grounding supports become displayable evidence. Search evidence
+uses `context` stance because grounding attribution alone does not prove whether
+each individual source supports or contradicts the original claim. Trust tiers
+are based only on normalized, boundary-checked source hostnames; titles never
+grant authority, and Google redirect hosts remain low trust when their final
+hostname is not available in the response.
 
-Claims with `quant.ticker` first use the `get_stock_data` function. The complete
+Only claims with an explicit current-price/current-quote metric and compatible
+current period use the `get_stock_data` function. Revenue, earnings, market-cap,
+historical, and ambiguous ticker claims go directly to Search. The complete
 Gemini model content object, including the original function-call part and
 `thoughtSignature`, is returned unchanged before the function response. Finnhub
-quotes are normalized into a high-trust source. If the function or Finnhub path
-fails, the claim receives a fresh Search-grounded attempt.
+quotes are normalized into a high-trust API observation. Its displayable
+evidence explicitly states that the linked endpoint documentation describes the
+method but cannot reproduce the request-specific value. If the function or
+Finnhub path fails, the claim receives a fresh Search-grounded attempt.
 
 Gemini and Finnhub both use a maximum of three attempts with exponential 429
-backoff. A claim that still fails or returns a malformed verification becomes a
-contract-valid `unverifiable` result without exposing upstream details or
-failing sibling claims. Caller cancellation remains an abort.
+backoff. Every Gemini request has an implementation-owned 30-second deadline;
+every Finnhub request has a 10-second deadline. Both compose their deadline with
+the caller signal, and caller cancellation remains the original abort. A claim
+that still fails or returns a malformed verification becomes a contract-valid
+`unverifiable` result without exposing upstream details or failing sibling
+claims.
 
 ## Verification evidence
 
@@ -53,6 +65,10 @@ checkable-only selection, frozen-contract validation, per-claim degradation,
 bounded concurrency, Finnhub normalization and 429 backoff, Search-supported
 citations, deterministic trust tiers, exact signed model-turn replay,
 `get_stock_data`, Search fallback, Gemini 429 backoff, and production wiring.
+Coordinator-review cycles then added deterministic Gemini/Finnhub deadline and
+caller-abort coverage, hostile-title and hostname-boundary trust tests,
+quote-compatible versus unsupported-ticker routing, honest Finnhub citation
+limitations, and non-fabricated Search citation stance.
 
 Run deterministic checks with:
 

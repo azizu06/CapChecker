@@ -53,6 +53,7 @@ type FinnhubMarketDataOptions = {
   sleep?: (milliseconds: number, signal: AbortSignal) => Promise<void>;
   baseBackoffMs?: number;
   maxAttempts?: number;
+  requestTimeoutMs?: number;
 };
 
 const sleepWithSignal = (milliseconds: number, signal: AbortSignal) =>
@@ -77,6 +78,7 @@ export function createFinnhubMarketData({
   sleep = sleepWithSignal,
   baseBackoffMs = 250,
   maxAttempts = 3,
+  requestTimeoutMs = 10_000,
 }: FinnhubMarketDataOptions) {
   if (!Number.isInteger(maxAttempts) || maxAttempts < 1) {
     throw new TypeError("maxAttempts must be a positive integer");
@@ -105,11 +107,20 @@ export function createFinnhubMarketData({
 
       let response: Response | undefined;
       for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        const timeout = new AbortController();
+        const timer = setTimeout(
+          () => timeout.abort(new DOMException("Request timed out", "TimeoutError")),
+          requestTimeoutMs,
+        );
         try {
-          response = await fetchImpl(url, { signal });
+          response = await fetchImpl(url, {
+            signal: AbortSignal.any([signal, timeout.signal]),
+          });
         } catch (cause) {
           if (signal.aborted) throw cause;
           throw new MarketDataError();
+        } finally {
+          clearTimeout(timer);
         }
         if (response.status !== 429 || attempt === maxAttempts) break;
         await sleep(baseBackoffMs * 2 ** (attempt - 1), signal);
@@ -142,7 +153,7 @@ export function createFinnhubMarketData({
           timestamp: timestamp.toISOString(),
         },
         source: {
-          title: "Stock quote",
+          title: "Finnhub quote API documentation",
           publisher: "Finnhub",
           url: "https://finnhub.io/docs/api/quote",
           trustTier: "high",
