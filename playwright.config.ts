@@ -28,6 +28,6 @@ export default defineConfig({
       ...process.env,
       CAPCHECK_ANALYSIS_MODE: "fixture",
     },
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
   },
 });

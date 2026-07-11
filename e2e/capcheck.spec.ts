@@ -128,6 +128,12 @@ test("validates URL input, prevents duplicate work, and exposes truthful progres
 test("mixed result exposes every claim and safe evidence destination, then resets", async ({
   page,
 }) => {
+  let analysisRequests = 0;
+  page.on("request", (request) => {
+    if (request.method() === "POST" && request.url().endsWith("/api/analyze")) {
+      analysisRequests += 1;
+    }
+  });
   await submitUrl(page);
   await expect(page.getByText("52", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Some cap" })).toBeVisible();
@@ -168,8 +174,12 @@ test("mixed result exposes every claim and safe evidence destination, then reset
   await expectSafeExternalLink(
     page.getByRole("link", { name: /Review the latest filing/ }),
   );
+  expect(analysisRequests).toBe(1);
   await page.getByRole("button", { name: "Run again" }).click();
+  await expect(page.getByRole("button", { name: "Analyzing…" })).toBeDisabled();
+  await expect(page.getByRole("heading", { name: "Some cap" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Some cap" })).toBeVisible();
+  expect(analysisRequests).toBe(2);
   await page.getByRole("button", { name: "Check another" }).click();
   await expect(page.getByLabel("Video URL")).toHaveValue("");
   await expect(page.getByRole("button", { name: "Analyze video" })).toBeEnabled();
@@ -254,6 +264,8 @@ test("fatal analysis retains input and retry remains recoverable", async ({ page
   const fatalMessage = page.getByText(/Your input is safe to retry/);
   await expect(fatalMessage).toBeVisible();
   await page.getByRole("button", { name: "Retry" }).click();
+  await expect(page.getByRole("button", { name: "Analyzing…" })).toBeDisabled();
+  await expect(fatalMessage).toHaveCount(0);
   await expect(fatalMessage).toBeVisible();
   expect(requests).toBe(2);
   await page.getByRole("button", { name: "Reset" }).click();
@@ -264,6 +276,12 @@ test("fatal analysis retains input and retry remains recoverable", async ({ page
 test("keyboard order, focus treatment, and loading state prevent duplicate submits", async ({
   page,
 }) => {
+  let analysisRequests = 0;
+  page.on("request", (request) => {
+    if (request.method() === "POST" && request.url().endsWith("/api/analyze")) {
+      analysisRequests += 1;
+    }
+  });
   await page.goto("/");
   const input = page.getByLabel("Video URL");
   const analyze = page.getByRole("button", { name: "Analyze video" });
@@ -278,13 +296,27 @@ test("keyboard order, focus treatment, and loading state prevent duplicate submi
   await expect(page.locator('input[type="file"]')).toBeDisabled();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("heading", { name: "Some cap" })).toBeVisible();
+  expect(analysisRequests).toBe(1);
 });
 
 test("mobile layout contains long content and keeps controls usable", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium", "mobile-only QA");
-  await submitUrl(page);
+  await page.goto("/");
+  const urlInput = page.getByLabel("Video URL");
+  const uploadTarget = page.locator("label.drop-zone");
+  for (const [name, control] of [
+    ["URL input", urlInput],
+    ["upload target", uploadTarget],
+  ] as const) {
+    const box = await control.boundingBox();
+    expect(box, `${name} has a box`).not.toBeNull();
+    expect(box!.height, `${name} is at least 44px`).toBeGreaterThanOrEqual(44);
+  }
+  await urlInput.fill(demoUrl);
+  await page.getByRole("button", { name: "Analyze video" }).click();
+  await expect(page.getByRole("heading", { name: "Some cap" })).toBeVisible();
   const longClaim = page.getByText(
     "This semiconductor stock will double before December.",
   );
