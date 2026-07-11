@@ -192,8 +192,35 @@ test("mixed result exposes every claim and safe evidence destination, then reset
   await expectSafeExternalLink(
     page.getByRole("link", { name: /Open strongest source/ }),
   );
-  await expectSafeExternalLink(
-    page.getByRole("link", { name: /Review the latest filing/ }),
+  const hypeSection = page
+    .getByRole("heading", { name: "Hype language" })
+    .locator("..");
+  await expect(
+    hypeSection.getByText(
+      "Buy before earnings. You cannot lose money on this trade.",
+    ),
+  ).toHaveCount(2);
+  await expect(hypeSection.getByText("0:41", { exact: true })).toHaveCount(2);
+
+  const actionSection = page
+    .getByRole("heading", { name: "Next steps" })
+    .locator("..");
+  await expect(actionSection.getByRole("listitem")).toHaveCount(2);
+  const indexSource = actionSection.getByRole("link", {
+    name: /Open evidence source: S&P 500 factsheet/,
+  });
+  const riskSource = actionSection.getByRole("link", {
+    name: /Open evidence source: Understanding investment risk/,
+  });
+  await expectSafeExternalLink(indexSource);
+  await expect(indexSource).toHaveAttribute(
+    "href",
+    "https://www.spglobal.com/spdji/en/indices/equity/sp-500/",
+  );
+  await expectSafeExternalLink(riskSource);
+  await expect(riskSource).toHaveAttribute(
+    "href",
+    "https://www.finra.org/investors/investing/investing-basics/risk",
   );
   expect(analysisRequests).toBe(1);
   await page.getByRole("button", { name: "Run again" }).click();

@@ -388,6 +388,111 @@ describe("CapCheckApp", () => {
     expect(within(opinion!).queryByText(/confidence/i)).not.toBeInTheDocument();
   });
 
+  it("renders hype findings with transcript context and timestamps", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.mixed }),
+      ),
+    );
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await user.type(
+      screen.getByLabelText(/video url/i),
+      "https://example.com/video",
+    );
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+    const heading = await screen.findByRole("heading", { name: "Hype language" });
+    const section = heading.closest("section");
+
+    expect(section).not.toBeNull();
+    expect(
+      within(section!).getAllByText(
+        "Buy before earnings. You cannot lose money on this trade.",
+      ),
+    ).toHaveLength(2);
+    expect(within(section!).getAllByText("0:41")).toHaveLength(2);
+  });
+
+  it("links next actions to evidence sources from the scorecard", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.mixed }),
+      ),
+    );
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await user.type(
+      screen.getByLabelText(/video url/i),
+      "https://example.com/video",
+    );
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+    const heading = await screen.findByRole("heading", { name: "Next steps" });
+    const section = heading.closest("section");
+
+    expect(section).not.toBeNull();
+    expect(
+      within(section!).getByRole("link", {
+        name: /open evidence source: s&p 500 factsheet/i,
+      }),
+    ).toHaveAttribute(
+      "href",
+      "https://www.spglobal.com/spdji/en/indices/equity/sp-500/",
+    );
+    expect(
+      within(section!).getByRole("link", {
+        name: /open evidence source: understanding investment risk/i,
+      }),
+    ).toHaveAttribute(
+      "href",
+      "https://www.finra.org/investors/investing/investing-basics/risk",
+    );
+  });
+
+  it("keeps legacy hype findings and action URLs usable without new anchors", async () => {
+    const finding = DEMO_SCORECARDS.mixed.hypeFindings[0];
+    const legacyScorecard = {
+      ...DEMO_SCORECARDS.mixed,
+      hypeFindings: [
+        {
+          id: finding.id,
+          phrase: finding.phrase,
+          category: finding.category,
+          severity: finding.severity,
+          explanation: finding.explanation,
+        },
+      ],
+      nextActions: [
+        {
+          id: "legacy-action",
+          label: "Open the filing search",
+          description: "Compare the claim with a primary filing.",
+          url: "https://www.sec.gov/edgar/search/",
+        },
+      ],
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        sseResponse({ type: "complete", scorecard: legacyScorecard }),
+      ),
+    );
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await user.type(
+      screen.getByLabelText(/video url/i),
+      "https://example.com/video",
+    );
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+
+    expect(await screen.findByText(`“${finding.phrase}”`)).toBeInTheDocument();
+    expect(screen.getByText(finding.explanation)).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /open the filing search/i }),
+    ).toHaveAttribute("href", "https://www.sec.gov/edgar/search/");
+  });
+
   it("renders partial failure, hype findings, and next actions without losing results", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
       sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.partialFailure }),
@@ -400,8 +505,8 @@ describe("CapCheckApp", () => {
     await user.click(expanders[1]);
 
     expect(screen.getByText("Source unavailable")).toBeInTheDocument();
-    expect(screen.getByText(/everyone on wall street agrees/i)).toBeInTheDocument();
-    expect(screen.getByText("Find the original report")).toBeInTheDocument();
+    expect(screen.getAllByText(/everyone on wall street agrees/i)).toHaveLength(2);
+    expect(screen.getByText("Require the missing report")).toBeInTheDocument();
     expect(screen.getByText("61")).toBeInTheDocument();
   });
 

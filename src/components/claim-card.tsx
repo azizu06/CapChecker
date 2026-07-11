@@ -8,6 +8,7 @@ import {
 import { useState } from "react";
 
 import type { OpinionClaim, Verification } from "@/domain/analysis";
+import { formatTimestamp } from "@/lib/format-timestamp";
 
 const verdictLabels = {
   true: "Supported",
@@ -15,13 +16,6 @@ const verdictLabels = {
   false: "Contradicted",
   unverifiable: "Unverifiable",
 } as const;
-
-const formatTimestamp = (timestampSeconds: number) => {
-  const wholeSeconds = Math.floor(timestampSeconds);
-  const minutes = Math.floor(wholeSeconds / 60);
-  const seconds = String(wholeSeconds % 60).padStart(2, "0");
-  return `${minutes}:${seconds}`;
-};
 
 const ClaimTimestamp = ({ timestampSeconds }: { timestampSeconds?: number }) =>
   timestampSeconds === undefined ? null : (
