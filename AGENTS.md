@@ -13,6 +13,19 @@ hackathon. The planning repository is the source of truth for product scope:
 - Shared issues are coordinated by both lanes. Do not change a frozen contract
   without updating both owners and the dependent issues.
 
+## Parallel execution
+
+Do not work through independent issues sequentially. At every scheduling point,
+identify the ready frontier: all open issues whose `Blocked by` issues are
+closed. Dispatch separate agents or subagents to every independent issue on
+that frontier at the same time.
+
+Each agent owns exactly one issue, branch, worktree, and PR. Before dispatch,
+check assignees, active branches, worktrees, and open PRs so two agents do not
+claim the same surface. If independent issues would edit the same shared file,
+give that file one owner or serialize those edits. The coordinator reviews all
+returned work and runs the combined checks before integration.
+
 ## Issue to PR workflow
 
 1. Pick one issue labeled `ready-for-agent` whose blockers are closed.
