@@ -1,9 +1,18 @@
-import { ExternalLink, Flag, RotateCcw, ShieldAlert } from "lucide-react";
+import {
+  ExternalLink,
+  FileText,
+  Search,
+  ShieldCheck,
+  Video,
+} from "lucide-react";
 
 import type { Scorecard } from "@/domain/analysis";
 import { formatTimestamp } from "@/lib/format-timestamp";
 
 import { ClaimCard } from "./claim-card";
+import { CountUp } from "./react-bits/count-up";
+import { ResultsTabs, type ResultsTab } from "./results-tabs";
+import { ScoreMeter } from "./score-meter";
 
 const labels = {
   "no-cap": "No cap",
@@ -11,197 +20,242 @@ const labels = {
   "full-of-cap": "Full of cap",
 } as const;
 
-const explanations = {
-  "no-cap": "Most checkable claims are supported by credible evidence.",
-  "some-cap": "Some claims are misleading, unsupported, or need more context.",
-  "full-of-cap": "A high share of claims are misleading or unsupported.",
+const toneClass = {
+  "no-cap": "good-c",
+  "some-cap": "warn-c",
+  "full-of-cap": "bad-c",
 } as const;
 
 const trustRank = { primary: 4, high: 3, medium: 2, low: 1 };
 
-export function ScorecardView({
-  scorecard,
-  onReset,
-  onRetry,
-}: {
-  scorecard: Scorecard;
-  onReset(): void;
-  onRetry(): void;
-}) {
+const displayUrl = (url: string) => url.replace(/^https?:\/\//, "");
+
+export function ScorecardView({ scorecard }: { scorecard: Scorecard }) {
   const strongest = scorecard.verifications
-    .flatMap((item) =>
-      item.evidence.map((evidence) => ({ evidence, verdict: item.verdict })),
-    )
-    .sort(
-      (a, b) =>
-        trustRank[b.evidence.trustTier] - trustRank[a.evidence.trustTier],
-    )[0];
+    .flatMap((item) => item.evidence)
+    .sort((a, b) => trustRank[b.trustTier] - trustRank[a.trustTier])[0];
+
   const evidenceById = new Map(
     scorecard.verifications.flatMap((verification) =>
       verification.evidence.map((evidence) => [evidence.id, evidence] as const),
     ),
   );
 
-  return (
-    <section className="results" aria-labelledby="result-title">
-      <div className={`score-header panel ${scorecard.capLabel}`}>
-        <div className="score-block">
-          <p className="step-label">Cap Score · higher is worse</p>
-          <div className="score-number">{scorecard.capScore}</div>
-          <h2 id="result-title">{labels[scorecard.capLabel]}</h2>
-          <p>{explanations[scorecard.capLabel]}</p>
-          <div className="score-band" aria-label="Cap Score bands">
-            <span>No cap 0–29</span>
-            <span>Some cap 30–69</span>
-            <span>Full of cap 70–100</span>
-          </div>
-        </div>
-        <div className="result-takeaway">
-          <p className="step-label">What we found</p>
-          <h3>{scorecard.summary}</h3>
-          {strongest && (
-            <div className="strongest-source">
-              <ShieldAlert aria-hidden="true" />
-              <span>
-                <small>Strongest source</small>
-                <strong>{strongest.evidence.publisher}</strong>
-                <a
-                  href={strongest.evidence.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Open strongest source: ${strongest.evidence.title} (opens in new tab)`}
-                >
-                  {strongest.evidence.title}
-                  <ExternalLink aria-hidden="true" />
-                </a>
-              </span>
-            </div>
-          )}
-          <div className="result-actions">
-            <button type="button" onClick={onReset}>
-              <RotateCcw aria-hidden="true" />
-              Check another
-            </button>
-            <button type="button" onClick={onRetry}>
-              Run again
-            </button>
-          </div>
-        </div>
-      </div>
+  const tone = toneClass[scorecard.capLabel];
+  const sourceTitle =
+    scorecard.source.title ??
+    (scorecard.source.kind === "upload" ? scorecard.source.fileName : "this video");
 
-      <section className="result-section" aria-labelledby="claims-title">
-        <div className="section-heading">
-          <div>
-            <p className="step-label">Evidence review</p>
-            <h2 id="claims-title">Claims reviewed</h2>
+  const claimsPanel = (
+    <div className="claims">
+      {scorecard.verifications.length === 0 &&
+        (scorecard.skippedClaims?.length ?? 0) === 0 && (
+          <p className="empty-note">No claims were reviewed.</p>
+        )}
+      {scorecard.verifications.map((verification) => (
+        <ClaimCard key={verification.claim.id} verification={verification} />
+      ))}
+      {scorecard.skippedClaims?.map((claim) => (
+        <ClaimCard key={claim.id} skippedClaim={claim} />
+      ))}
+    </div>
+  );
+
+  const hypePanel = (
+    <div className="panel list-panel">
+      {scorecard.hypeFindings.length ? (
+        <ul className="hype">
+          {scorecard.hypeFindings.map((finding) => (
+            <li key={finding.id}>
+              <b>“{finding.phrase}”</b>
+              <span className="cat">
+                {finding.category} · {finding.severity}
+              </span>
+              {finding.context && (
+                <blockquote>
+                  {finding.timestampSeconds !== undefined && (
+                    <time dateTime={`PT${finding.timestampSeconds}S`}>
+                      {formatTimestamp(finding.timestampSeconds)}
+                    </time>
+                  )}
+                  {finding.context}
+                </blockquote>
+              )}
+              <p>{finding.explanation}</p>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="empty-note">No manipulative hype language detected.</p>
+      )}
+    </div>
+  );
+
+  const stepsPanel = (
+    <div className="panel list-panel">
+      {scorecard.nextActions.length ? (
+        <ol className="steps">
+          {scorecard.nextActions.map((action, index) => {
+            const evidence = action.evidenceId
+              ? evidenceById.get(action.evidenceId)
+              : undefined;
+            return (
+              <li key={action.id}>
+                <span className="num" aria-hidden="true">
+                  {index + 1}
+                </span>
+                <div>
+                  <b>{action.label}</b>
+                  <p>{action.description}</p>
+                  {evidence ? (
+                    <a
+                      href={evidence.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Open evidence source: ${evidence.title} (opens in new tab)`}
+                    >
+                      {evidence.title}
+                      <ExternalLink aria-hidden="true" />
+                    </a>
+                  ) : (
+                    action.url && (
+                      <a
+                        href={action.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${action.label} (opens in new tab)`}
+                      >
+                        Open resource
+                        <ExternalLink aria-hidden="true" />
+                      </a>
+                    )
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      ) : (
+        <p className="empty-note">No next actions were generated.</p>
+      )}
+    </div>
+  );
+
+  const tabs: ResultsTab[] = [
+    {
+      key: "claims",
+      label: "Claims reviewed",
+      count: scorecard.verifications.length,
+      panel: claimsPanel,
+    },
+    {
+      key: "hype",
+      label: "Hype language",
+      count: scorecard.hypeFindings.length,
+      panel: hypePanel,
+    },
+    {
+      key: "steps",
+      label: "Before you act",
+      count: scorecard.nextActions.length,
+      panel: stepsPanel,
+    },
+  ];
+
+  return (
+    <div className="main">
+      <p className="source-line">
+        <Video aria-hidden="true" />
+        Checked: <b>{sourceTitle}</b>
+        {scorecard.source.kind === "url" ? (
+          <a
+            href={scorecard.source.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open the checked video (opens in new tab)"
+          >
+            {displayUrl(scorecard.source.url)}
+            <ExternalLink aria-hidden="true" />
+          </a>
+        ) : (
+          <span className="file-name">{scorecard.source.fileName}</span>
+        )}
+        <span className="when">· just now</span>
+      </p>
+
+      <section
+        className="panel score-header"
+        aria-labelledby="result-title"
+        aria-roledescription="Cap Score"
+      >
+        <div className="score-left">
+          <div
+            className={`score-num ${tone}`}
+            aria-label={`Cap Score ${scorecard.capScore} out of 100`}
+          >
+            <CountUp to={scorecard.capScore} />
           </div>
-          <span>
-            {scorecard.verifications.length} fact-checked
-            {scorecard.skippedClaims?.length
-              ? ` · ${scorecard.skippedClaims.length} skipped`
-              : ""}
-          </span>
+          <h2 id="result-title" className={tone}>
+            {labels[scorecard.capLabel]}
+          </h2>
+          <ScoreMeter score={scorecard.capScore} />
         </div>
-        <div className="claim-list">
-          {scorecard.verifications.map((verification) => (
-            <ClaimCard
-              key={verification.claim.id}
-              verification={verification}
-            />
-          ))}
-          {scorecard.skippedClaims?.map((claim) => (
-            <ClaimCard key={claim.id} skippedClaim={claim} />
-          ))}
+        <div className="score-right">
+          <p className="summary">{scorecard.summary}</p>
+          {strongest && (
+            <span className="strongest">
+              <ShieldCheck aria-hidden="true" />
+              Strongest source:{" "}
+              <a
+                href={strongest.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open strongest source: ${strongest.title} (opens in new tab)`}
+              >
+                {strongest.publisher} — {strongest.title}
+                <ExternalLink aria-hidden="true" />
+              </a>
+            </span>
+          )}
         </div>
       </section>
 
-      <div className="result-grid">
-        <section
-          className="result-section panel"
-          aria-labelledby="hype-title"
-        >
-          <p className="step-label">Pressure check</p>
-          <h2 id="hype-title">Hype language</h2>
-          {scorecard.hypeFindings.length ? (
-            <ul className="hype-list">
-              {scorecard.hypeFindings.map((finding) => (
-                <li key={finding.id}>
-                  <Flag aria-hidden="true" />
-                  <div>
-                    <strong>“{finding.phrase}”</strong>
-                    <small>
-                      {finding.category} · {finding.severity}
-                    </small>
-                    {finding.context && (
-                      <blockquote>
-                        {finding.timestampSeconds !== undefined && (
-                          <time dateTime={`PT${finding.timestampSeconds}S`}>
-                            {formatTimestamp(finding.timestampSeconds)}
-                          </time>
-                        )}
-                        {finding.context}
-                      </blockquote>
-                    )}
-                    <p>{finding.explanation}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="empty-note">No manipulative hype language detected.</p>
-          )}
-        </section>
+      <ResultsTabs tabs={tabs} />
 
-        <section
-          className="result-section panel"
-          aria-labelledby="actions-title"
-        >
-          <p className="step-label">Before you act</p>
-          <h2 id="actions-title">Next steps</h2>
-          <ol className="next-actions">
-            {scorecard.nextActions.map((action, index) => {
-              const evidence = action.evidenceId
-                ? evidenceById.get(action.evidenceId)
-                : undefined;
-
-              return (
-                <li key={action.id}>
-                  <span>{index + 1}</span>
-                  <div>
-                    <strong>{action.label}</strong>
-                    <p>{action.description}</p>
-                    {evidence ? (
-                      <div className="action-source">
-                        <small>Evidence source · {evidence.publisher}</small>
-                        <a
-                          href={evidence.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Open evidence source: ${evidence.title} (opens in new tab)`}
-                        >
-                          {evidence.title}
-                          <ExternalLink aria-hidden="true" />
-                        </a>
-                      </div>
-                    ) : (
-                      action.url && (
-                        <a
-                          href={action.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`${action.label} (opens in new tab)`}
-                        >
-                          Open resource <ExternalLink aria-hidden="true" />
-                        </a>
-                      )
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        </section>
+      <div className="how">
+        <h2>How the Cap Score works</h2>
+        <div className="how-grid">
+          <div>
+            <FileText aria-hidden="true" />
+            <b>Claims get extracted</b>
+            <p>
+              CapCheck transcribes the video and pulls out every checkable
+              statement — facts and predictions, with timestamps.
+            </p>
+          </div>
+          <div>
+            <Search aria-hidden="true" />
+            <b>Evidence gets checked</b>
+            <p>
+              Primary evidence is preferred. Evidence may be high, medium, or
+              low trust—or unavailable.
+            </p>
+          </div>
+          <div>
+            <ShieldCheck aria-hidden="true" />
+            <b>The score adds up</b>
+            <p>
+              Verdict weights determine the score. Prediction-heavy videos have
+              a minimum score of 30; hype is shown separately and does not add points.
+            </p>
+          </div>
+        </div>
+        <div className="app-footer">
+          <span className="disclaimer">
+            CapCheck verifies claims — it isn&rsquo;t financial advice.
+          </span>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

@@ -1,19 +1,26 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Baloo_2, Geist_Mono, Nunito } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const balooDisplay = Baloo_2({
+  variable: "--font-display",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const nunitoBody = Nunito({
+  variable: "--font-body",
+  subsets: ["latin"],
+  weight: ["300", "400", "600", "700", "800", "900"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "CapCheck — AI financial claim verifier",
+  title: "CapCheck — Financial advice, fact-checked",
   description: "Check short-form financial claims against credible evidence.",
 };
 
@@ -25,7 +32,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${balooDisplay.variable} ${nunitoBody.variable} ${geistMono.variable} antialiased`}
     >
       <body>{children}</body>
     </html>

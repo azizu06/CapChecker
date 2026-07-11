@@ -43,21 +43,25 @@ mapping are defined once in
 [`docs/agents/ui-design.md`](../agents/ui-design.md#locked-design-decisions)
 and are locked. Summary: `canvas #faf8f3`, `surface #ffffff`,
 `surface-raised #f5f2ea`, `border #e7e2d6`/`#cfc9ba`, `text #211f1b`,
-`text-muted #6b675f`, `text-subtle #98928a`; accent `#2f66d0`; verdict green
-`#1d8a55`/`#e2f3e9`, amber `#9c6a0a`/`#f8eed4`, red `#c23f3e`/`#fbe7e4`.
+`text-muted #6b675f`, accessible metadata `#706b63`, decorative subtle
+`#98928a`; accent `#2f66d0`; verdict green
+`#1d8a55` (pill ink `#19784a`)/`#e2f3e9`, amber `#9c6a0a` (pill ink
+`#8e6009`)/`#f8eed4`, red `#c23f3e` (pill ink `#b83c3b`)/`#fbe7e4`.
+Compact verdict labels and their status dots use the pill inks; headings and
+meter bands use the standard semantic inks.
 
 Do not use decorative gradients. Semantic color must always be paired with an
 icon or label. Avoid large saturated fills; use tinted surface backgrounds
-with strong foreground text. The accent blue appears only on interactive
-elements, never as decoration.
+with strong foreground text. Accent blue may also appear in the approved small
+identity and methodology accents; it must not become a large decorative fill.
 
 ### Typography
 
 - Font family: Baloo 2 for display and headings, Nunito for body and UI copy
   (both via `next/font/google`); Geist Mono only for URLs, source domains,
   timestamps, confidence percentages, counts, and other compact data.
-- Display score: `clamp(3.5rem, 12vw, 7rem)`, weight 650, line-height 0.9.
-- Page title: `clamp(2rem, 5vw, 4.5rem)`, weight 600, line-height 1.02.
+- Display score: 4rem in the compact score header, weight 700, line-height 0.95.
+- Page title: `clamp(1.9rem, 3.8vw, 2.85rem)`, weight 700, line-height 1.12.
 - Section title: 1.25rem desktop and 1.125rem mobile, weight 600.
 - Body: 1rem, line-height 1.6. Small metadata: 0.8125rem, line-height 1.4.
 - Keep body measures at 68 characters or less. Do not use uppercase for prose.
@@ -90,13 +94,14 @@ elements, never as decoration.
 ### App header
 
 Use a compact wordmark row: shield/check icon, `CapCheck`, and the descriptor
-`AI financial claim verifier`. No full dashboard sidebar for the hackathon flow.
+`Financial advice, fact-checked`. Use `Check it` for the primary action. No full
+dashboard sidebar for the hackathon flow.
 
 ### Intake panel
 
 - URL is the primary labeled input. Its helper copy states which video URLs are
   accepted and errors appear directly below it.
-- `Analyze video` is the only filled primary button.
+- `Check it` is the only filled primary button.
 - A visible `or upload a video` divider reveals or focuses the drop zone; upload
   is never hidden in an overflow menu.
 - Selected files show name, size, status, and a labeled remove control.
@@ -132,11 +137,14 @@ Use a compact wordmark row: shield/check icon, `CapCheck`, and the descriptor
 
 ### Claim and evidence card
 
-- Collapsed row shows claim text, Supported/Contradicted/Unverifiable label,
-  confidence, and an explicit expand button with `aria-expanded`.
+- Verified claims use a native `<details>` disclosure whose `<summary>` row
+  shows claim text, Supported/Contradicted/Unverifiable label, confidence, and
+  a disclosure chevron. The summary row is the disclosure control, and its
+  expanded/collapsed state must remain clear visually and in the accessibility
+  tree. Opinion cards are noninteractive rows with no disclosure control.
 - Expanded content order: explanation, evidence excerpt, source title/domain,
-  then `Open source` external link. Never make the entire card an ambiguous
-  click target.
+  then `Open source` external link. Only the native summary row toggles the
+  verified claim; do not make the entire card an ambiguous click target.
 - Evidence links open in a new tab with `noopener noreferrer` and include an
   external-link icon plus accessible text.
 - Partial failure stays inline on the affected claim and does not erase other

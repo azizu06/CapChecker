@@ -1,7 +1,7 @@
 "use client";
 
 import { ShieldCheck } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 import type { AnalysisStage, ErrorEvent, Scorecard } from "@/domain/analysis";
 import { parseAnalysisStream } from "@/lib/analysis-stream";
@@ -21,6 +21,8 @@ const allowedScenarios = new Set([
 export function CapCheckApp() {
   const [url, setUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [nextUrl, setNextUrl] = useState("");
+  const [miniError, setMiniError] = useState("");
   const [error, setError] = useState<ErrorEvent["error"] | null>(null);
   const [validation, setValidation] = useState("");
   const [progress, setProgress] = useState<UiProgress[]>([]);
@@ -33,16 +35,16 @@ export function CapCheckApp() {
     return value && allowedScenarios.has(value) ? value : undefined;
   }, []);
 
-  const analyze = async () => {
-    if (loading) return;
-    const validationMessage = validateSubmission(url, file);
-    if (validationMessage) {
-      setError(null);
-      setValidation(validationMessage);
-      return;
-    }
+  useEffect(() => {
+    document.documentElement.dataset.capcheckHydrated = "true";
+    return () => {
+      delete document.documentElement.dataset.capcheckHydrated;
+    };
+  }, []);
 
+  const performAnalysis = async (submitUrl: string, submitFile: File | null) => {
     setValidation("");
+    setMiniError("");
     setError(null);
     setScorecard(null);
     setProgress([]);
@@ -51,13 +53,13 @@ export function CapCheckApp() {
     try {
       let body: BodyInit;
       let headers: HeadersInit | undefined;
-      if (file) {
+      if (submitFile) {
         const form = new FormData();
-        form.set("file", file);
+        form.set("file", submitFile);
         if (scenario) form.set("scenario", scenario);
         body = form;
       } else {
-        body = JSON.stringify({ url, ...(scenario ? { scenario } : {}) });
+        body = JSON.stringify({ url: submitUrl, ...(scenario ? { scenario } : {}) });
         headers = { "content-type": "application/json" };
       }
 
@@ -98,9 +100,37 @@ export function CapCheckApp() {
     }
   };
 
+  const analyze = () => {
+    if (loading) return;
+    const validationMessage = validateSubmission(url, file);
+    if (validationMessage) {
+      setError(null);
+      setValidation(validationMessage);
+      return;
+    }
+    void performAnalysis(url, file);
+  };
+
+  const analyzeNext = (event: FormEvent) => {
+    event.preventDefault();
+    if (loading) return;
+    const validationMessage = validateSubmission(nextUrl, null);
+    if (validationMessage) {
+      setMiniError(validationMessage);
+      return;
+    }
+    const submitUrl = nextUrl;
+    setUrl(submitUrl);
+    setFile(null);
+    setNextUrl("");
+    void performAnalysis(submitUrl, null);
+  };
+
   const reset = () => {
     setUrl("");
     setFile(null);
+    setNextUrl("");
+    setMiniError("");
     setError(null);
     setValidation("");
     setProgress([]);
@@ -119,46 +149,83 @@ export function CapCheckApp() {
     if (value) setError(null);
   };
 
-  return (
-    <main className="app-shell">
-      <header className="app-header">
-        <span className="brand-mark">
-          <ShieldCheck aria-hidden="true" />
-        </span>
-        <div>
+  if (scorecard) {
+    return (
+      <main className="app app--results">
+        <header className="results-header">
+          <span className="brand-mark" aria-hidden="true">
+            <ShieldCheck />
+          </span>
           <strong>CapCheck</strong>
-          <span>AI financial claim verifier</span>
+          <span className="tagline">Financial advice, fact-checked</span>
+          <form className="mini-intake" onSubmit={analyzeNext} noValidate>
+            <input
+              type="url"
+              value={nextUrl}
+              aria-label="Check another video URL"
+              aria-invalid={Boolean(miniError)}
+              placeholder="Check another video — paste a URL…"
+              onChange={(event) => {
+                setNextUrl(event.target.value);
+                setMiniError("");
+              }}
+            />
+            <button type="submit">Check it</button>
+          </form>
+        </header>
+        {miniError && (
+          <p className="mini-error" role="alert">
+            {miniError}
+          </p>
+        )}
+        <div className="result-actions" aria-label="Completed result actions">
+          <button className="ghost" type="button" onClick={reset}>
+            Check another
+          </button>
+          <button
+            className="ghost"
+            type="button"
+            onClick={() => void performAnalysis(url, file)}
+          >
+            Run again
+          </button>
         </div>
+        <ScorecardView scorecard={scorecard} />
+      </main>
+    );
+  }
+
+  return (
+    <main className="app app--landing">
+      <header className="app-header">
+        <span className="brand-mark" aria-hidden="true">
+          <ShieldCheck />
+        </span>
+        <strong>CapCheck</strong>
+        <span className="tagline">Financial advice, fact-checked</span>
       </header>
       <section className="hero" aria-labelledby="page-title">
-        <p className="eyebrow">Evidence before influence</p>
-        <h1 id="page-title">Is that money advice fact or cap?</h1>
+        <h1 id="page-title">
+          Is that stock tip <em>cap</em>? Check before you act.
+        </h1>
         <p>
-          Paste a short-form video link or upload a clip. CapCheck finds the
-          claims, checks the evidence, and shows what deserves your trust.
+          Paste a finance video. CapCheck pulls out the claims, verifies each one
+          against available evidence, and shows you exactly what holds up.
         </p>
       </section>
-      {!scorecard && (
-        <IntakePanel
-          url={url}
-          file={file}
-          loading={loading}
-          error={error}
-          validation={validation}
-          onUrlChange={changeUrl}
-          onFileChange={changeFile}
-          onSubmit={analyze}
-          onRetry={analyze}
-          onReset={reset}
-        />
-      )}
-      {!scorecard && (loading || progress.length > 0) && (
-        <ProgressTimeline progress={progress} />
-      )}
-      {scorecard && (
-        <ScorecardView scorecard={scorecard} onReset={reset} onRetry={analyze} />
-      )}
-      {scorecard && progress.length > 0 && (
+      <IntakePanel
+        url={url}
+        file={file}
+        loading={loading}
+        error={error}
+        validation={validation}
+        onUrlChange={changeUrl}
+        onFileChange={changeFile}
+        onSubmit={analyze}
+        onRetry={analyze}
+        onReset={reset}
+      />
+      {(loading || progress.length > 0) && (
         <ProgressTimeline progress={progress} />
       )}
     </main>
