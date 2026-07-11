@@ -107,9 +107,11 @@ commit. Query an existing graph first and refresh it only at the milestones in
 
 ### UI design
 
-Lane B must design from real reference screens. Use Mobbin when its MCP is
-available, then fall back to focused web image searches. Use Impeccable when
-available to critique and refine implemented UI. See `docs/agents/ui-design.md`.
+The cream light visual direction is locked; do not redesign it. Reference
+screens (Mobbin MCP first, then focused web image searches) are only for
+genuinely new surface types, not for existing surfaces. Use Impeccable when
+available to critique and refine implemented UI against the locked spec. See
+`docs/agents/ui-design.md`.
 
 ### Testing
 

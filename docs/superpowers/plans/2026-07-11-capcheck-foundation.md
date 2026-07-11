@@ -95,7 +95,7 @@
 - [ ] Implement the minimal client state machine and accessible form to make it pass.
 - [ ] Add visible URL validation, upload selection, reset, retry, and disabled/loading states one failing behavior at a time.
 - [ ] Implement the reference composite: combined intake, meaningful stage feed, verdict-first score header, labeled score band, and provenance-rich claim cards.
-- [ ] Use Geist, a charcoal/navy canvas, warm white text, mint trust accent, and semantic verdict colors. Use one radius and border system with restrained shadows and no decorative gradients.
+- [ ] Use the locked cream light theme from `docs/agents/ui-design.md`: Baloo 2 + Nunito (Geist Mono for data only), cream/white surfaces, ink text, one blue accent, and semantic verdict colors. Use one radius and border system with restrained, soft warm shadows and no decorative gradients.
 - [ ] Verify every interactive element has an accessible name, focus style, disabled behavior, and pointer affordance.
 - [ ] Run component tests; expect GREEN.
 
