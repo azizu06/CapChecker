@@ -49,4 +49,24 @@ describe("streamFixtureAnalysis", () => {
 
     expect(await stream.next()).toEqual({ done: true, value: undefined });
   });
+
+  it("paces progress asynchronously so the UI can render it", async () => {
+    const stream = streamFixtureAnalysis(
+      { scenario: "mixed" },
+      new AbortController().signal,
+    );
+    await stream.next();
+
+    const next = stream.next();
+    const immediate = await Promise.race([
+      next.then(() => "event"),
+      new Promise<string>((resolve) => setTimeout(() => resolve("pending"), 10)),
+    ]);
+
+    expect(immediate).toBe("pending");
+    expect(await next).toMatchObject({
+      done: false,
+      value: { type: "progress", stage: "processing" },
+    });
+  });
 });

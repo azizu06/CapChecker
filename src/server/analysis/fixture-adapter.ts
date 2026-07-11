@@ -18,6 +18,23 @@ const progress: ReadonlyArray<{
   { stage: "synthesizing", message: "Building the CapCheck scorecard" },
 ];
 
+const waitForNextStage = (signal: AbortSignal, delayMs = 100) =>
+  new Promise<boolean>((resolve) => {
+    if (signal.aborted) {
+      resolve(false);
+      return;
+    }
+
+    const finish = (ready: boolean) => {
+      clearTimeout(timer);
+      signal.removeEventListener("abort", abort);
+      resolve(ready);
+    };
+    const abort = () => finish(false);
+    const timer = setTimeout(() => finish(true), delayMs);
+    signal.addEventListener("abort", abort, { once: true });
+  });
+
 export async function* streamFixtureAnalysis(
   input: FixtureAnalysisInput,
   signal: AbortSignal,
@@ -25,6 +42,7 @@ export async function* streamFixtureAnalysis(
   for (const event of progress) {
     if (signal.aborted) return;
     yield { type: "progress", ...event };
+    if (!(await waitForNextStage(signal))) return;
   }
 
   if (signal.aborted) return;

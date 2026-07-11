@@ -113,6 +113,12 @@ export function CapCheckApp() {
     setValidation("");
   };
 
+  const changeFile = (value: File | null) => {
+    setFile(value);
+    setValidation("");
+    if (value) setError(null);
+  };
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -140,7 +146,7 @@ export function CapCheckApp() {
           error={error}
           validation={validation}
           onUrlChange={changeUrl}
-          onFileChange={setFile}
+          onFileChange={changeFile}
           onSubmit={analyze}
           onRetry={analyze}
           onReset={reset}
