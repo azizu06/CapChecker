@@ -27,7 +27,15 @@ describe("live Gemini claim extraction", () => {
   it.skipIf(!canRun)(
     "extracts useful transcript claims from one prepared financial video",
     async () => {
-      const pipeline = createNodeClaimExtractionPipeline({ apiKey: apiKey! });
+      const deletedFiles: string[] = [];
+      const observingFetch: typeof fetch = async (input, init) => {
+        if (init?.method === "DELETE") deletedFiles.push(String(input));
+        return globalThis.fetch(input, init);
+      };
+      const pipeline = createNodeClaimExtractionPipeline({
+        apiKey: apiKey!,
+        fetch: observingFetch,
+      });
       const source = uploadPath
         ? {
             kind: "upload" as const,
@@ -55,6 +63,24 @@ describe("live Gemini claim extraction", () => {
         ]),
       );
       expect(result.claims.some((claim) => claim.checkable)).toBe(true);
+      const claimsWithNumbers = result.claims.filter((claim) =>
+        /(?:[$€£]\s?\d|\d+(?:[.,]\d+)?\s?%|\b\d[\d,.]*\b)/u.test(
+          claim.text,
+        ),
+      );
+      for (const claim of claimsWithNumbers) {
+        expect(claim.quant).toBeDefined();
+        expect(
+          Object.values(claim.quant ?? {}).some((value) => value.length > 0),
+        ).toBe(true);
+      }
+      expect(deletedFiles).toEqual(
+        expect.arrayContaining([
+          expect.stringMatching(
+            /^https:\/\/generativelanguage\.googleapis\.com\/v1beta\/files\/[A-Za-z0-9_-]+$/u,
+          ),
+        ]),
+      );
     },
     360_000,
   );

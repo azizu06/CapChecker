@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
+import { ClaimGenerationError } from "./gemini-claim-generator";
 import { createNodeClaimExtractionPipeline } from "./node-claim-extraction-pipeline";
+
+const MP4_BYTES = Uint8Array.from([
+  0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6f,
+  0x6d, 0x00, 0x00, 0x02, 0x00,
+]);
 
 describe("createNodeClaimExtractionPipeline", () => {
   it("extracts claims inside the ACTIVE-file lease and leaves cleanup to ingestion", async () => {
@@ -61,18 +67,13 @@ describe("createNodeClaimExtractionPipeline", () => {
       fetch: fetch as typeof globalThis.fetch,
     });
     const progress: unknown[] = [];
-    const bytes = Uint8Array.from([
-      0x00, 0x00, 0x00, 0x18, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6f,
-      0x6d, 0x00, 0x00, 0x02, 0x00,
-    ]);
-
     await expect(
       pipeline.extract(
         {
           kind: "upload",
           fileName: "prepared.mp4",
           mimeType: "video/mp4",
-          bytes,
+          bytes: MP4_BYTES,
         },
         {
           signal: new AbortController().signal,
@@ -108,5 +109,125 @@ describe("createNodeClaimExtractionPipeline", () => {
       "https://generativelanguage.googleapis.com/v1beta/files/uploaded",
       expect.objectContaining({ method: "DELETE" }),
     );
+  });
+
+  it("deletes the ACTIVE Gemini file when claim generation fails", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(null, {
+          status: 200,
+          headers: {
+            "x-goog-upload-url": "https://upload.example/session-123",
+          },
+        }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({
+          file: {
+            name: "files/uploaded",
+            uri: "https://generativelanguage.googleapis.com/v1beta/files/uploaded",
+            mimeType: "video/mp4",
+            state: "ACTIVE",
+          },
+        }),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 503 }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const pipeline = createNodeClaimExtractionPipeline({
+      apiKey: "test-api-key",
+      fetch: fetch as typeof globalThis.fetch,
+    });
+
+    await expect(
+      pipeline.extract(
+        {
+          kind: "upload",
+          fileName: "prepared.mp4",
+          mimeType: "video/mp4",
+          bytes: MP4_BYTES,
+        },
+        {
+          signal: new AbortController().signal,
+          onProgress: () => undefined,
+        },
+      ),
+    ).rejects.toEqual(
+      new ClaimGenerationError({
+        code: "GEMINI_CLAIM_REQUEST_FAILED",
+        message: "Gemini could not extract claims from this video. Try again.",
+        retryable: true,
+      }),
+    );
+    expect(fetch).toHaveBeenNthCalledWith(
+      4,
+      "https://generativelanguage.googleapis.com/v1beta/files/uploaded",
+      expect.objectContaining({ method: "DELETE" }),
+    );
+  });
+
+  it("uses a fresh cleanup signal after caller aborts claim generation", async () => {
+    let markGenerationStarted: (() => void) | undefined;
+    const generationStarted = new Promise<void>((resolve) => {
+      markGenerationStarted = resolve;
+    });
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(null, {
+          status: 200,
+          headers: {
+            "x-goog-upload-url": "https://upload.example/session-123",
+          },
+        }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({
+          file: {
+            name: "files/uploaded",
+            uri: "https://generativelanguage.googleapis.com/v1beta/files/uploaded",
+            mimeType: "video/mp4",
+            state: "ACTIVE",
+          },
+        }),
+      )
+      .mockImplementationOnce(
+        (_input: RequestInfo | URL, init?: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            markGenerationStarted?.();
+            init?.signal?.addEventListener(
+              "abort",
+              () => reject(init.signal?.reason),
+              { once: true },
+            );
+          }),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const pipeline = createNodeClaimExtractionPipeline({
+      apiKey: "test-api-key",
+      fetch: fetch as typeof globalThis.fetch,
+    });
+    const controller = new AbortController();
+
+    const extraction = pipeline.extract(
+      {
+        kind: "upload",
+        fileName: "prepared.mp4",
+        mimeType: "video/mp4",
+        bytes: MP4_BYTES,
+      },
+      { signal: controller.signal, onProgress: () => undefined },
+    );
+    await generationStarted;
+    controller.abort();
+
+    await expect(extraction).rejects.toMatchObject({ name: "AbortError" });
+    expect(fetch).toHaveBeenNthCalledWith(
+      4,
+      "https://generativelanguage.googleapis.com/v1beta/files/uploaded",
+      expect.objectContaining({ method: "DELETE" }),
+    );
+    const cleanupSignal = fetch.mock.calls[3]?.[1]?.signal;
+    expect(cleanupSignal?.aborted).toBe(false);
   });
 });

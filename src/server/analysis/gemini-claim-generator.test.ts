@@ -85,6 +85,9 @@ describe("Gemini claim generator", () => {
     expect(body.contents[0].parts[1].text).toContain(
       "unique sequential id",
     );
+    expect(body.contents[0].parts[1].text).toContain(
+      "Preserve each quantitative field that is present",
+    );
     expect(body.generationConfig).toMatchObject({
       responseMimeType: "application/json",
       responseJsonSchema: {
@@ -92,6 +95,16 @@ describe("Gemini claim generator", () => {
         required: ["transcript", "claims"],
       },
     });
+    const quantSchema =
+      body.generationConfig.responseJsonSchema.properties.claims.items.anyOf[0]
+        .properties.quant;
+    expect(quantSchema.required).toBeUndefined();
+    expect(quantSchema.anyOf).toEqual([
+      { required: ["ticker"] },
+      { required: ["metric"] },
+      { required: ["value"] },
+      { required: ["period"] },
+    ]);
   });
 
   it("rejects malformed JSON without exposing raw model output", async () => {

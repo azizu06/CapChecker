@@ -30,8 +30,9 @@ extraction result.
 - `transcript`: one or more `{ timestampSeconds, text }` segments;
 - `claims`: zero or more frozen factual, predictive, or opinion claim shapes,
   each with a required extraction timestamp;
-- optional `quant` metadata on an extracted claim, containing all of `ticker`,
-  `metric`, `value`, and `period`.
+- optional `quant` metadata on an extracted claim, preserving whichever of
+  `ticker`, `metric`, `value`, and `period` are present. `quant` must contain at
+  least one field when emitted.
 
 `ExtractedClaimSchema` intersects the frozen `ClaimSchema` with the timestamp
 and optional quantitative metadata. Opinions therefore remain
@@ -56,8 +57,10 @@ cancellation remains an abort so ingestion cleanup still runs.
 
 The first red test failed because `claim-extraction.ts` did not exist. Vertical
 red-green cycles then covered valid extraction, malformed structured content,
-the Gemini REST request/response contract, ACTIVE-file lease ordering, missing
-or malformed model envelopes, safe 429 handling, and the generation deadline.
+partial and empty quantitative metadata, the Gemini REST request/response
+contract, ACTIVE-file lease ordering, cleanup after generation failure and
+caller abort, missing or malformed model envelopes, safe 429 handling, and the
+generation deadline.
 
 Run deterministic checks with:
 
@@ -71,7 +74,8 @@ An opt-in prepared-video test lives at
 `src/server/analysis/claim-extraction.live.test.ts`. It requires
 `GEMINI_API_KEY` plus either `CAPCHECK_LIVE_UPLOAD_PATH` or
 `CAPCHECK_LIVE_SHORT_URL`, asserts a non-empty transcript and useful checkable
-claims, and leaves both local and remote cleanup to the production ingestor.
+claims, checks that claims containing numeric details retain non-empty `quant`
+metadata, and observes one production-ingestor remote delete after extraction.
 Those variables were unavailable in this worktree during implementation, so a
 credentialed run remains required before the final live acceptance checkbox can
 be claimed.

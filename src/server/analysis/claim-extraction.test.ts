@@ -4,10 +4,45 @@ import { ClaimSchema } from "@/domain/analysis";
 
 import {
   ClaimExtractionError,
+  ExtractedClaimSchema,
   createClaimExtractionPipeline,
 } from "./claim-extraction";
 
 describe("claim extraction pipeline", () => {
+  it("preserves the quantitative fields that are present in a claim", () => {
+    expect(
+      ExtractedClaimSchema.parse({
+        id: "claim-1",
+        text: "Revenue rose 5%.",
+        timestampSeconds: 3,
+        kind: "factual",
+        checkable: true,
+        quant: {
+          metric: "revenue growth",
+          value: "5%",
+        },
+      }),
+    ).toMatchObject({
+      quant: {
+        metric: "revenue growth",
+        value: "5%",
+      },
+    });
+  });
+
+  it("rejects an empty quantitative metadata object", () => {
+    expect(
+      ExtractedClaimSchema.safeParse({
+        id: "claim-1",
+        text: "Revenue rose.",
+        timestampSeconds: 3,
+        kind: "factual",
+        checkable: true,
+        quant: {},
+      }).success,
+    ).toBe(false);
+  });
+
   it("extracts a timestamped transcript and frozen claims from an ACTIVE video", async () => {
     const activeFile = {
       name: "files/demo-short",

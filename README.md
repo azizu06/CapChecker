@@ -83,7 +83,9 @@ The live claim-extraction entry point is
 Gemini file only for the duration of one schema-constrained video-understanding
 request, then returns timestamped transcript segments and claims. The frozen
 claim fields remain unchanged; extraction adds optional `quant` metadata with
-`ticker`, `metric`, `value`, and `period` for the later verification stage.
+any present `ticker`, `metric`, `value`, and `period` fields for the later
+verification stage. An emitted `quant` object always contains at least one of
+those fields.
 
 Normal tests inject external boundaries and require no credentials. To run the
 opt-in prepared-video smoke test, set `GEMINI_API_KEY` and either

@@ -7,12 +7,17 @@ import type {
   VideoIngestionSource,
 } from "@/server/ingestion/video-ingestion";
 
-export const QuantitativeClaimSchema = z.object({
-  ticker: z.string().min(1),
-  metric: z.string().min(1),
-  value: z.string().min(1),
-  period: z.string().min(1),
-});
+export const QuantitativeClaimSchema = z
+  .object({
+    ticker: z.string().min(1).optional(),
+    metric: z.string().min(1).optional(),
+    value: z.string().min(1).optional(),
+    period: z.string().min(1).optional(),
+  })
+  .refine(
+    (quant) => Object.values(quant).some((value) => value !== undefined),
+    { message: "Quantitative metadata must include at least one field" },
+  );
 
 export const ExtractedClaimSchema = ClaimSchema.and(
   z.object({
