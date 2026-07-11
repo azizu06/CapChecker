@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -37,6 +37,12 @@ describe("CapCheckApp", () => {
 
     expect(await screen.findByText("52")).toBeInTheDocument();
     expect(screen.getByText("Some cap")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Analysis complete" }))
+      .toBeInTheDocument();
+    const timeline = screen.getByRole("region", { name: "Analysis complete" });
+    expect(within(timeline).getAllByRole("listitem").at(-1)).toHaveTextContent(
+      "CompleteAnalysis complete",
+    );
     expect(screen.getByRole("button", { name: /run again/i })).toBeEnabled();
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/analyze",
@@ -92,6 +98,24 @@ describe("CapCheckApp", () => {
     expect(screen.getByLabelText(/video url/i)).toBeEnabled();
   });
 
+  it.each([
+    [new File([], "empty.mp4", { type: "video/mp4" }), /cannot be empty/i],
+    [new File(["video"], "clip.exe", { type: "application/octet-stream" }), /mp4, mov, or webm/i],
+    [new File(["video"], "clip.mp4", { type: "text/plain" }), /mp4, mov, or webm/i],
+    [new File([new Uint8Array(50 * 1024 * 1024 + 1)], "large.mp4", { type: "video/mp4" }), /50 mb or smaller/i],
+  ])("rejects an invalid upload before it is ready or submitted", async (file, message) => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup({ applyAccept: false });
+    render(<CapCheckApp />);
+
+    await user.upload(screen.getByLabelText(/choose a video file/i), file);
+
+    expect(screen.getByRole("alert")).toHaveTextContent(message);
+    expect(screen.queryByText(`${file.name}`)).not.toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("passes only an allowlisted fixture query scenario to the public route", async () => {
     window.history.replaceState({}, "", "/?fixture=scammy");
     const fetchMock = vi.fn().mockResolvedValue(
@@ -123,15 +147,33 @@ describe("CapCheckApp", () => {
     const button = screen.getByRole("button", { name: /analyze video/i });
 
     await user.click(button);
+    fireEvent.submit(button.closest("form")!);
 
     expect(screen.getByRole("button", { name: /analyzing/i })).toBeDisabled();
     expect(screen.getByLabelText(/video url/i)).toBeDisabled();
+    expect(screen.getByLabelText(/choose a video file/i).closest("label"))
+      .toHaveAttribute("aria-disabled", "true");
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(JSON.parse(fetchMock.mock.calls[0][1].body as string)).toEqual({
       url: "https://example.com/video",
     });
     resolveResponse(sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.mixed }));
     await screen.findByText("52");
+  });
+
+  it("renders the legitimate fixture as a low, no-cap result", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
+      sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.legitimate }),
+    ));
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await user.type(screen.getByLabelText(/video url/i), "https://example.com/video");
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+
+    expect(await screen.findByText("8")).toBeInTheDocument();
+    expect(screen.getByText("No cap")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Analysis complete" }))
+      .toBeInTheDocument();
   });
 
   it("keeps the input on a retryable fatal error and supports retry and reset", async () => {
@@ -152,6 +194,41 @@ describe("CapCheckApp", () => {
     await screen.findByRole("alert");
     await user.click(screen.getByRole("button", { name: /reset/i }));
     expect(input).toHaveValue("");
+  });
+
+  it("does not retry after the retained URL becomes malformed", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(sseResponse(DEMO_FATAL_ERROR));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    const input = screen.getByLabelText(/video url/i);
+    await user.type(input, "https://example.com/video");
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+    await screen.findByRole("alert");
+    await user.clear(input);
+    await user.type(input, "not a url");
+
+    await user.click(screen.getByRole("button", { name: /^retry$/i }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(/valid http or https/i);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not retry after the failed upload is removed", async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(sseResponse(DEMO_FATAL_ERROR));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    const file = new File(["video"], "failed.mp4", { type: "video/mp4" });
+    await user.upload(screen.getByLabelText(/choose a video file/i), file);
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+    await screen.findByRole("alert");
+    await user.click(screen.getByRole("button", { name: /remove failed.mp4/i }));
+
+    await user.click(screen.getByRole("button", { name: /^retry$/i }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(/valid http or https/i);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it("expands a claim to show evidence and a safe external source", async () => {
