@@ -77,6 +77,24 @@ stream. Lane B can continue working against fixtures. Contract changes require
 a coordinated update to schemas, fixtures, adapter tests, parser tests, and UI
 tests before either lane depends on them.
 
+The live claim-extraction entry point is
+`createNodeClaimExtractionPipeline` in
+`src/server/analysis/node-claim-extraction-pipeline.ts`. It leases an ACTIVE
+Gemini file only for the duration of one schema-constrained video-understanding
+request, then returns timestamped transcript segments and claims. The frozen
+claim fields remain unchanged; extraction adds optional `quant` metadata with
+any present `ticker`, `metric`, `value`, and `period` fields for the later
+verification stage. An emitted `quant` object always contains at least one of
+those fields.
+
+Normal tests inject external boundaries and require no credentials. To run the
+opt-in prepared-video smoke test, set `GEMINI_API_KEY` and either
+`CAPCHECK_LIVE_UPLOAD_PATH` or `CAPCHECK_LIVE_SHORT_URL`, then run:
+
+```bash
+npm run test:unit -- src/server/analysis/claim-extraction.live.test.ts
+```
+
 The implementation and verification approach is documented in
 [`docs/agents/testing.md`](docs/agents/testing.md). Product scope and domain
 language live in [`CONTEXT.md`](CONTEXT.md).
