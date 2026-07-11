@@ -9,6 +9,7 @@
 | `wontfix` | `wontfix` | Will not be actioned |
 
 Additional execution labels are `lane-a-pipeline`, `lane-b-ui`, `lane-shared`,
-`type-afk`, `type-hitl`, `priority-core`, `priority-stretch`, and
-`gate-no-mistakes`. The gate label is reserved for high-risk implementation
-work. Do not add it to planning, documentation, setup, or routine UI issues.
+`type-afk`, `type-hitl`, `priority-core`, and `priority-stretch`.
+
+The legacy `gate-no-mistakes` label is deprecated. Do not assign it; required
+verification is deterministic and defined in `docs/agents/build-workflow.md`.
