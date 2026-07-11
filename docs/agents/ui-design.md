@@ -82,10 +82,10 @@ No long scroll. The results screen is:
    act", each with a count badge on its tab.
 3. A persistent mini-intake in the app header while in the results state, so a
    user can start a new check without losing place.
-4. A "How the Cap Score works" three-column strip plus a footer (Methodology /
-   Sources we trust / Report a bad verdict / "isn't financial advice"
-   disclaimer), so the results never float alone on the page with nothing
-   underneath.
+4. A "How the Cap Score works" three-column strip plus a simple footer stating
+   that CapCheck verifies claims and is not financial advice. Do not render
+   dead footer links or invent destinations, so the results never float alone
+   on the page with nothing underneath.
 
 Verdict pills are bold, uppercase Nunito with a status dot — no colored
 left-border card stripes, and no monospace pills.

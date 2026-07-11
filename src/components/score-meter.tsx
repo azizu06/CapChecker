@@ -5,16 +5,25 @@ import { useEffect, useState } from "react";
 /**
  * The Cap Score meter: three verdict bands that light by score, plus a pin that
  * sweeps to the score position on mount. This is the second beat of the single
- * hero moment (paired with the CountUp score reveal). CSS handles the transition
- * so prefers-reduced-motion (which zeroes transition durations) makes it instant.
+ * hero moment (paired with the CountUp score reveal). With reduced motion, the
+ * pin starts at its final position and does not schedule the sweep.
  */
 export function ScoreMeter({ score }: { score: number }) {
-  const [pinLeft, setPinLeft] = useState(0);
+  const finalPinLeft = Math.min(Math.max(score, 0), 100);
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const [pinLeft, setPinLeft] = useState(() =>
+    prefersReducedMotion ? finalPinLeft : 0,
+  );
 
   useEffect(() => {
-    const raf = requestAnimationFrame(() => setPinLeft(score));
+    if (prefersReducedMotion) return;
+
+    const raf = requestAnimationFrame(() => setPinLeft(finalPinLeft));
     return () => cancelAnimationFrame(raf);
-  }, [score]);
+  }, [finalPinLeft, prefersReducedMotion]);
 
   return (
     <div className="meter-wrap">
@@ -24,7 +33,7 @@ export function ScoreMeter({ score }: { score: number }) {
         <i className={score >= 70 ? "lit" : undefined} />
         <span
           className="pin"
-          style={{ left: `${Math.min(Math.max(pinLeft, 0), 100)}%` }}
+          style={{ left: `${prefersReducedMotion ? finalPinLeft : pinLeft}%` }}
         />
       </div>
       <div className="meter-labels" aria-label="Cap Score bands; higher is worse">

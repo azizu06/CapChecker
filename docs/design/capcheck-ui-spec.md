@@ -98,7 +98,7 @@ dashboard sidebar for the hackathon flow.
 
 - URL is the primary labeled input. Its helper copy states which video URLs are
   accepted and errors appear directly below it.
-- `Analyze video` is the only filled primary button.
+- `Check it` is the only filled primary button.
 - A visible `or upload a video` divider reveals or focuses the drop zone; upload
   is never hidden in an overflow menu.
 - Selected files show name, size, status, and a labeled remove control.
@@ -134,11 +134,14 @@ dashboard sidebar for the hackathon flow.
 
 ### Claim and evidence card
 
-- Collapsed row shows claim text, Supported/Contradicted/Unverifiable label,
-  confidence, and an explicit expand button with `aria-expanded`.
+- Verified claims use a native `<details>` disclosure whose `<summary>` row
+  shows claim text, Supported/Contradicted/Unverifiable label, confidence, and
+  a disclosure chevron. The summary row is the disclosure control, and its
+  expanded/collapsed state must remain clear visually and in the accessibility
+  tree. Opinion cards are noninteractive rows with no disclosure control.
 - Expanded content order: explanation, evidence excerpt, source title/domain,
-  then `Open source` external link. Never make the entire card an ambiguous
-  click target.
+  then `Open source` external link. Only the native summary row toggles the
+  verified claim; do not make the entire card an ambiguous click target.
 - Evidence links open in a new tab with `noopener noreferrer` and include an
   external-link icon plus accessible text.
 - Partial failure stays inline on the affected claim and does not erase other
