@@ -289,7 +289,7 @@
       "source_file": "package.json",
       "source_location": "L21",
       "id": "package_devdependencies",
-      "community": 6,
+      "community": 7,
       "norm_label": "devdependencies"
     },
     {
@@ -298,7 +298,7 @@
       "source_file": "package.json",
       "source_location": "L22",
       "id": "package_devdependencies_playwright_test",
-      "community": 6,
+      "community": 7,
       "norm_label": "@playwright/test"
     },
     {
@@ -307,7 +307,7 @@
       "source_file": "package.json",
       "source_location": "L23",
       "id": "package_devdependencies_tailwindcss_postcss",
-      "community": 6,
+      "community": 7,
       "norm_label": "@tailwindcss/postcss"
     },
     {
@@ -316,7 +316,7 @@
       "source_file": "package.json",
       "source_location": "L24",
       "id": "package_devdependencies_testing_library_jest_dom",
-      "community": 6,
+      "community": 7,
       "norm_label": "@testing-library/jest-dom"
     },
     {
@@ -325,7 +325,7 @@
       "source_file": "package.json",
       "source_location": "L25",
       "id": "package_devdependencies_testing_library_react",
-      "community": 6,
+      "community": 7,
       "norm_label": "@testing-library/react"
     },
     {
@@ -334,7 +334,7 @@
       "source_file": "package.json",
       "source_location": "L26",
       "id": "package_devdependencies_testing_library_user_event",
-      "community": 6,
+      "community": 7,
       "norm_label": "@testing-library/user-event"
     },
     {
@@ -343,7 +343,7 @@
       "source_file": "package.json",
       "source_location": "L27",
       "id": "package_devdependencies_types_node",
-      "community": 6,
+      "community": 7,
       "norm_label": "@types/node"
     },
     {
@@ -352,7 +352,7 @@
       "source_file": "package.json",
       "source_location": "L28",
       "id": "package_devdependencies_types_react",
-      "community": 6,
+      "community": 7,
       "norm_label": "@types/react"
     },
     {
@@ -361,7 +361,7 @@
       "source_file": "package.json",
       "source_location": "L29",
       "id": "package_devdependencies_types_react_dom",
-      "community": 6,
+      "community": 7,
       "norm_label": "@types/react-dom"
     },
     {
@@ -370,7 +370,7 @@
       "source_file": "package.json",
       "source_location": "L30",
       "id": "package_devdependencies_vitejs_plugin_react",
-      "community": 6,
+      "community": 7,
       "norm_label": "@vitejs/plugin-react"
     },
     {
@@ -379,7 +379,7 @@
       "source_file": "package.json",
       "source_location": "L31",
       "id": "package_devdependencies_eslint",
-      "community": 6,
+      "community": 7,
       "norm_label": "eslint"
     },
     {
@@ -388,7 +388,7 @@
       "source_file": "package.json",
       "source_location": "L32",
       "id": "package_devdependencies_eslint_config_next",
-      "community": 6,
+      "community": 7,
       "norm_label": "eslint-config-next"
     },
     {
@@ -397,7 +397,7 @@
       "source_file": "package.json",
       "source_location": "L33",
       "id": "package_devdependencies_jsdom",
-      "community": 6,
+      "community": 7,
       "norm_label": "jsdom"
     },
     {
@@ -406,7 +406,7 @@
       "source_file": "package.json",
       "source_location": "L34",
       "id": "package_devdependencies_tailwindcss",
-      "community": 6,
+      "community": 7,
       "norm_label": "tailwindcss"
     },
     {
@@ -415,7 +415,7 @@
       "source_file": "package.json",
       "source_location": "L35",
       "id": "package_devdependencies_typescript",
-      "community": 6,
+      "community": 7,
       "norm_label": "typescript"
     },
     {
@@ -424,7 +424,7 @@
       "source_file": "package.json",
       "source_location": "L36",
       "id": "package_devdependencies_vitest",
-      "community": 6,
+      "community": 7,
       "norm_label": "vitest"
     },
     {
@@ -658,7 +658,7 @@
       "source_file": "src/components/claim-card.tsx",
       "source_location": "L1",
       "id": "components_claim_card",
-      "community": 1,
+      "community": 18,
       "norm_label": "claim-card.tsx"
     },
     {
@@ -667,7 +667,7 @@
       "source_file": "src/components/claim-card.tsx",
       "source_location": "L13",
       "id": "components_claim_card_verdictlabels",
-      "community": 1,
+      "community": 18,
       "norm_label": "verdictlabels"
     },
     {
@@ -676,7 +676,7 @@
       "source_file": "src/components/claim-card.tsx",
       "source_location": "L20",
       "id": "components_claim_card_claimtimestamp",
-      "community": 1,
+      "community": 18,
       "norm_label": "claimtimestamp()"
     },
     {
@@ -685,7 +685,7 @@
       "source_file": "src/components/claim-card.tsx",
       "source_location": "L27",
       "id": "components_claim_card_claimcardprops",
-      "community": 1,
+      "community": 18,
       "norm_label": "claimcardprops"
     },
     {
@@ -694,7 +694,7 @@
       "source_file": "src/components/claim-card.tsx",
       "source_location": "L31",
       "id": "components_claim_card_claimcard",
-      "community": 1,
+      "community": 18,
       "norm_label": "claimcard()"
     },
     {
@@ -829,7 +829,7 @@
       "source_file": "src/components/scorecard.tsx",
       "source_location": "L1",
       "id": "components_scorecard",
-      "community": 1,
+      "community": 18,
       "norm_label": "scorecard.tsx"
     },
     {
@@ -838,7 +838,7 @@
       "source_file": "src/components/scorecard.tsx",
       "source_location": "L8",
       "id": "components_scorecard_labels",
-      "community": 1,
+      "community": 18,
       "norm_label": "labels"
     },
     {
@@ -847,7 +847,7 @@
       "source_file": "src/components/scorecard.tsx",
       "source_location": "L14",
       "id": "components_scorecard_explanations",
-      "community": 1,
+      "community": 18,
       "norm_label": "explanations"
     },
     {
@@ -856,7 +856,7 @@
       "source_file": "src/components/scorecard.tsx",
       "source_location": "L20",
       "id": "components_scorecard_trustrank",
-      "community": 1,
+      "community": 18,
       "norm_label": "trustrank"
     },
     {
@@ -865,7 +865,7 @@
       "source_file": "src/components/scorecard.tsx",
       "source_location": "L22",
       "id": "components_scorecard_scorecardview",
-      "community": 1,
+      "community": 18,
       "norm_label": "scorecardview()"
     },
     {
@@ -1063,7 +1063,7 @@
       "source_file": "src/domain/analysis.ts",
       "source_location": "L161",
       "id": "domain_analysis_opinionclaim",
-      "community": 1,
+      "community": 18,
       "norm_label": "opinionclaim"
     },
     {
@@ -1090,7 +1090,7 @@
       "source_file": "src/domain/analysis.ts",
       "source_location": "L164",
       "id": "domain_analysis_verification",
-      "community": 1,
+      "community": 18,
       "norm_label": "verification"
     },
     {
@@ -1126,7 +1126,7 @@
       "source_file": "src/domain/analysis.ts",
       "source_location": "L168",
       "id": "domain_analysis_scorecard",
-      "community": 1,
+      "community": 18,
       "norm_label": "scorecard"
     },
     {
@@ -1333,7 +1333,7 @@
       "source_file": "src/lib/format-timestamp.ts",
       "source_location": "L1",
       "id": "lib_format_timestamp",
-      "community": 1,
+      "community": 18,
       "norm_label": "format-timestamp.ts"
     },
     {
@@ -1342,7 +1342,7 @@
       "source_file": "src/lib/format-timestamp.ts",
       "source_location": "L1",
       "id": "lib_format_timestamp_formattimestamp",
-      "community": 1,
+      "community": 18,
       "norm_label": "formattimestamp()"
     },
     {
@@ -2012,19 +2012,10 @@
       "norm_label": "yt-dlp.ts"
     },
     {
-      "label": "FileSizeReader",
-      "file_type": "code",
-      "source_file": "src/server/ingestion/yt-dlp.ts",
-      "source_location": "L7",
-      "id": "ingestion_yt_dlp_filesizereader",
-      "community": 2,
-      "norm_label": "filesizereader"
-    },
-    {
       "label": "ProcessResult",
       "file_type": "code",
       "source_file": "src/server/ingestion/yt-dlp.ts",
-      "source_location": "L9",
+      "source_location": "L6",
       "id": "ingestion_yt_dlp_processresult",
       "community": 2,
       "norm_label": "processresult"
@@ -2033,7 +2024,7 @@
       "label": "ProcessRequest",
       "file_type": "code",
       "source_file": "src/server/ingestion/yt-dlp.ts",
-      "source_location": "L15",
+      "source_location": "L12",
       "id": "ingestion_yt_dlp_processrequest",
       "community": 2,
       "norm_label": "processrequest"
@@ -2042,7 +2033,7 @@
       "label": "ProcessRunner",
       "file_type": "code",
       "source_file": "src/server/ingestion/yt-dlp.ts",
-      "source_location": "L23",
+      "source_location": "L20",
       "id": "ingestion_yt_dlp_processrunner",
       "community": 2,
       "norm_label": "processrunner"
@@ -2051,25 +2042,16 @@
       "label": "YtDlpDownloaderOptions",
       "file_type": "code",
       "source_file": "src/server/ingestion/yt-dlp.ts",
-      "source_location": "L25",
+      "source_location": "L22",
       "id": "ingestion_yt_dlp_ytdlpdownloaderoptions",
       "community": 2,
       "norm_label": "ytdlpdownloaderoptions"
     },
     {
-      "label": "statFileSize()",
-      "file_type": "code",
-      "source_file": "src/server/ingestion/yt-dlp.ts",
-      "source_location": "L32",
-      "id": "ingestion_yt_dlp_statfilesize",
-      "community": 2,
-      "norm_label": "statfilesize()"
-    },
-    {
       "label": "runProcess()",
       "file_type": "code",
       "source_file": "src/server/ingestion/yt-dlp.ts",
-      "source_location": "L35",
+      "source_location": "L28",
       "id": "ingestion_yt_dlp_runprocess",
       "community": 2,
       "norm_label": "runprocess()"
@@ -2078,7 +2060,7 @@
       "label": "createYtDlpDownloader()",
       "file_type": "code",
       "source_file": "src/server/ingestion/yt-dlp.ts",
-      "source_location": "L66",
+      "source_location": "L59",
       "id": "ingestion_yt_dlp_createytdlpdownloader",
       "community": 2,
       "norm_label": "createytdlpdownloader()"
@@ -4980,9 +4962,9 @@
       "source_file": "src/components/claim-card.tsx",
       "source_location": "L27",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "components_claim_card",
-      "target": "components_claim_card_claimcardprops"
+      "target": "components_claim_card_claimcardprops",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -4990,9 +4972,9 @@
       "source_file": "src/components/claim-card.tsx",
       "source_location": "L20",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "components_claim_card",
-      "target": "components_claim_card_claimtimestamp"
+      "target": "components_claim_card_claimtimestamp",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -5022,9 +5004,9 @@
       "source_file": "src/components/claim-card.tsx",
       "source_location": "L10",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "components_claim_card",
-      "target": "domain_analysis_opinionclaim"
+      "target": "domain_analysis_opinionclaim",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -5044,9 +5026,9 @@
       "source_file": "src/components/claim-card.tsx",
       "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "components_claim_card",
-      "target": "lib_format_timestamp"
+      "target": "lib_format_timestamp",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -5055,9 +5037,9 @@
       "source_file": "src/components/claim-card.tsx",
       "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "components_claim_card",
-      "target": "lib_format_timestamp_formattimestamp"
+      "target": "lib_format_timestamp_formattimestamp",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -5359,9 +5341,9 @@
       "source_file": "src/components/scorecard.tsx",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "components_scorecard",
-      "target": "lib_format_timestamp"
+      "target": "lib_format_timestamp",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -5370,9 +5352,9 @@
       "source_file": "src/components/scorecard.tsx",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "components_scorecard",
-      "target": "lib_format_timestamp_formattimestamp"
+      "target": "lib_format_timestamp_formattimestamp",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -5414,9 +5396,9 @@
       "source_file": "src/domain/analysis.test.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "domain_analysis_test",
-      "target": "domain_analysis_hypefindingschema"
+      "target": "domain_analysis_hypefindingschema",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -5733,9 +5715,9 @@
       "source_file": "src/domain/analysis.ts",
       "source_location": "L161",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "domain_analysis",
-      "target": "domain_analysis_opinionclaim"
+      "target": "domain_analysis_opinionclaim",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -5743,9 +5725,9 @@
       "source_file": "src/domain/analysis.ts",
       "source_location": "L22",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "domain_analysis",
-      "target": "domain_analysis_opinionclaimschema"
+      "target": "domain_analysis_opinionclaimschema",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -5855,9 +5837,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "domain_analysis"
+      "target": "domain_analysis",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -5866,9 +5848,9 @@
       "source_file": "src/server/ingestion/video-ingestion.test.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_test",
-      "target": "domain_analysis"
+      "target": "domain_analysis",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -5910,9 +5892,9 @@
       "source_file": "src/server/ingestion/video-ingestion.test.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_test",
-      "target": "domain_analysis_progresseventschema"
+      "target": "domain_analysis_progresseventschema",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -5932,9 +5914,9 @@
       "source_file": "src/server/ingestion/video-ingestion.test.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_test",
-      "target": "domain_analysis_erroreventschema"
+      "target": "domain_analysis_erroreventschema",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -5943,9 +5925,9 @@
       "source_file": "src/server/analysis/fixture-adapter.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "analysis_fixture_adapter",
-      "target": "domain_analysis_analysiseventschema"
+      "target": "domain_analysis_analysiseventschema",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -5998,9 +5980,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "domain_analysis_progressevent"
+      "target": "domain_analysis_progressevent",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6009,9 +5991,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "domain_analysis_errorevent"
+      "target": "domain_analysis_errorevent",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6280,9 +6262,9 @@
       "source_file": "src/lib/format-timestamp.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "lib_format_timestamp",
-      "target": "lib_format_timestamp_formattimestamp"
+      "target": "lib_format_timestamp_formattimestamp",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -6301,9 +6283,9 @@
       "source_file": "src/server/analysis/fixture-adapter.ts",
       "source_location": "L42",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "analysis_fixture_adapter",
-      "target": "analysis_fixture_adapter_buildcompletionevent"
+      "target": "analysis_fixture_adapter_buildcompletionevent",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6352,9 +6334,9 @@
       "source_file": "src/server/ingestion/gemini-files.test.ts",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files_test",
-      "target": "ingestion_gemini_files"
+      "target": "ingestion_gemini_files",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6363,9 +6345,9 @@
       "source_file": "src/server/ingestion/gemini-files.test.ts",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files_test",
-      "target": "ingestion_gemini_files_creategeminifilesclient"
+      "target": "ingestion_gemini_files_creategeminifilesclient",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -6374,9 +6356,9 @@
       "source_file": "src/server/ingestion/gemini-files.test.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files_test",
-      "target": "ingestion_video_ingestion"
+      "target": "ingestion_video_ingestion",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6385,9 +6367,9 @@
       "source_file": "src/server/ingestion/gemini-files.test.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files_test",
-      "target": "ingestion_video_ingestion_boundaryerror"
+      "target": "ingestion_video_ingestion_boundaryerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6395,9 +6377,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L73",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_gemini_files_creategeminifilesclient"
+      "target": "ingestion_gemini_files_creategeminifilesclient",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6405,9 +6387,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L35",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_gemini_files_fileendpoint"
+      "target": "ingestion_gemini_files_fileendpoint",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6415,9 +6397,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L18",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_gemini_files_geminifilesclientoptions"
+      "target": "ingestion_gemini_files_geminifilesclientoptions",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6425,9 +6407,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L42",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_gemini_files_parsefile"
+      "target": "ingestion_gemini_files_parsefile",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6435,9 +6417,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L13",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_gemini_files_readfile"
+      "target": "ingestion_gemini_files_readfile",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6445,9 +6427,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L29",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_gemini_files_requesterror"
+      "target": "ingestion_gemini_files_requesterror",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6455,9 +6437,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L27",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_gemini_files_transientstatuses"
+      "target": "ingestion_gemini_files_transientstatuses",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -6466,9 +6448,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_video_ingestion"
+      "target": "ingestion_video_ingestion",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6477,9 +6459,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_video_ingestion_boundaryerror"
+      "target": "ingestion_video_ingestion_boundaryerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6488,9 +6470,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_video_ingestion_geminifile"
+      "target": "ingestion_video_ingestion_geminifile",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6499,9 +6481,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_video_ingestion_supportedvideomimetype"
+      "target": "ingestion_video_ingestion_supportedvideomimetype",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6510,9 +6492,9 @@
       "source_file": "src/server/ingestion/gemini-files.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_gemini_files",
-      "target": "ingestion_video_ingestion_videoingestiondependencies"
+      "target": "ingestion_video_ingestion_videoingestiondependencies",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -6521,9 +6503,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_gemini_files"
+      "target": "ingestion_gemini_files",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6532,9 +6514,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_gemini_files_creategeminifilesclient"
+      "target": "ingestion_gemini_files_creategeminifilesclient",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -6554,9 +6536,9 @@
       "source_file": "src/server/ingestion/media-type.test.ts",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type_test",
-      "target": "ingestion_media_type"
+      "target": "ingestion_media_type",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6565,9 +6547,9 @@
       "source_file": "src/server/ingestion/media-type.test.ts",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type_test",
-      "target": "ingestion_media_type_detectvideomimetype"
+      "target": "ingestion_media_type_detectvideomimetype",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6575,9 +6557,9 @@
       "source_file": "src/server/ingestion/media-type.test.ts",
       "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type_test",
-      "target": "ingestion_media_type_test_stagefile"
+      "target": "ingestion_media_type_test_stagefile",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6585,9 +6567,9 @@
       "source_file": "src/server/ingestion/media-type.test.ts",
       "source_location": "L9",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type_test",
-      "target": "ingestion_media_type_test_temporarydirectories"
+      "target": "ingestion_media_type_test_temporarydirectories",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6596,9 +6578,9 @@
       "source_file": "src/server/ingestion/media-type.test.ts",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type_test",
-      "target": "ingestion_media_type_videomediatypeerror"
+      "target": "ingestion_media_type_videomediatypeerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6606,9 +6588,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type",
-      "target": "ingestion_media_type_detectedvideomimetype"
+      "target": "ingestion_media_type_detectedvideomimetype",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6616,9 +6598,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L97",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type",
-      "target": "ingestion_media_type_detectfromsignature"
+      "target": "ingestion_media_type_detectfromsignature",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6626,9 +6608,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L117",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type",
-      "target": "ingestion_media_type_detectvideomimetype"
+      "target": "ingestion_media_type_detectvideomimetype",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6636,9 +6618,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L36",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type",
-      "target": "ingestion_media_type_extension_types"
+      "target": "ingestion_media_type_extension_types",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6646,9 +6628,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L53",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type",
-      "target": "ingestion_media_type_haswebmdoctype"
+      "target": "ingestion_media_type_haswebmdoctype",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6656,9 +6638,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L30",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type",
-      "target": "ingestion_media_type_mime_types"
+      "target": "ingestion_media_type_mime_types",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6666,9 +6648,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L42",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type",
-      "target": "ingestion_media_type_mp4_brands"
+      "target": "ingestion_media_type_mp4_brands",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6676,9 +6658,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L86",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type",
-      "target": "ingestion_media_type_normalizedeclaredtype"
+      "target": "ingestion_media_type_normalizedeclaredtype",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6686,9 +6668,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L13",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type",
-      "target": "ingestion_media_type_safe_messages"
+      "target": "ingestion_media_type_safe_messages",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6696,9 +6678,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L20",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type",
-      "target": "ingestion_media_type_videomediatypeerror"
+      "target": "ingestion_media_type_videomediatypeerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6706,9 +6688,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L9",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type",
-      "target": "ingestion_media_type_videomediatypeerrorcode"
+      "target": "ingestion_media_type_videomediatypeerrorcode",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -6717,9 +6699,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_media_type"
+      "target": "ingestion_media_type",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -6728,9 +6710,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_media_type"
+      "target": "ingestion_media_type",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -6738,9 +6720,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L23",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type_videomediatypeerror",
-      "target": "ingestion_media_type_videomediatypeerror_constructor"
+      "target": "ingestion_media_type_videomediatypeerror_constructor",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6749,9 +6731,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_media_type_videomediatypeerror"
+      "target": "ingestion_media_type_videomediatypeerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -6760,9 +6742,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L110",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type_detectfromsignature",
-      "target": "ingestion_media_type_haswebmdoctype"
+      "target": "ingestion_media_type_haswebmdoctype",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -6771,9 +6753,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L133",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type_detectvideomimetype",
-      "target": "ingestion_media_type_normalizedeclaredtype"
+      "target": "ingestion_media_type_normalizedeclaredtype",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -6782,9 +6764,9 @@
       "source_file": "src/server/ingestion/media-type.ts",
       "source_location": "L131",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_media_type_detectvideomimetype",
-      "target": "ingestion_media_type_detectfromsignature"
+      "target": "ingestion_media_type_detectfromsignature",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6793,9 +6775,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L2",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_media_type_detectvideomimetype"
+      "target": "ingestion_media_type_detectvideomimetype",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -6804,9 +6786,9 @@
       "source_file": "src/server/ingestion/node-temp-files.test.ts",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_temp_files_test",
-      "target": "ingestion_node_temp_files"
+      "target": "ingestion_node_temp_files",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6815,9 +6797,9 @@
       "source_file": "src/server/ingestion/node-temp-files.test.ts",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_temp_files_test",
-      "target": "ingestion_node_temp_files_createnodetemporaryfiles"
+      "target": "ingestion_node_temp_files_createnodetemporaryfiles",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6826,9 +6808,9 @@
       "source_file": "src/server/ingestion/node-temp-files.test.ts",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_temp_files_test",
-      "target": "ingestion_node_temp_files_nodetemporaryfileerror"
+      "target": "ingestion_node_temp_files_nodetemporaryfileerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6836,9 +6818,9 @@
       "source_file": "src/server/ingestion/node-temp-files.ts",
       "source_location": "L44",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_temp_files",
-      "target": "ingestion_node_temp_files_createnodetemporaryfiles"
+      "target": "ingestion_node_temp_files_createnodetemporaryfiles",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6846,9 +6828,9 @@
       "source_file": "src/server/ingestion/node-temp-files.ts",
       "source_location": "L33",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_temp_files",
-      "target": "ingestion_node_temp_files_isbasename"
+      "target": "ingestion_node_temp_files_isbasename",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6856,9 +6838,9 @@
       "source_file": "src/server/ingestion/node-temp-files.ts",
       "source_location": "L23",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_temp_files",
-      "target": "ingestion_node_temp_files_nodetemporaryfileerror"
+      "target": "ingestion_node_temp_files_nodetemporaryfileerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6866,9 +6848,9 @@
       "source_file": "src/server/ingestion/node-temp-files.ts",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_temp_files",
-      "target": "ingestion_node_temp_files_nodetemporaryfileerrorcode"
+      "target": "ingestion_node_temp_files_nodetemporaryfileerrorcode",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6876,9 +6858,9 @@
       "source_file": "src/server/ingestion/node-temp-files.ts",
       "source_location": "L14",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_temp_files",
-      "target": "ingestion_node_temp_files_safe_messages"
+      "target": "ingestion_node_temp_files_safe_messages",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -6887,9 +6869,9 @@
       "source_file": "src/server/ingestion/node-temp-files.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_temp_files",
-      "target": "ingestion_video_ingestion"
+      "target": "ingestion_video_ingestion",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6898,9 +6880,9 @@
       "source_file": "src/server/ingestion/node-temp-files.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_temp_files",
-      "target": "ingestion_video_ingestion_videoingestiondependencies"
+      "target": "ingestion_video_ingestion_videoingestiondependencies",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -6909,9 +6891,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_node_temp_files"
+      "target": "ingestion_node_temp_files",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -6919,9 +6901,9 @@
       "source_file": "src/server/ingestion/node-temp-files.ts",
       "source_location": "L26",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_temp_files_nodetemporaryfileerror",
-      "target": "ingestion_node_temp_files_nodetemporaryfileerror_constructor"
+      "target": "ingestion_node_temp_files_nodetemporaryfileerror_constructor",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6930,9 +6912,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_node_temp_files_createnodetemporaryfiles"
+      "target": "ingestion_node_temp_files_createnodetemporaryfiles",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -6952,9 +6934,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.test.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor_test",
-      "target": "ingestion_node_video_ingestor"
+      "target": "ingestion_node_video_ingestor",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -6963,9 +6945,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.test.ts",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor_test",
-      "target": "ingestion_node_video_ingestor_createnodevideoingestor"
+      "target": "ingestion_node_video_ingestor_createnodevideoingestor",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6973,9 +6955,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L19",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_node_video_ingestor_abortablesleep"
+      "target": "ingestion_node_video_ingestor_abortablesleep",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6983,9 +6965,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L41",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_node_video_ingestor_createnodevideoingestor"
+      "target": "ingestion_node_video_ingestor_createnodevideoingestor",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6993,9 +6975,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_node_video_ingestor_nodevideoingestoroptions"
+      "target": "ingestion_node_video_ingestor_nodevideoingestoroptions",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7004,9 +6986,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_video_ingestion"
+      "target": "ingestion_video_ingestion",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7015,9 +6997,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_video_ingestion_createvideoingestor"
+      "target": "ingestion_video_ingestion_createvideoingestor",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7026,9 +7008,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_video_ingestion_default_video_ingestion_policy"
+      "target": "ingestion_video_ingestion_default_video_ingestion_policy",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7037,9 +7019,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_video_ingestion_videoingestionpolicy"
+      "target": "ingestion_video_ingestion_videoingestionpolicy",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7048,9 +7030,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L9",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_yt_dlp"
+      "target": "ingestion_yt_dlp",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7059,9 +7041,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L9",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_yt_dlp_createytdlpdownloader"
+      "target": "ingestion_yt_dlp_createytdlpdownloader",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7070,9 +7052,9 @@
       "source_file": "src/server/ingestion/node-video-ingestor.ts",
       "source_location": "L9",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_node_video_ingestor",
-      "target": "ingestion_yt_dlp_processrunner"
+      "target": "ingestion_yt_dlp_processrunner",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7081,9 +7063,9 @@
       "source_file": "src/server/ingestion/video-ingestion.live.test.ts",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_live_test",
-      "target": "ingestion_node_video_ingestor"
+      "target": "ingestion_node_video_ingestor",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -7114,9 +7096,9 @@
       "source_file": "src/server/ingestion/video-ingestion.live.test.ts",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_live_test",
-      "target": "ingestion_node_video_ingestor_createnodevideoingestor"
+      "target": "ingestion_node_video_ingestor_createnodevideoingestor",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7124,9 +7106,9 @@
       "source_file": "src/server/ingestion/video-ingestion.live.test.ts",
       "source_location": "L12",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_live_test",
-      "target": "ingestion_video_ingestion_live_test_canrunupload"
+      "target": "ingestion_video_ingestion_live_test_canrunupload",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7134,9 +7116,9 @@
       "source_file": "src/server/ingestion/video-ingestion.live.test.ts",
       "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_live_test",
-      "target": "ingestion_video_ingestion_live_test_canrunurl"
+      "target": "ingestion_video_ingestion_live_test_canrunurl",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7144,9 +7126,9 @@
       "source_file": "src/server/ingestion/video-ingestion.live.test.ts",
       "source_location": "L14",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_live_test",
-      "target": "ingestion_video_ingestion_live_test_declaredmimetype"
+      "target": "ingestion_video_ingestion_live_test_declaredmimetype",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7155,9 +7137,9 @@
       "source_file": "src/server/ingestion/video-ingestion.test.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_test",
-      "target": "ingestion_video_ingestion"
+      "target": "ingestion_video_ingestion",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7166,9 +7148,9 @@
       "source_file": "src/server/ingestion/video-ingestion.test.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_test",
-      "target": "ingestion_video_ingestion_boundaryerror"
+      "target": "ingestion_video_ingestion_boundaryerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7177,9 +7159,9 @@
       "source_file": "src/server/ingestion/video-ingestion.test.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_test",
-      "target": "ingestion_video_ingestion_createvideoingestor"
+      "target": "ingestion_video_ingestion_createvideoingestor",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7188,9 +7170,9 @@
       "source_file": "src/server/ingestion/video-ingestion.test.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_test",
-      "target": "ingestion_video_ingestion_ingestionerror"
+      "target": "ingestion_video_ingestion_ingestionerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7199,9 +7181,9 @@
       "source_file": "src/server/ingestion/video-ingestion.test.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_test",
-      "target": "ingestion_video_ingestion_mapingestionerror"
+      "target": "ingestion_video_ingestion_mapingestionerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7209,9 +7191,9 @@
       "source_file": "src/server/ingestion/video-ingestion.test.ts",
       "source_location": "L12",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_test",
-      "target": "ingestion_video_ingestion_test_makeharness"
+      "target": "ingestion_video_ingestion_test_makeharness",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -7220,9 +7202,9 @@
       "source_file": "src/server/ingestion/video-ingestion.test.ts",
       "source_location": "L54",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_test_makeharness",
-      "target": "ingestion_video_ingestion_createvideoingestor"
+      "target": "ingestion_video_ingestion_createvideoingestor",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7230,9 +7212,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L89",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_activegeminifile"
+      "target": "ingestion_video_ingestion_activegeminifile",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7240,9 +7222,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L26",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_boundaryerror"
+      "target": "ingestion_video_ingestion_boundaryerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7250,9 +7232,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L216",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_createvideoingestor"
+      "target": "ingestion_video_ingestion_createvideoingestor",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7260,9 +7242,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L147",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_default_video_ingestion_policy"
+      "target": "ingestion_video_ingestion_default_video_ingestion_policy",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7270,9 +7252,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L82",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_geminifile"
+      "target": "ingestion_video_ingestion_geminifile",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7280,9 +7262,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L12",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_ingestionerror"
+      "target": "ingestion_video_ingestion_ingestionerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7290,9 +7272,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_ingestionerrordetails"
+      "target": "ingestion_video_ingestion_ingestionerrordetails",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7300,9 +7282,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L173",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_issupportedvideourl"
+      "target": "ingestion_video_ingestion_issupportedvideourl",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7310,9 +7292,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L36",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_mapingestionerror"
+      "target": "ingestion_video_ingestion_mapingestionerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7320,9 +7302,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L196",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_rejectfailedprocessing"
+      "target": "ingestion_video_ingestion_rejectfailedprocessing",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7330,9 +7312,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L77",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_supportedvideomimetype"
+      "target": "ingestion_video_ingestion_supportedvideomimetype",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7340,9 +7322,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L207",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_throwprocessingtimeout"
+      "target": "ingestion_video_ingestion_throwprocessingtimeout",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7350,9 +7332,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L165",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_tiktokhosts"
+      "target": "ingestion_video_ingestion_tiktokhosts",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7360,9 +7342,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L104",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_videoingestiondependencies"
+      "target": "ingestion_video_ingestion_videoingestiondependencies",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7370,9 +7352,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L155",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_videoingestionoptions"
+      "target": "ingestion_video_ingestion_videoingestionoptions",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7380,9 +7362,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L139",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_videoingestionpolicy"
+      "target": "ingestion_video_ingestion_videoingestionpolicy",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7390,9 +7372,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L95",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_videoingestionsource"
+      "target": "ingestion_video_ingestion_videoingestionsource",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7400,9 +7382,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L160",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion",
-      "target": "ingestion_video_ingestion_youtubehosts"
+      "target": "ingestion_video_ingestion_youtubehosts",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7411,9 +7393,9 @@
       "source_file": "src/server/ingestion/yt-dlp.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp",
-      "target": "ingestion_video_ingestion"
+      "target": "ingestion_video_ingestion",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7422,9 +7404,9 @@
       "source_file": "src/server/ingestion/yt-dlp.test.ts",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp_test",
-      "target": "ingestion_video_ingestion"
+      "target": "ingestion_video_ingestion",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -7432,9 +7414,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L17",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_ingestionerror",
-      "target": "ingestion_video_ingestion_ingestionerror_constructor"
+      "target": "ingestion_video_ingestion_ingestionerror_constructor",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -7442,9 +7424,9 @@
       "source_file": "src/server/ingestion/video-ingestion.ts",
       "source_location": "L27",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_video_ingestion_boundaryerror",
-      "target": "ingestion_video_ingestion_boundaryerror_constructor"
+      "target": "ingestion_video_ingestion_boundaryerror_constructor",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7453,9 +7435,9 @@
       "source_file": "src/server/ingestion/yt-dlp.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp",
-      "target": "ingestion_video_ingestion_boundaryerror"
+      "target": "ingestion_video_ingestion_boundaryerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7464,9 +7446,9 @@
       "source_file": "src/server/ingestion/yt-dlp.test.ts",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp_test",
-      "target": "ingestion_video_ingestion_boundaryerror"
+      "target": "ingestion_video_ingestion_boundaryerror",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7475,9 +7457,9 @@
       "source_file": "src/server/ingestion/yt-dlp.ts",
       "source_location": "L4",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp",
-      "target": "ingestion_video_ingestion_videoingestiondependencies"
+      "target": "ingestion_video_ingestion_videoingestiondependencies",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports_from",
@@ -7486,9 +7468,9 @@
       "source_file": "src/server/ingestion/yt-dlp.test.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp_test",
-      "target": "ingestion_yt_dlp"
+      "target": "ingestion_yt_dlp",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7497,9 +7479,9 @@
       "source_file": "src/server/ingestion/yt-dlp.test.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp_test",
-      "target": "ingestion_yt_dlp_createytdlpdownloader"
+      "target": "ingestion_yt_dlp_createytdlpdownloader",
+      "confidence_score": 1.0
     },
     {
       "relation": "imports",
@@ -7508,9 +7490,9 @@
       "source_file": "src/server/ingestion/yt-dlp.test.ts",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp_test",
-      "target": "ingestion_yt_dlp_processrunner"
+      "target": "ingestion_yt_dlp_processrunner",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7518,18 +7500,8 @@
       "source_file": "src/server/ingestion/yt-dlp.ts",
       "source_location": "L59",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp",
-      "target": "ingestion_yt_dlp_createytdlpdownloader"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/server/ingestion/yt-dlp.ts",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "ingestion_yt_dlp",
-      "target": "ingestion_yt_dlp_filesizereader",
+      "target": "ingestion_yt_dlp_createytdlpdownloader",
       "confidence_score": 1.0
     },
     {
@@ -7538,9 +7510,9 @@
       "source_file": "src/server/ingestion/yt-dlp.ts",
       "source_location": "L12",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp",
-      "target": "ingestion_yt_dlp_processrequest"
+      "target": "ingestion_yt_dlp_processrequest",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7548,9 +7520,9 @@
       "source_file": "src/server/ingestion/yt-dlp.ts",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp",
-      "target": "ingestion_yt_dlp_processresult"
+      "target": "ingestion_yt_dlp_processresult",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7558,9 +7530,9 @@
       "source_file": "src/server/ingestion/yt-dlp.ts",
       "source_location": "L20",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp",
-      "target": "ingestion_yt_dlp_processrunner"
+      "target": "ingestion_yt_dlp_processrunner",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7568,18 +7540,8 @@
       "source_file": "src/server/ingestion/yt-dlp.ts",
       "source_location": "L28",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp",
-      "target": "ingestion_yt_dlp_runprocess"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/server/ingestion/yt-dlp.ts",
-      "source_location": "L32",
-      "weight": 1.0,
-      "source": "ingestion_yt_dlp",
-      "target": "ingestion_yt_dlp_statfilesize",
+      "target": "ingestion_yt_dlp_runprocess",
       "confidence_score": 1.0
     },
     {
@@ -7588,9 +7550,9 @@
       "source_file": "src/server/ingestion/yt-dlp.ts",
       "source_location": "L22",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "ingestion_yt_dlp",
-      "target": "ingestion_yt_dlp_ytdlpdownloaderoptions"
+      "target": "ingestion_yt_dlp_ytdlpdownloaderoptions",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7788,9 +7750,9 @@
       "source_file": ".github/pull_request_template.md",
       "source_location": "L27",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "github_pull_request_template",
-      "target": "github_pull_request_template_demo_notes"
+      "target": "github_pull_request_template_demo_notes",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7798,9 +7760,9 @@
       "source_file": ".github/pull_request_template.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "github_pull_request_template",
-      "target": "github_pull_request_template_issue"
+      "target": "github_pull_request_template_issue",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7808,9 +7770,9 @@
       "source_file": ".github/pull_request_template.md",
       "source_location": "L20",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "github_pull_request_template",
-      "target": "github_pull_request_template_tdd_evidence"
+      "target": "github_pull_request_template_tdd_evidence",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7818,9 +7780,9 @@
       "source_file": ".github/pull_request_template.md",
       "source_location": "L8",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "github_pull_request_template",
-      "target": "github_pull_request_template_verification"
+      "target": "github_pull_request_template_verification",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7828,9 +7790,9 @@
       "source_file": ".github/pull_request_template.md",
       "source_location": "L5",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "github_pull_request_template",
-      "target": "github_pull_request_template_what_changed"
+      "target": "github_pull_request_template_what_changed",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7838,9 +7800,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents",
-      "target": "agents_capcheck_agent_guide"
+      "target": "agents_capcheck_agent_guide",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7848,9 +7810,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L81",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_capcheck_agent_guide",
-      "target": "agents_agent_skills"
+      "target": "agents_agent_skills",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7858,9 +7820,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L15",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_capcheck_agent_guide",
-      "target": "agents_build_lanes"
+      "target": "agents_build_lanes",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7868,9 +7830,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L8",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_capcheck_agent_guide",
-      "target": "agents_current_foundation_handoff"
+      "target": "agents_current_foundation_handoff",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7878,9 +7840,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L63",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_capcheck_agent_guide",
-      "target": "agents_issue_to_pr_workflow"
+      "target": "agents_issue_to_pr_workflow",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7888,9 +7850,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L28",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_capcheck_agent_guide",
-      "target": "agents_parallel_execution"
+      "target": "agents_parallel_execution",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7898,9 +7860,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L41",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_capcheck_agent_guide",
-      "target": "agents_test_driven_development"
+      "target": "agents_test_driven_development",
+      "confidence_score": 1.0
     },
     {
       "relation": "conceptually_related_to",
@@ -7958,9 +7920,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L98",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_agent_skills",
-      "target": "agents_codebase_graph"
+      "target": "agents_codebase_graph",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7968,9 +7930,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L93",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_agent_skills",
-      "target": "agents_domain_docs"
+      "target": "agents_domain_docs",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7978,9 +7940,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L83",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_agent_skills",
-      "target": "agents_md_agents_issue_tracker"
+      "target": "agents_md_agents_issue_tracker",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7988,9 +7950,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L110",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_agent_skills",
-      "target": "agents_md_agents_testing"
+      "target": "agents_md_agents_testing",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -7998,9 +7960,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L88",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_agent_skills",
-      "target": "agents_md_agents_triage_labels"
+      "target": "agents_md_agents_triage_labels",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8008,9 +7970,9 @@
       "source_file": "AGENTS.md",
       "source_location": "L104",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_agent_skills",
-      "target": "agents_md_agents_ui_design"
+      "target": "agents_md_agents_ui_design",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8018,9 +7980,9 @@
       "source_file": "CONTEXT.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "context",
-      "target": "context_capcheck_domain_glossary"
+      "target": "context_capcheck_domain_glossary",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8028,9 +7990,9 @@
       "source_file": "CONTEXT.md",
       "source_location": "L33",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "context_capcheck_domain_glossary",
-      "target": "context_cap_score"
+      "target": "context_cap_score",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8038,9 +8000,9 @@
       "source_file": "CONTEXT.md",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "context_capcheck_domain_glossary",
-      "target": "context_capcheck"
+      "target": "context_capcheck",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8048,9 +8010,9 @@
       "source_file": "CONTEXT.md",
       "source_location": "L17",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "context_capcheck_domain_glossary",
-      "target": "context_checkable_claim"
+      "target": "context_checkable_claim",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8058,9 +8020,9 @@
       "source_file": "CONTEXT.md",
       "source_location": "L12",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "context_capcheck_domain_glossary",
-      "target": "context_claim"
+      "target": "context_claim",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8068,9 +8030,9 @@
       "source_file": "CONTEXT.md",
       "source_location": "L49",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "context_capcheck_domain_glossary",
-      "target": "context_demo_fixture"
+      "target": "context_demo_fixture",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8078,9 +8040,9 @@
       "source_file": "CONTEXT.md",
       "source_location": "L27",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "context_capcheck_domain_glossary",
-      "target": "context_evidence_source"
+      "target": "context_evidence_source",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8088,9 +8050,9 @@
       "source_file": "CONTEXT.md",
       "source_location": "L44",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "context_capcheck_domain_glossary",
-      "target": "context_hype_language"
+      "target": "context_hype_language",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8098,9 +8060,9 @@
       "source_file": "CONTEXT.md",
       "source_location": "L39",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "context_capcheck_domain_glossary",
-      "target": "context_scorecard"
+      "target": "context_scorecard",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8108,9 +8070,9 @@
       "source_file": "CONTEXT.md",
       "source_location": "L8",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "context_capcheck_domain_glossary",
-      "target": "context_source_video"
+      "target": "context_source_video",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8118,9 +8080,9 @@
       "source_file": "CONTEXT.md",
       "source_location": "L22",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "context_capcheck_domain_glossary",
-      "target": "context_verification"
+      "target": "context_verification",
+      "confidence_score": 1.0
     },
     {
       "relation": "conceptually_related_to",
@@ -8268,9 +8230,9 @@
       "source_file": "README.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "readme",
-      "target": "readme_capcheck"
+      "target": "readme_capcheck",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8278,9 +8240,9 @@
       "source_file": "README.md",
       "source_location": "L66",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "readme_capcheck",
-      "target": "readme_architecture_and_the_live_adapter_seam"
+      "target": "readme_architecture_and_the_live_adapter_seam",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8288,9 +8250,9 @@
       "source_file": "README.md",
       "source_location": "L28",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "readme_capcheck",
-      "target": "readme_commands"
+      "target": "readme_commands",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8298,9 +8260,9 @@
       "source_file": "README.md",
       "source_location": "L47",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "readme_capcheck",
-      "target": "readme_fixture_mode_is_server_only"
+      "target": "readme_fixture_mode_is_server_only",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8308,9 +8270,9 @@
       "source_file": "README.md",
       "source_location": "L13",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "readme_capcheck",
-      "target": "readme_local_setup"
+      "target": "readme_local_setup",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8318,9 +8280,9 @@
       "source_file": "README.md",
       "source_location": "L84",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "readme_capcheck",
-      "target": "readme_ui_design_contract"
+      "target": "readme_ui_design_contract",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8328,9 +8290,9 @@
       "source_file": "README.md",
       "source_location": "L96",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "readme_capcheck",
-      "target": "readme_verification_before_a_pr"
+      "target": "readme_verification_before_a_pr",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8338,9 +8300,9 @@
       "source_file": "docs/agents/build-workflow.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_build_workflow",
-      "target": "agents_build_workflow_build_workflow"
+      "target": "agents_build_workflow_build_workflow",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8348,9 +8310,9 @@
       "source_file": "docs/agents/build-workflow.md",
       "source_location": "L3",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_build_workflow_build_workflow",
-      "target": "agents_build_workflow_dependency_rule"
+      "target": "agents_build_workflow_dependency_rule",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8358,9 +8320,9 @@
       "source_file": "docs/agents/build-workflow.md",
       "source_location": "L61",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_build_workflow_build_workflow",
-      "target": "agents_build_workflow_merge_policy"
+      "target": "agents_build_workflow_merge_policy",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8368,9 +8330,9 @@
       "source_file": "docs/agents/build-workflow.md",
       "source_location": "L9",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_build_workflow_build_workflow",
-      "target": "agents_build_workflow_parallel_scheduling"
+      "target": "agents_build_workflow_parallel_scheduling",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8378,9 +8340,9 @@
       "source_file": "docs/agents/build-workflow.md",
       "source_location": "L53",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_build_workflow_build_workflow",
-      "target": "agents_build_workflow_required_ci"
+      "target": "agents_build_workflow_required_ci",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8388,9 +8350,9 @@
       "source_file": "docs/agents/build-workflow.md",
       "source_location": "L34",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_build_workflow_build_workflow",
-      "target": "agents_build_workflow_risk_based_no_mistakes_gate"
+      "target": "agents_build_workflow_risk_based_no_mistakes_gate",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -8411,6 +8373,16 @@
       "weight": 1.0,
       "source": "agents_build_workflow_required_ci",
       "target": "workflows_ci_e2e_job"
+    },
+    {
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": ".github/workflows/ci.yml",
+      "source_location": "jobs.quality",
+      "weight": 1.0,
+      "source": "workflows_ci_quality_job",
+      "target": "agents_build_workflow_required_ci"
     },
     {
       "relation": "references",
@@ -8443,24 +8415,14 @@
       "target": "agents_build_workflow_required_ci"
     },
     {
-      "relation": "implements",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": ".github/workflows/ci.yml",
-      "source_location": "jobs.quality",
-      "weight": 1.0,
-      "source": "workflows_ci_quality_job",
-      "target": "agents_build_workflow_required_ci"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/agents/domain.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_domain",
-      "target": "agents_domain_domain_docs"
+      "target": "agents_domain_domain_docs",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8468,9 +8430,9 @@
       "source_file": "docs/agents/graphify.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_graphify",
-      "target": "agents_graphify_graphify_workflow"
+      "target": "agents_graphify_graphify_workflow",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8478,9 +8440,9 @@
       "source_file": "docs/agents/graphify.md",
       "source_location": "L16",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_graphify_graphify_workflow",
-      "target": "agents_graphify_commands"
+      "target": "agents_graphify_commands",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8488,9 +8450,9 @@
       "source_file": "docs/agents/graphify.md",
       "source_location": "L39",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_graphify_graphify_workflow",
-      "target": "agents_graphify_repository_policy"
+      "target": "agents_graphify_repository_policy",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8498,9 +8460,9 @@
       "source_file": "docs/agents/graphify.md",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_graphify_graphify_workflow",
-      "target": "agents_graphify_when_to_use_it"
+      "target": "agents_graphify_when_to_use_it",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8508,9 +8470,9 @@
       "source_file": "docs/agents/issue-tracker.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "docs_agents_issue_tracker_md_agents_issue_tracker",
-      "target": "agents_issue_tracker_issue_tracker_github"
+      "target": "agents_issue_tracker_issue_tracker_github",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8518,9 +8480,9 @@
       "source_file": "docs/agents/issue-tracker.md",
       "source_location": "L25",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_issue_tracker_issue_tracker_github",
-      "target": "agents_issue_tracker_build_ownership"
+      "target": "agents_issue_tracker_build_ownership",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8528,9 +8490,9 @@
       "source_file": "docs/agents/issue-tracker.md",
       "source_location": "L6",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_issue_tracker_issue_tracker_github",
-      "target": "agents_issue_tracker_conventions"
+      "target": "agents_issue_tracker_conventions",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8538,9 +8500,9 @@
       "source_file": "docs/agents/testing.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "docs_agents_testing_md_agents_testing",
-      "target": "agents_testing_tdd_and_browser_qa_workflow"
+      "target": "agents_testing_tdd_and_browser_qa_workflow",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8548,9 +8510,9 @@
       "source_file": "docs/agents/testing.md",
       "source_location": "L83",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_testing_tdd_and_browser_qa_workflow",
-      "target": "agents_testing_independent_lane_workflow"
+      "target": "agents_testing_independent_lane_workflow",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8558,9 +8520,9 @@
       "source_file": "docs/agents/testing.md",
       "source_location": "L101",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_testing_tdd_and_browser_qa_workflow",
-      "target": "agents_testing_pr_evidence"
+      "target": "agents_testing_pr_evidence",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8568,9 +8530,9 @@
       "source_file": "docs/agents/testing.md",
       "source_location": "L20",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_testing_tdd_and_browser_qa_workflow",
-      "target": "agents_testing_test_layers"
+      "target": "agents_testing_test_layers",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8578,9 +8540,9 @@
       "source_file": "docs/agents/testing.md",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_testing_tdd_and_browser_qa_workflow",
-      "target": "agents_testing_the_required_loop"
+      "target": "agents_testing_the_required_loop",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8588,9 +8550,9 @@
       "source_file": "docs/agents/testing.md",
       "source_location": "L32",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_testing_test_layers",
-      "target": "agents_testing_lane_a_contract_and_integration_tests"
+      "target": "agents_testing_lane_a_contract_and_integration_tests",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8598,9 +8560,9 @@
       "source_file": "docs/agents/testing.md",
       "source_location": "L50",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_testing_test_layers",
-      "target": "agents_testing_lane_b_fixture_backed_playwright_tests"
+      "target": "agents_testing_lane_b_fixture_backed_playwright_tests",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8608,9 +8570,9 @@
       "source_file": "docs/agents/testing.md",
       "source_location": "L22",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_testing_test_layers",
-      "target": "agents_testing_unit_and_component_tests"
+      "target": "agents_testing_unit_and_component_tests",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8618,9 +8580,9 @@
       "source_file": "docs/agents/triage-labels.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "docs_agents_triage_labels_md_agents_triage_labels",
-      "target": "agents_triage_labels_triage_labels"
+      "target": "agents_triage_labels_triage_labels",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8628,9 +8590,9 @@
       "source_file": "docs/agents/ui-design.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "docs_agents_ui_design_md_agents_ui_design",
-      "target": "agents_ui_design_lane_b_ui_design_workflow"
+      "target": "agents_ui_design_lane_b_ui_design_workflow",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8638,9 +8600,9 @@
       "source_file": "docs/agents/ui-design.md",
       "source_location": "L38",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_ui_design_lane_b_ui_design_workflow",
-      "target": "agents_ui_design_capcheck_constraints"
+      "target": "agents_ui_design_capcheck_constraints",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8648,9 +8610,9 @@
       "source_file": "docs/agents/ui-design.md",
       "source_location": "L25",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_ui_design_lane_b_ui_design_workflow",
-      "target": "agents_ui_design_impeccable"
+      "target": "agents_ui_design_impeccable",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8658,9 +8620,9 @@
       "source_file": "docs/agents/ui-design.md",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "agents_ui_design_lane_b_ui_design_workflow",
-      "target": "agents_ui_design_reference_order"
+      "target": "agents_ui_design_reference_order",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -8678,9 +8640,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec",
-      "target": "design_capcheck_ui_spec_capcheck_shared_ui_specification"
+      "target": "design_capcheck_ui_spec_capcheck_shared_ui_specification",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8688,9 +8650,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L86",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_capcheck_shared_ui_specification",
-      "target": "design_capcheck_ui_spec_component_contracts"
+      "target": "design_capcheck_ui_spec_component_contracts",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8698,9 +8660,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L30",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_capcheck_shared_ui_specification",
-      "target": "design_capcheck_ui_spec_design_tokens"
+      "target": "design_capcheck_ui_spec_design_tokens",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8708,9 +8670,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L134",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_capcheck_shared_ui_specification",
-      "target": "design_capcheck_ui_spec_interaction_accessibility_and_motion"
+      "target": "design_capcheck_ui_spec_interaction_accessibility_and_motion",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8718,9 +8680,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L15",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_capcheck_shared_ui_specification",
-      "target": "design_capcheck_ui_spec_mobbin_reference_composite"
+      "target": "design_capcheck_ui_spec_mobbin_reference_composite",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8728,9 +8690,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_capcheck_shared_ui_specification",
-      "target": "design_capcheck_ui_spec_product_character"
+      "target": "design_capcheck_ui_spec_product_character",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8738,9 +8700,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L145",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_capcheck_shared_ui_specification",
-      "target": "design_capcheck_ui_spec_qa_contract"
+      "target": "design_capcheck_ui_spec_qa_contract",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8748,9 +8710,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L73",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_capcheck_shared_ui_specification",
-      "target": "design_capcheck_ui_spec_responsive_layout"
+      "target": "design_capcheck_ui_spec_responsive_layout",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8758,9 +8720,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L32",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_design_tokens",
-      "target": "design_capcheck_ui_spec_color"
+      "target": "design_capcheck_ui_spec_color",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8768,9 +8730,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L64",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_design_tokens",
-      "target": "design_capcheck_ui_spec_geometry_and_spacing"
+      "target": "design_capcheck_ui_spec_geometry_and_spacing",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8778,9 +8740,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L54",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_design_tokens",
-      "target": "design_capcheck_ui_spec_typography"
+      "target": "design_capcheck_ui_spec_typography",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -8808,9 +8770,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L88",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_component_contracts",
-      "target": "design_capcheck_ui_spec_app_header"
+      "target": "design_capcheck_ui_spec_app_header",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8818,9 +8780,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L122",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_component_contracts",
-      "target": "design_capcheck_ui_spec_claim_and_evidence_card"
+      "target": "design_capcheck_ui_spec_claim_and_evidence_card",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8828,9 +8790,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L93",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_component_contracts",
-      "target": "design_capcheck_ui_spec_intake_panel"
+      "target": "design_capcheck_ui_spec_intake_panel",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8838,9 +8800,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L103",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_component_contracts",
-      "target": "design_capcheck_ui_spec_progress_timeline"
+      "target": "design_capcheck_ui_spec_progress_timeline",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8848,9 +8810,9 @@
       "source_file": "docs/design/capcheck-ui-spec.md",
       "source_location": "L112",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "design_capcheck_ui_spec_component_contracts",
-      "target": "design_capcheck_ui_spec_score_header"
+      "target": "design_capcheck_ui_spec_score_header",
+      "confidence_score": 1.0
     },
     {
       "relation": "conceptually_related_to",
@@ -8898,9 +8860,9 @@
       "source_file": "docs/handoffs/hype-actions-contract.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_hype_actions_contract",
-      "target": "handoffs_hype_actions_contract_shared_contract_change_hype_context_and_evidence_linked_actions_lane_a_must_read"
+      "target": "handoffs_hype_actions_contract_shared_contract_change_hype_context_and_evidence_linked_actions_lane_a_must_read",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8908,9 +8870,9 @@
       "source_file": "docs/handoffs/hype-actions-contract.md",
       "source_location": "L24",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_hype_actions_contract_shared_contract_change_hype_context_and_evidence_linked_actions_lane_a_must_read",
-      "target": "handoffs_hype_actions_contract_invariants"
+      "target": "handoffs_hype_actions_contract_invariants",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8918,9 +8880,9 @@
       "source_file": "docs/handoffs/hype-actions-contract.md",
       "source_location": "L9",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_hype_actions_contract_shared_contract_change_hype_context_and_evidence_linked_actions_lane_a_must_read",
-      "target": "handoffs_hype_actions_contract_what_changed"
+      "target": "handoffs_hype_actions_contract_what_changed",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8928,9 +8890,9 @@
       "source_file": "docs/handoffs/hype-actions-contract.md",
       "source_location": "L44",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_hype_actions_contract_shared_contract_change_hype_context_and_evidence_linked_actions_lane_a_must_read",
-      "target": "handoffs_hype_actions_contract_what_issue_9_should_populate"
+      "target": "handoffs_hype_actions_contract_what_issue_9_should_populate",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8938,9 +8900,9 @@
       "source_file": "docs/handoffs/hype-actions-contract.md",
       "source_location": "L60",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_hype_actions_contract_shared_contract_change_hype_context_and_evidence_linked_actions_lane_a_must_read",
-      "target": "handoffs_hype_actions_contract_where_to_look"
+      "target": "handoffs_hype_actions_contract_where_to_look",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8948,9 +8910,9 @@
       "source_file": "docs/handoffs/issue-2-foundation.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_2_foundation",
-      "target": "handoffs_issue_2_foundation_issue_2_foundation_handoff"
+      "target": "handoffs_issue_2_foundation_issue_2_foundation_handoff",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8958,9 +8920,9 @@
       "source_file": "docs/handoffs/issue-2-foundation.md",
       "source_location": "L24",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_2_foundation_issue_2_foundation_handoff",
-      "target": "handoffs_issue_2_foundation_frozen_seam_and_invariants"
+      "target": "handoffs_issue_2_foundation_frozen_seam_and_invariants",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8968,9 +8930,9 @@
       "source_file": "docs/handoffs/issue-2-foundation.md",
       "source_location": "L42",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_2_foundation_issue_2_foundation_handoff",
-      "target": "handoffs_issue_2_foundation_key_implementation_map"
+      "target": "handoffs_issue_2_foundation_key_implementation_map",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8978,9 +8940,9 @@
       "source_file": "docs/handoffs/issue-2-foundation.md",
       "source_location": "L58",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_2_foundation_issue_2_foundation_handoff",
-      "target": "handoffs_issue_2_foundation_next_issue_direction"
+      "target": "handoffs_issue_2_foundation_next_issue_direction",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8988,9 +8950,9 @@
       "source_file": "docs/handoffs/issue-2-foundation.md",
       "source_location": "L8",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_2_foundation_issue_2_foundation_handoff",
-      "target": "handoffs_issue_2_foundation_read_in_this_order"
+      "target": "handoffs_issue_2_foundation_read_in_this_order",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -8998,9 +8960,9 @@
       "source_file": "docs/handoffs/issue-2-foundation.md",
       "source_location": "L105",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_2_foundation_issue_2_foundation_handoff",
-      "target": "handoffs_issue_2_foundation_suggested_skills"
+      "target": "handoffs_issue_2_foundation_suggested_skills",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9008,9 +8970,9 @@
       "source_file": "docs/handoffs/issue-2-foundation.md",
       "source_location": "L88",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_2_foundation_issue_2_foundation_handoff",
-      "target": "handoffs_issue_2_foundation_verification_baseline"
+      "target": "handoffs_issue_2_foundation_verification_baseline",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9018,9 +8980,9 @@
       "source_file": "docs/handoffs/issue-2-foundation.md",
       "source_location": "L60",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_2_foundation_next_issue_direction",
-      "target": "handoffs_issue_2_foundation_issue_3_audit_before_coding"
+      "target": "handoffs_issue_2_foundation_issue_3_audit_before_coding",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9028,9 +8990,9 @@
       "source_file": "docs/handoffs/issue-2-foundation.md",
       "source_location": "L68",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_2_foundation_next_issue_direction",
-      "target": "handoffs_issue_2_foundation_issue_4_clean_backend_lane"
+      "target": "handoffs_issue_2_foundation_issue_4_clean_backend_lane",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9038,9 +9000,9 @@
       "source_file": "docs/handoffs/issue-2-foundation.md",
       "source_location": "L76",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_2_foundation_next_issue_direction",
-      "target": "handoffs_issue_2_foundation_issue_5_extend_do_not_rebuild"
+      "target": "handoffs_issue_2_foundation_issue_5_extend_do_not_rebuild",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9048,9 +9010,9 @@
       "source_file": "docs/handoffs/issue-4-gemini-ingestion.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_4_gemini_ingestion",
-      "target": "handoffs_issue_4_gemini_ingestion_issue_4_gemini_video_ingestion_handoff"
+      "target": "handoffs_issue_4_gemini_ingestion_issue_4_gemini_video_ingestion_handoff",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9058,9 +9020,9 @@
       "source_file": "docs/handoffs/issue-4-gemini-ingestion.md",
       "source_location": "L33",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_4_gemini_ingestion_issue_4_gemini_video_ingestion_handoff",
-      "target": "handoffs_issue_4_gemini_ingestion_behavior_and_ownership"
+      "target": "handoffs_issue_4_gemini_ingestion_behavior_and_ownership",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9068,9 +9030,9 @@
       "source_file": "docs/handoffs/issue-4-gemini-ingestion.md",
       "source_location": "L58",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_4_gemini_ingestion_issue_4_gemini_video_ingestion_handoff",
-      "target": "handoffs_issue_4_gemini_ingestion_issue_6_wiring_direction"
+      "target": "handoffs_issue_4_gemini_ingestion_issue_6_wiring_direction",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9078,9 +9040,9 @@
       "source_file": "docs/handoffs/issue-4-gemini-ingestion.md",
       "source_location": "L7",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_4_gemini_ingestion_issue_4_gemini_video_ingestion_handoff",
-      "target": "handoffs_issue_4_gemini_ingestion_public_entry_point"
+      "target": "handoffs_issue_4_gemini_ingestion_public_entry_point",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9088,9 +9050,9 @@
       "source_file": "docs/handoffs/issue-4-gemini-ingestion.md",
       "source_location": "L69",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_issue_4_gemini_ingestion_issue_4_gemini_video_ingestion_handoff",
-      "target": "handoffs_issue_4_gemini_ingestion_verification"
+      "target": "handoffs_issue_4_gemini_ingestion_verification",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9098,9 +9060,9 @@
       "source_file": "docs/handoffs/scorecard-skippedclaims-contract.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_scorecard_skippedclaims_contract",
-      "target": "handoffs_scorecard_skippedclaims_contract_shared_contract_change_scorecard_skippedclaims_lane_a_must_read"
+      "target": "handoffs_scorecard_skippedclaims_contract_shared_contract_change_scorecard_skippedclaims_lane_a_must_read",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9108,9 +9070,9 @@
       "source_file": "docs/handoffs/scorecard-skippedclaims-contract.md",
       "source_location": "L19",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_scorecard_skippedclaims_contract_shared_contract_change_scorecard_skippedclaims_lane_a_must_read",
-      "target": "handoffs_scorecard_skippedclaims_contract_invariants_keep_these_when_you_populate_it_in_9"
+      "target": "handoffs_scorecard_skippedclaims_contract_invariants_keep_these_when_you_populate_it_in_9",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9118,9 +9080,9 @@
       "source_file": "docs/handoffs/scorecard-skippedclaims-contract.md",
       "source_location": "L31",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_scorecard_skippedclaims_contract_shared_contract_change_scorecard_skippedclaims_lane_a_must_read",
-      "target": "handoffs_scorecard_skippedclaims_contract_what_9_should_do"
+      "target": "handoffs_scorecard_skippedclaims_contract_what_9_should_do",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9128,9 +9090,9 @@
       "source_file": "docs/handoffs/scorecard-skippedclaims-contract.md",
       "source_location": "L8",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_scorecard_skippedclaims_contract_shared_contract_change_scorecard_skippedclaims_lane_a_must_read",
-      "target": "handoffs_scorecard_skippedclaims_contract_what_changed"
+      "target": "handoffs_scorecard_skippedclaims_contract_what_changed",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9138,9 +9100,9 @@
       "source_file": "docs/handoffs/scorecard-skippedclaims-contract.md",
       "source_location": "L39",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "handoffs_scorecard_skippedclaims_contract_shared_contract_change_scorecard_skippedclaims_lane_a_must_read",
-      "target": "handoffs_scorecard_skippedclaims_contract_where_to_look"
+      "target": "handoffs_scorecard_skippedclaims_contract_where_to_look",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9148,9 +9110,9 @@
       "source_file": "docs/references/ui-references.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "references_ui_references",
-      "target": "references_ui_references_capcheck_ui_references"
+      "target": "references_ui_references_capcheck_ui_references",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9158,9 +9120,9 @@
       "source_file": "docs/references/ui-references.md",
       "source_location": "L17",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "references_ui_references_capcheck_ui_references",
-      "target": "references_ui_references_analysis_progress"
+      "target": "references_ui_references_analysis_progress",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9168,9 +9130,9 @@
       "source_file": "docs/references/ui-references.md",
       "source_location": "L35",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "references_ui_references_capcheck_ui_references",
-      "target": "references_ui_references_evidence_and_sources"
+      "target": "references_ui_references_evidence_and_sources",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9178,9 +9140,9 @@
       "source_file": "docs/references/ui-references.md",
       "source_location": "L8",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "references_ui_references_capcheck_ui_references",
-      "target": "references_ui_references_intake_and_upload"
+      "target": "references_ui_references_intake_and_upload",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9188,9 +9150,9 @@
       "source_file": "docs/references/ui-references.md",
       "source_location": "L44",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "references_ui_references_capcheck_ui_references",
-      "target": "references_ui_references_original_composition_rule"
+      "target": "references_ui_references_original_composition_rule",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9198,9 +9160,9 @@
       "source_file": "docs/references/ui-references.md",
       "source_location": "L26",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "references_ui_references_capcheck_ui_references",
-      "target": "references_ui_references_score_and_verdict_summary"
+      "target": "references_ui_references_score_and_verdict_summary",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9208,9 +9170,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-capcheck-foundation.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_capcheck_foundation",
-      "target": "plans_2026_07_11_capcheck_foundation_capcheck_foundation_implementation_plan"
+      "target": "plans_2026_07_11_capcheck_foundation_capcheck_foundation_implementation_plan",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9218,9 +9180,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-capcheck-foundation.md",
       "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_capcheck_foundation_capcheck_foundation_implementation_plan",
-      "target": "plans_2026_07_11_capcheck_foundation_global_constraints"
+      "target": "plans_2026_07_11_capcheck_foundation_global_constraints",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9228,9 +9190,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-capcheck-foundation.md",
       "source_location": "L24",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_capcheck_foundation_global_constraints",
-      "target": "plans_2026_07_11_capcheck_foundation_task_1_scaffold_and_test_harness"
+      "target": "plans_2026_07_11_capcheck_foundation_task_1_scaffold_and_test_harness",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9238,9 +9200,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-capcheck-foundation.md",
       "source_location": "L41",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_capcheck_foundation_global_constraints",
-      "target": "plans_2026_07_11_capcheck_foundation_task_2_frozen_contracts_and_fixtures"
+      "target": "plans_2026_07_11_capcheck_foundation_task_2_frozen_contracts_and_fixtures",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9248,9 +9210,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-capcheck-foundation.md",
       "source_location": "L58",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_capcheck_foundation_global_constraints",
-      "target": "plans_2026_07_11_capcheck_foundation_task_3_fixture_analysis_route_and_sse_parser"
+      "target": "plans_2026_07_11_capcheck_foundation_task_3_fixture_analysis_route_and_sse_parser",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9258,9 +9220,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-capcheck-foundation.md",
       "source_location": "L79",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_capcheck_foundation_global_constraints",
-      "target": "plans_2026_07_11_capcheck_foundation_task_4_intake_to_result_frontend_tracer_bullet"
+      "target": "plans_2026_07_11_capcheck_foundation_task_4_intake_to_result_frontend_tracer_bullet",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9268,9 +9230,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-capcheck-foundation.md",
       "source_location": "L102",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_capcheck_foundation_global_constraints",
-      "target": "plans_2026_07_11_capcheck_foundation_task_5_playwright_e2e_and_responsive_qa"
+      "target": "plans_2026_07_11_capcheck_foundation_task_5_playwright_e2e_and_responsive_qa",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9278,9 +9240,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-capcheck-foundation.md",
       "source_location": "L119",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_capcheck_foundation_global_constraints",
-      "target": "plans_2026_07_11_capcheck_foundation_task_6_full_verification_and_handoff"
+      "target": "plans_2026_07_11_capcheck_foundation_task_6_full_verification_and_handoff",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9288,9 +9250,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-gemini-video-ingestion.md",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_gemini_video_ingestion",
-      "target": "plans_2026_07_11_gemini_video_ingestion_gemini_video_ingestion_implementation_plan"
+      "target": "plans_2026_07_11_gemini_video_ingestion_gemini_video_ingestion_implementation_plan",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9298,9 +9260,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-gemini-video-ingestion.md",
       "source_location": "L11",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_gemini_video_ingestion_gemini_video_ingestion_implementation_plan",
-      "target": "plans_2026_07_11_gemini_video_ingestion_global_constraints"
+      "target": "plans_2026_07_11_gemini_video_ingestion_global_constraints",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9308,9 +9270,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-gemini-video-ingestion.md",
       "source_location": "L23",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_gemini_video_ingestion_global_constraints",
-      "target": "plans_2026_07_11_gemini_video_ingestion_task_1_orchestration_tracer_slice"
+      "target": "plans_2026_07_11_gemini_video_ingestion_task_1_orchestration_tracer_slice",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9318,9 +9280,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-gemini-video-ingestion.md",
       "source_location": "L38",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_gemini_video_ingestion_global_constraints",
-      "target": "plans_2026_07_11_gemini_video_ingestion_task_2_upload_and_failure_contracts"
+      "target": "plans_2026_07_11_gemini_video_ingestion_task_2_upload_and_failure_contracts",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9328,9 +9290,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-gemini-video-ingestion.md",
       "source_location": "L54",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_gemini_video_ingestion_global_constraints",
-      "target": "plans_2026_07_11_gemini_video_ingestion_task_3_concrete_external_adapters"
+      "target": "plans_2026_07_11_gemini_video_ingestion_task_3_concrete_external_adapters",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9338,9 +9300,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-gemini-video-ingestion.md",
       "source_location": "L72",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_gemini_video_ingestion_global_constraints",
-      "target": "plans_2026_07_11_gemini_video_ingestion_task_4_live_smoke_path_and_handoff"
+      "target": "plans_2026_07_11_gemini_video_ingestion_task_4_live_smoke_path_and_handoff",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -9348,9 +9310,9 @@
       "source_file": "docs/superpowers/plans/2026-07-11-gemini-video-ingestion.md",
       "source_location": "L86",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "plans_2026_07_11_gemini_video_ingestion_global_constraints",
-      "target": "plans_2026_07_11_gemini_video_ingestion_task_5_review_and_delivery"
+      "target": "plans_2026_07_11_gemini_video_ingestion_task_5_review_and_delivery",
+      "confidence_score": 1.0
     },
     {
       "relation": "references",
@@ -9638,5 +9600,5 @@
       "source_file": "docs/design/capcheck-ui-spec.md"
     }
   ],
-  "built_at_commit": "27e047c8a535e5950d029c27fccd29ee074c856c"
+  "built_at_commit": "28f1d5d996f8e54dca9ff23072e192780f17a24b"
 }
