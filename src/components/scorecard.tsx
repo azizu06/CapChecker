@@ -48,6 +48,10 @@ export function ScorecardView({ scorecard }: { scorecard: Scorecard }) {
 
   const claimsPanel = (
     <div className="claims">
+      {scorecard.verifications.length === 0 &&
+        (scorecard.skippedClaims?.length ?? 0) === 0 && (
+          <p className="empty-note">No claims were reviewed.</p>
+        )}
       {scorecard.verifications.map((verification) => (
         <ClaimCard key={verification.claim.id} verification={verification} />
       ))}
@@ -89,47 +93,51 @@ export function ScorecardView({ scorecard }: { scorecard: Scorecard }) {
 
   const stepsPanel = (
     <div className="panel list-panel">
-      <ol className="steps">
-        {scorecard.nextActions.map((action, index) => {
-          const evidence = action.evidenceId
-            ? evidenceById.get(action.evidenceId)
-            : undefined;
-          return (
-            <li key={action.id}>
-              <span className="num" aria-hidden="true">
-                {index + 1}
-              </span>
-              <div>
-                <b>{action.label}</b>
-                <p>{action.description}</p>
-                {evidence ? (
-                  <a
-                    href={evidence.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Open evidence source: ${evidence.title} (opens in new tab)`}
-                  >
-                    {evidence.title}
-                    <ExternalLink aria-hidden="true" />
-                  </a>
-                ) : (
-                  action.url && (
+      {scorecard.nextActions.length ? (
+        <ol className="steps">
+          {scorecard.nextActions.map((action, index) => {
+            const evidence = action.evidenceId
+              ? evidenceById.get(action.evidenceId)
+              : undefined;
+            return (
+              <li key={action.id}>
+                <span className="num" aria-hidden="true">
+                  {index + 1}
+                </span>
+                <div>
+                  <b>{action.label}</b>
+                  <p>{action.description}</p>
+                  {evidence ? (
                     <a
-                      href={action.url}
+                      href={evidence.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label={`${action.label} (opens in new tab)`}
+                      aria-label={`Open evidence source: ${evidence.title} (opens in new tab)`}
                     >
-                      Open resource
+                      {evidence.title}
                       <ExternalLink aria-hidden="true" />
                     </a>
-                  )
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
+                  ) : (
+                    action.url && (
+                      <a
+                        href={action.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${action.label} (opens in new tab)`}
+                      >
+                        Open resource
+                        <ExternalLink aria-hidden="true" />
+                      </a>
+                    )
+                  )}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      ) : (
+        <p className="empty-note">No next actions were generated.</p>
+      )}
     </div>
   );
 
@@ -229,23 +237,20 @@ export function ScorecardView({ scorecard }: { scorecard: Scorecard }) {
             <Search aria-hidden="true" />
             <b>Evidence gets checked</b>
             <p>
-              Each claim is verified against primary sources — regulators,
-              official filings, and index publishers first.
+              Primary evidence is preferred. Evidence may be high, medium, or
+              low trust—or unavailable.
             </p>
           </div>
           <div>
             <ShieldCheck aria-hidden="true" />
             <b>The score adds up</b>
             <p>
-              False and unsupported claims raise the Cap Score; hype language
-              raises it further. 0 is clean, 100 is full of cap.
+              Verdict weights determine the score. Prediction-heavy videos have
+              a minimum score of 30; hype is shown separately and does not add points.
             </p>
           </div>
         </div>
         <div className="app-footer">
-          <a href="#methodology">Methodology</a>
-          <a href="#sources">Sources we trust</a>
-          <a href="#report">Report a bad verdict</a>
           <span className="disclaimer">
             CapCheck verifies claims — it isn&rsquo;t financial advice.
           </span>

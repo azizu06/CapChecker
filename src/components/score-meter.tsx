@@ -27,10 +27,10 @@ export function ScoreMeter({ score }: { score: number }) {
           style={{ left: `${Math.min(Math.max(pinLeft, 0), 100)}%` }}
         />
       </div>
-      <div className="meter-labels">
-        <span>0</span>
-        <span>higher is worse</span>
-        <span>100</span>
+      <div className="meter-labels" aria-label="Cap Score bands; higher is worse">
+        <span>No cap 0–29</span>
+        <span>Some cap 30–69</span>
+        <span>Full of cap 70–100</span>
       </div>
     </div>
   );

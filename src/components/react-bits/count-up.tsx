@@ -31,7 +31,7 @@ const canAnimate = () =>
 export function CountUp({
   to,
   from = 0,
-  durationMs = 1100,
+  durationMs = 200,
   className,
 }: CountUpProps) {
   const [value, setValue] = useState(() => (canAnimate() ? from : to));

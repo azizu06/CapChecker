@@ -3,6 +3,7 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
+  workers: 2,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   reporter: "html",
@@ -28,6 +29,6 @@ export default defineConfig({
       ...process.env,
       CAPCHECK_ANALYSIS_MODE: "fixture",
     },
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
   },
 });

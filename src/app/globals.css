@@ -16,7 +16,7 @@
   --border-strong: #cfc9ba;
   --ink: #211f1b;
   --muted: #6b675f;
-  --subtle: #98928a;
+  --subtle: #706b63;
 
   --good: #1d8a55;
   --good-dim: #e2f3e9;
@@ -564,6 +564,11 @@ input:disabled {
   font-size: 1.2rem;
 }
 
+.results-header .tagline {
+  color: var(--subtle);
+  font-size: 0.85rem;
+}
+
 .mini-intake {
   display: flex;
   gap: 8px;
@@ -618,6 +623,13 @@ input:disabled {
 
 .main {
   padding: 28px 32px 40px;
+}
+
+.result-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 32px 0;
 }
 
 /* ---------- source line ---------- */
@@ -749,7 +761,7 @@ input:disabled {
   background: var(--ink);
   border-radius: 2px;
   left: 0;
-  transition: left 1.1s cubic-bezier(0.2, 0.8, 0.25, 1);
+  transition: left 0.2s cubic-bezier(0.2, 0.8, 0.25, 1);
 }
 
 .meter-labels {
@@ -902,13 +914,18 @@ input:disabled {
   overflow: hidden;
 }
 
-.claim summary {
+.claim summary,
+.claim-summary {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
   list-style: none;
+}
+
+.claim-summary {
+  grid-template-columns: auto minmax(0, 1fr) auto;
 }
 
 .claim summary::-webkit-details-marker {
@@ -942,6 +959,11 @@ input:disabled {
 .v-true {
   color: var(--good);
   background: var(--good-dim);
+}
+
+.v-mostly {
+  color: var(--warn);
+  background: var(--warn-dim);
 }
 
 .v-false {
@@ -1305,6 +1327,10 @@ input:disabled {
     margin: -6px 18px 0;
   }
 
+  .result-actions {
+    padding: 16px 18px 0;
+  }
+
   .hero {
     margin: 32px 0 28px;
   }
@@ -1330,11 +1356,17 @@ input:disabled {
   }
 
   .claim summary {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
   .claim-meta {
-    display: none;
+    grid-column: 2 / -1;
+    grid-row: 2;
+    white-space: normal;
+  }
+
+  .claim-summary {
+    grid-template-columns: auto minmax(0, 1fr);
   }
 
   .how-grid {

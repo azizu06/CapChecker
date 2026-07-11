@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CapCheck — AI financial claim verifier",
+  title: "CapCheck — Financial advice, fact-checked",
   description: "Check short-form financial claims against credible evidence.",
 };
 

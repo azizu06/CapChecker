@@ -26,7 +26,8 @@ following surface and text tokens.
 | `border-strong` | `#cfc9ba` | hover/selected boundaries |
 | `text` | `#211f1b` | ink, primary text |
 | `text-muted` | `#6b675f` | supporting copy |
-| `text-subtle` | `#98928a` | metadata only |
+| `text-subtle` | `#706b63` | essential small metadata |
+| `decorative-subtle` | `#98928a` | nonessential decoration only |
 
 Shadows are soft and warm (not black drop shadows) — think a low-opacity warm
 brown/grey, short blur radius, used sparingly on the one primary raised panel.
@@ -41,9 +42,9 @@ brown/grey, short blur radius, used sparingly on the one primary raised panel.
 
 ### Accent and semantic color
 
-- Single interactive accent: cool blue `#2f66d0` (hover `#2857b4`, dim/tint
-  `#e8effb`). Use it only on interactive elements — links, primary buttons,
-  focus states, active tabs. It does not appear elsewhere.
+- Primary accent: cool blue `#2f66d0` (hover `#2857b4`, dim/tint `#e8effb`).
+  Use it for interactive elements and the approved small decorative identity
+  accents (the brand mark, emphasized `cap`, and compact methodology icons).
 - Verdict/semantic colors are reserved for verdicts and must not be reused for
   decoration or generic interactivity:
   - Green (`No cap`): ink `#1d8a55`, tint `#e2f3e9`.
@@ -58,6 +59,10 @@ Sober and financial-grade, with exactly one wink: the verdict labels stay
 `No cap`, `Some cap`, `Full of cap`. Everything else — labels, errors, empty
 states, methodology copy — reads like a credible fintech product, not a meme
 account.
+
+The approved identity descriptor is `Financial advice, fact-checked`; the page
+title is `Is that stock tip cap? Check before you act.` and the primary action
+is `Check it`.
 
 ### Motion budget
 

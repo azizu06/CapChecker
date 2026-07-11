@@ -5,7 +5,7 @@ import { formatTimestamp } from "@/lib/format-timestamp";
 
 const verdictPills = {
   true: { label: "True", tone: "v-true" },
-  "mostly-true": { label: "Mostly true", tone: "v-true" },
+  "mostly-true": { label: "Mostly true", tone: "v-mostly" },
   unverifiable: { label: "Unverifiable", tone: "v-unv" },
   false: { label: "False", tone: "v-false" },
 } as const;
@@ -67,23 +67,16 @@ export function ClaimCard(props: ClaimCardProps) {
   if (props.skippedClaim) {
     const claim = props.skippedClaim;
     return (
-      <details className="claim opinion">
-        <summary>
+      <article className="claim opinion">
+        <div className="claim-summary">
           <span className="verdict-pill v-skip">Opinion</span>
           <span className="claim-text">{claim.text}</span>
           <ClaimMeta
             timestampSeconds={claim.timestampSeconds}
             trailing="skipped"
           />
-          <Chevron />
-        </summary>
-        <div className="claim-body">
-          <p>
-            Opinions aren&rsquo;t checkable claims, so they don&rsquo;t count
-            toward the Cap Score.
-          </p>
         </div>
-      </details>
+      </article>
     );
   }
 

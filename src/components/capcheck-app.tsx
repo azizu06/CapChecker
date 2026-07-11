@@ -1,7 +1,7 @@
 "use client";
 
 import { ShieldCheck } from "lucide-react";
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 import type { AnalysisStage, ErrorEvent, Scorecard } from "@/domain/analysis";
 import { parseAnalysisStream } from "@/lib/analysis-stream";
@@ -33,6 +33,13 @@ export function CapCheckApp() {
     if (typeof window === "undefined") return undefined;
     const value = new URLSearchParams(window.location.search).get("fixture");
     return value && allowedScenarios.has(value) ? value : undefined;
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.capcheckHydrated = "true";
+    return () => {
+      delete document.documentElement.dataset.capcheckHydrated;
+    };
   }, []);
 
   const performAnalysis = async (submitUrl: string, submitFile: File | null) => {
@@ -150,6 +157,7 @@ export function CapCheckApp() {
             <ShieldCheck />
           </span>
           <strong>CapCheck</strong>
+          <span className="tagline">Financial advice, fact-checked</span>
           <form className="mini-intake" onSubmit={analyzeNext} noValidate>
             <input
               type="url"
@@ -170,6 +178,18 @@ export function CapCheckApp() {
             {miniError}
           </p>
         )}
+        <div className="result-actions" aria-label="Completed result actions">
+          <button className="ghost" type="button" onClick={reset}>
+            Check another
+          </button>
+          <button
+            className="ghost"
+            type="button"
+            onClick={() => void performAnalysis(url, file)}
+          >
+            Run again
+          </button>
+        </div>
         <ScorecardView scorecard={scorecard} />
       </main>
     );
@@ -190,7 +210,7 @@ export function CapCheckApp() {
         </h1>
         <p>
           Paste a finance video. CapCheck pulls out the claims, verifies each one
-          against primary sources, and shows you exactly what holds up.
+          against available evidence, and shows you exactly what holds up.
         </p>
       </section>
       <IntakePanel

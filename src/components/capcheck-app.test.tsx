@@ -65,6 +65,7 @@ describe("CapCheckApp", () => {
     await submitUrl(user, "https://www.youtube.com/shorts/demo");
 
     expect(await screen.findByText("52")).toBeInTheDocument();
+    expect(screen.getByText("Financial advice, fact-checked")).toBeVisible();
     expect(screen.getByRole("heading", { name: "Some cap" })).toBeInTheDocument();
     expect(
       screen.getByText(/The video mixes a supported market fact/),
@@ -73,6 +74,45 @@ describe("CapCheckApp", () => {
       "/api/analyze",
       expect.objectContaining({ method: "POST" }),
     );
+  });
+
+  it("shows the complete accessible Cap Score bands", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
+      sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.mixed }),
+    ));
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await submitUrl(user);
+
+    expect(await screen.findByText("No cap 0–29")).toBeVisible();
+    expect(screen.getByText("Some cap 30–69")).toBeVisible();
+    expect(screen.getByText("Full of cap 70–100")).toBeVisible();
+  });
+
+  it("explains the deterministic score and evidence trust truthfully", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
+      sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.mixed }),
+    ));
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await submitUrl(user);
+
+    expect(await screen.findByText(/verdict weights/i)).toBeVisible();
+    expect(screen.getByText(/prediction-heavy videos have a minimum score of 30/i)).toBeVisible();
+    expect(screen.getByText(/evidence may be high, medium, or low trust—or unavailable/i)).toBeVisible();
+    expect(screen.queryByText(/hype language raises it further/i)).not.toBeInTheDocument();
+  });
+
+  it("does not expose dead footer fragment links", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
+      sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.mixed }),
+    ));
+    const user = userEvent.setup();
+    const { container } = render(<CapCheckApp />);
+    await submitUrl(user);
+    await screen.findByText("How the Cap Score works");
+
+    expect(container.querySelectorAll('.app-footer a[href^="#"]')).toHaveLength(0);
   });
 
   it.each(["", "not a url", "mailto:tips@example.com"])(
@@ -253,6 +293,9 @@ describe("CapCheckApp", () => {
 
     expect(await screen.findByText("8")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "No cap" })).toBeInTheDocument();
+    const mostlyTrue = screen.getByText("Mostly true");
+    expect(mostlyTrue).toHaveClass("v-mostly");
+    expect(mostlyTrue).not.toHaveClass("v-true");
   });
 
   it("keeps the input on a retryable fatal error and supports retry and reset", async () => {
@@ -392,12 +435,14 @@ describe("CapCheckApp", () => {
     const opinionText = await screen.findByText(
       "I think this is the most exciting stock in the market.",
     );
-    const opinion = opinionText.closest("details");
+    const opinion = opinionText.closest(".claim") as HTMLElement | null;
 
     expect(opinion).not.toBeNull();
     expect(within(opinion!).getByText("Opinion")).toBeInTheDocument();
     expect(within(opinion!).getByText("0:54")).toBeInTheDocument();
     expect(within(opinion!).queryByText(/confidence/i)).not.toBeInTheDocument();
+    expect(opinion).not.toBeInstanceOf(HTMLDetailsElement);
+    expect(within(opinion!).queryByRole("button")).not.toBeInTheDocument();
   });
 
   it("renders hype findings with transcript context and timestamps on its tab", async () => {
@@ -420,6 +465,35 @@ describe("CapCheckApp", () => {
       ),
     ).toHaveLength(2);
     expect(within(panel).getAllByText("0:41")).toHaveLength(2);
+  });
+
+  it("moves tab focus, selection, and panels with arrows, Home, End, and wraparound", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
+      sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.mixed }),
+    ));
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await submitUrl(user);
+    const claims = await screen.findByRole("tab", { name: /claims reviewed/i });
+    const hype = screen.getByRole("tab", { name: /hype language/i });
+    const actions = screen.getByRole("tab", { name: /before you act/i });
+
+    claims.focus();
+    await user.keyboard("{ArrowLeft}");
+    expect(actions).toHaveFocus();
+    expect(actions).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel", { name: /before you act/i })).toBeVisible();
+    await user.keyboard("{ArrowRight}");
+    expect(claims).toHaveFocus();
+    await user.keyboard("{End}");
+    expect(actions).toHaveFocus();
+    await user.keyboard("{Home}");
+    expect(claims).toHaveFocus();
+    await user.keyboard("{ArrowRight}");
+    expect(hype).toHaveFocus();
+    expect(hype).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel", { name: /hype language/i })).toBeVisible();
+    expect(document.getElementById(claims.getAttribute("aria-controls")!)).not.toBeVisible();
   });
 
   it("links next actions to evidence sources on the before-you-act tab", async () => {
@@ -544,6 +618,25 @@ describe("CapCheckApp", () => {
     expect(screen.getByText("Require the missing report")).toBeInTheDocument();
   });
 
+  it("shows explicit empty states for zero reviewed claims and zero next actions", async () => {
+    const emptyScorecard = {
+      ...DEMO_SCORECARDS.mixed,
+      verifications: [],
+      skippedClaims: [],
+      nextActions: [],
+    };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
+      sseResponse({ type: "complete", scorecard: emptyScorecard }),
+    ));
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await submitUrl(user);
+
+    expect(await screen.findByText("No claims were reviewed.")).toBeVisible();
+    await user.click(screen.getByRole("tab", { name: /before you act/i }));
+    expect(screen.getByText("No next actions were generated.")).toBeVisible();
+  });
+
   it("starts a fresh analysis from the persistent mini-intake", async () => {
     const fetchMock = vi.fn().mockImplementation(() =>
       Promise.resolve(
@@ -566,6 +659,28 @@ describe("CapCheckApp", () => {
       url: "https://example.com/second",
     });
     expect(await screen.findByText("52")).toBeInTheDocument();
+  });
+
+  it("offers completed-result rerun and full-intake reset actions", async () => {
+    const fetchMock = vi.fn().mockImplementation(() => Promise.resolve(
+      sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.mixed }),
+    ));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await submitUrl(user, "https://example.com/original");
+    await screen.findByText("52");
+
+    await user.click(screen.getByRole("button", { name: "Run again" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body as string).url).toBe(
+      "https://example.com/original",
+    );
+    await screen.findByText("52");
+
+    await user.click(screen.getByRole("button", { name: "Check another" }));
+    expect(landingUrlInput()).toBeVisible();
+    expect(screen.getByLabelText(/choose a video file/i)).toBeVisible();
   });
 
   it("rejects an invalid mini-intake URL without fetching again", async () => {

@@ -43,21 +43,22 @@ mapping are defined once in
 [`docs/agents/ui-design.md`](../agents/ui-design.md#locked-design-decisions)
 and are locked. Summary: `canvas #faf8f3`, `surface #ffffff`,
 `surface-raised #f5f2ea`, `border #e7e2d6`/`#cfc9ba`, `text #211f1b`,
-`text-muted #6b675f`, `text-subtle #98928a`; accent `#2f66d0`; verdict green
+`text-muted #6b675f`, accessible metadata `#706b63`, decorative subtle
+`#98928a`; accent `#2f66d0`; verdict green
 `#1d8a55`/`#e2f3e9`, amber `#9c6a0a`/`#f8eed4`, red `#c23f3e`/`#fbe7e4`.
 
 Do not use decorative gradients. Semantic color must always be paired with an
 icon or label. Avoid large saturated fills; use tinted surface backgrounds
-with strong foreground text. The accent blue appears only on interactive
-elements, never as decoration.
+with strong foreground text. Accent blue may also appear in the approved small
+identity and methodology accents; it must not become a large decorative fill.
 
 ### Typography
 
 - Font family: Baloo 2 for display and headings, Nunito for body and UI copy
   (both via `next/font/google`); Geist Mono only for URLs, source domains,
   timestamps, confidence percentages, counts, and other compact data.
-- Display score: `clamp(3.5rem, 12vw, 7rem)`, weight 650, line-height 0.9.
-- Page title: `clamp(2rem, 5vw, 4.5rem)`, weight 600, line-height 1.02.
+- Display score: 4rem in the compact score header, weight 700, line-height 0.95.
+- Page title: `clamp(1.9rem, 3.8vw, 2.85rem)`, weight 700, line-height 1.12.
 - Section title: 1.25rem desktop and 1.125rem mobile, weight 600.
 - Body: 1rem, line-height 1.6. Small metadata: 0.8125rem, line-height 1.4.
 - Keep body measures at 68 characters or less. Do not use uppercase for prose.
@@ -90,7 +91,8 @@ elements, never as decoration.
 ### App header
 
 Use a compact wordmark row: shield/check icon, `CapCheck`, and the descriptor
-`AI financial claim verifier`. No full dashboard sidebar for the hackathon flow.
+`Financial advice, fact-checked`. Use `Check it` for the primary action. No full
+dashboard sidebar for the hackathon flow.
 
 ### Intake panel
 

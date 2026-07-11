@@ -2,6 +2,11 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const demoUrl = "https://www.youtube.com/shorts/capcheck-demo";
 
+async function gotoReady(page: Page, url: string) {
+  await page.goto(url);
+  await expect(page.locator("html")).toHaveAttribute("data-capcheck-hydrated", "true");
+}
+
 function captureRuntimeErrors(page: Page) {
   const errors: string[] = [];
   page.on("console", (message) => {
@@ -12,7 +17,7 @@ function captureRuntimeErrors(page: Page) {
 }
 
 async function submitUrl(page: Page, scenario = "mixed") {
-  await page.goto(`/?fixture=${scenario}`);
+  await gotoReady(page, `/?fixture=${scenario}`);
   await page.getByLabel("Video URL").fill(demoUrl);
   await page.getByRole("button", { name: "Check it" }).click();
 }
@@ -34,9 +39,9 @@ test("loads the fixture-ready CapCheck intake without runtime errors", async ({
   page,
 }) => {
   const runtimeErrors = captureRuntimeErrors(page);
-  await page.goto("/");
+  await gotoReady(page, "/");
 
-  await expect(page).toHaveTitle("CapCheck — AI financial claim verifier");
+  await expect(page).toHaveTitle("CapCheck — Financial advice, fact-checked");
   await expect(page.getByText("CapCheck", { exact: true })).toBeVisible();
   await expect(page.getByText("Financial advice, fact-checked")).toBeVisible();
   await expect(
@@ -65,7 +70,7 @@ test("validates URL input, prevents duplicate work, and exposes truthful progres
     }
   });
 
-  await page.goto("/?fixture=mixed");
+  await gotoReady(page, "/?fixture=mixed");
   const input = page.getByLabel("Video URL");
   await input.fill("definitely not a URL");
   await input.press("Enter");
@@ -141,9 +146,6 @@ test("mixed result exposes every claim and safe evidence destination, then re-ch
     }
   });
   await submitUrl(page);
-  // Below 840px the compact claim summary hides the mono meta (timestamp/confidence).
-  const isNarrow = (page.viewportSize()?.width ?? 1280) <= 840;
-
   await expect(page.locator(".score-num")).toHaveText("52");
   await expect(page.getByRole("heading", { name: "Some cap" })).toBeVisible();
   await expect(
@@ -152,6 +154,13 @@ test("mixed result exposes every claim and safe evidence destination, then re-ch
     ),
   ).toBeVisible();
   await expect(page.getByText(/Checked:/)).toBeVisible();
+  await expect(page.getByText(/Verdict weights determine the score/)).toBeVisible();
+  await expect(page.getByText(/hype is shown separately and does not add points/)).toBeVisible();
+  await expect(page.getByText(/Evidence may be high, medium, or low trust—or unavailable/)).toBeVisible();
+  await expect(page.locator(".app-footer a")).toHaveCount(0);
+  await expectSafeExternalLink(
+    page.getByRole("link", { name: /Open the checked video/ }),
+  );
 
   // Claims tab is active by default.
   await expect(page.getByRole("tab", { name: /Claims reviewed/ })).toHaveAttribute(
@@ -167,11 +176,7 @@ test("mixed result exposes every claim and safe evidence destination, then re-ch
   for (const claim of checkedClaims) {
     const card = page.locator("details.claim").filter({ hasText: claim.text });
     await expect(card).toHaveCount(1);
-    if (isNarrow) {
-      await expect(card.getByText(claim.timestamp, { exact: true })).toBeAttached();
-    } else {
-      await expect(card.getByText(claim.timestamp, { exact: true })).toBeVisible();
-    }
+    await expect(card.getByText(claim.timestamp, { exact: true })).toBeVisible();
     const summary = card.locator("summary");
     await expect(card).not.toHaveAttribute("open", /.*/);
     await summary.click();
@@ -184,16 +189,13 @@ test("mixed result exposes every claim and safe evidence destination, then re-ch
     await expect(card).not.toHaveAttribute("open", /.*/);
   }
 
-  const skippedOpinion = page.locator("details.claim.opinion").filter({
+  const skippedOpinion = page.locator(".claim.opinion").filter({
     hasText: "I think this is the most exciting stock in the market.",
   });
   await expect(skippedOpinion).toBeVisible();
   await expect(skippedOpinion.getByText("Opinion", { exact: true })).toBeVisible();
-  if (isNarrow) {
-    await expect(skippedOpinion.getByText("0:54", { exact: true })).toBeAttached();
-  } else {
-    await expect(skippedOpinion.getByText("0:54", { exact: true })).toBeVisible();
-  }
+  await expect(skippedOpinion.getByText("0:54", { exact: true })).toBeVisible();
+  await expect(skippedOpinion.locator("summary")).toHaveCount(0);
   // Opinions are not fact-checked and expose no evidence links.
   await expect(skippedOpinion.getByRole("link")).toHaveCount(0);
 
@@ -242,12 +244,41 @@ test("mixed result exposes every claim and safe evidence destination, then re-ch
   await expect(page.getByRole("heading", { name: "Some cap" })).toBeVisible();
   await expect(page.locator(".score-num")).toHaveText("52");
   expect(analysisRequests).toBe(2);
+
+  await page.getByRole("button", { name: "Run again" }).click();
+  await expect(page.getByRole("heading", { name: "Some cap" })).toBeVisible();
+  expect(analysisRequests).toBe(3);
+  await page.getByRole("button", { name: "Check another" }).click();
+  await expect(page.getByLabel("Video URL")).toBeVisible();
+  await expect(page.getByLabel(/Choose a video file/)).toBeVisible();
+});
+
+test("result tabs support the complete keyboard navigation pattern", async ({ page }) => {
+  await submitUrl(page);
+  const claims = page.getByRole("tab", { name: /Claims reviewed/ });
+  const hype = page.getByRole("tab", { name: /Hype language/ });
+  const actions = page.getByRole("tab", { name: /Before you act/ });
+  await claims.focus();
+  await claims.press("ArrowLeft");
+  await expect(actions).toBeFocused();
+  await expect(actions).toHaveAttribute("aria-selected", "true");
+  await actions.press("ArrowRight");
+  await expect(claims).toBeFocused();
+  await claims.press("End");
+  await expect(actions).toBeFocused();
+  await actions.press("Home");
+  await expect(claims).toBeFocused();
+  await claims.press("ArrowRight");
+  await expect(hype).toBeFocused();
+  await expect(hype).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tabpanel", { name: /Hype language/ })).toBeVisible();
+  await expect(page.locator('[role="tabpanel"][hidden]')).toHaveCount(2);
 });
 
 test("upload can be selected, removed, reselected, and analyzed through multipart", async ({
   page,
 }) => {
-  await page.goto("/");
+  await gotoReady(page, "/");
   const chooser = page.getByLabel(/Choose a video file/);
   const sample = "e2e/fixtures/sample-video.mp4";
   await page.getByLabel("Video URL").fill("not a url");
@@ -345,7 +376,7 @@ test("keyboard order, focus treatment, and loading state prevent duplicate submi
       analysisRequests += 1;
     }
   });
-  await page.goto("/");
+  await gotoReady(page, "/");
   const input = page.getByLabel("Video URL");
   const analyze = page.getByRole("button", { name: "Check it" });
   await page.keyboard.press("Tab");
@@ -366,7 +397,7 @@ test("mobile layout contains long content and keeps controls usable", async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium", "mobile-only QA");
-  await page.goto("/");
+  await gotoReady(page, "/");
   const urlInput = page.getByLabel("Video URL");
   const uploadTarget = page.locator("label.drop-zone");
   for (const [name, control] of [
@@ -391,7 +422,7 @@ test("mobile layout contains long content and keeps controls usable", async ({
   );
   expect(overflow).toBeLessThanOrEqual(0);
 
-  const controls = page.locator("main").getByRole("button");
+  const controls = page.locator('main button, main [role="tab"]');
   for (let index = 0; index < (await controls.count()); index += 1) {
     const control = controls.nth(index);
     if (!(await control.isVisible())) continue;
