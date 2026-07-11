@@ -5,10 +5,9 @@ scorecard. A user can paste a video URL or upload a video, follow the analysis
 stages, and inspect the evidence behind each supported, contradicted, or
 unverifiable claim.
 
-This repository contains the Bloomberg Hackathon 2026 application. The current
-foundation uses deterministic fixtures so the frontend and analysis pipeline
-can be developed and tested independently against the same runtime-validated
-contracts.
+This repository contains the Bloomberg Hackathon 2026 application. Local and
+browser tests use deterministic fixtures, while live mode streams the real
+analysis pipelines through the same runtime-validated contracts.
 
 ## Local setup
 
@@ -48,9 +47,10 @@ npm run test:e2e -- --project=chromium-desktop
 
 `CAPCHECK_ANALYSIS_MODE=fixture` is read only by the server route. Do not rename
 it to a `NEXT_PUBLIC_*` variable or expose it in client bundles. The
-`/api/analyze` route refuses fixture analysis unless the variable is exactly
-`fixture`, and it refuses fixture analysis unconditionally when
-`NODE_ENV=production`.
+`/api/analyze` route selects fixtures only when the variable is exactly
+`fixture` and `NODE_ENV` is not `production`. Every other configuration selects
+live analysis. Live analysis requires server-only `GEMINI_API_KEY` and
+`FINNHUB_KEY`; missing credentials return a sanitized unavailable response.
 
 The browser still uses the real application boundary in fixture mode:
 
@@ -94,6 +94,37 @@ opt-in prepared-video smoke test, set `GEMINI_API_KEY` and either
 ```bash
 npm run test:unit -- src/server/analysis/claim-extraction.live.test.ts
 ```
+
+To smoke-test the complete production stream with one prepared video, remove
+`CAPCHECK_ANALYSIS_MODE=fixture` and run:
+
+```bash
+CAPCHECK_LIVE_ANALYSIS=1 \
+GEMINI_API_KEY=... \
+FINNHUB_KEY=... \
+CAPCHECK_LIVE_SHORT_URL='https://www.youtube.com/shorts/...' \
+npm run test:unit -- src/server/analysis/live-analysis.live.test.ts
+```
+
+`CAPCHECK_LIVE_UPLOAD_PATH=/absolute/path/to/video.mp4` may be used instead of
+the URL. The test is skipped unless the explicit opt-in flag, credentials, and
+one source are all present. Do not commit the prepared video or credentials.
+
+The end-to-end live browser smoke uses a separate Playwright configuration so
+normal CI remains fixture-backed. It starts Next in live mode, submits the
+prepared source through the real page and `/api/analyze`, observes SSE progress,
+and requires a rendered scorecard with at least one citation:
+
+```bash
+CAPCHECK_LIVE_BROWSER=1 \
+GEMINI_API_KEY=... \
+FINNHUB_KEY=... \
+CAPCHECK_LIVE_SHORT_URL='https://www.youtube.com/shorts/...' \
+npm run test:e2e:live
+```
+
+The same `CAPCHECK_LIVE_UPLOAD_PATH` alternative is supported. This smoke is
+explicitly opt-in and is not executed by `npm run test:e2e` or CI.
 
 The implementation and verification approach is documented in
 [`docs/agents/testing.md`](docs/agents/testing.md). Product scope and domain
