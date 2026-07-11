@@ -35,6 +35,23 @@ async function openTab(page: Page, name: RegExp) {
   await page.getByRole("tab", { name }).click();
 }
 
+function contrastRatio(foreground: number[], background: number[]) {
+  const luminance = ([red, green, blue]: number[]) => {
+    const channels = [red, green, blue].map((channel) => {
+      const value = channel / 255;
+      return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+  };
+  const lighter = Math.max(luminance(foreground), luminance(background));
+  const darker = Math.min(luminance(foreground), luminance(background));
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function rgbChannels(value: string) {
+  return (value.match(/\d+(?:\.\d+)?/g) ?? []).slice(0, 3).map(Number);
+}
+
 test("loads the fixture-ready CapCheck intake without runtime errors", async ({
   page,
 }) => {
@@ -134,6 +151,40 @@ test("validates URL input, prevents duplicate work, and exposes truthful progres
   );
   expect(observedProgress).toEqual(progressMessages);
   expect(analysisRequests).toHaveLength(1);
+});
+
+test("progress kicker meets the compact metadata minimum", async ({ page }) => {
+  await gotoReady(page, "/?fixture=mixed");
+  await page.getByLabel("Video URL").fill(demoUrl);
+  await page.getByRole("button", { name: "Check it" }).click();
+
+  const kicker = page.getByText("Research process", { exact: true });
+  await expect(kicker).toBeVisible();
+  const fontSize = await kicker.evaluate((element) =>
+    Number.parseFloat(getComputedStyle(element).fontSize),
+  );
+  expect(fontSize).toBeGreaterThanOrEqual(13);
+});
+
+test("checked-time metadata stays readable and contained at 375px", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await submitUrl(page);
+
+  const timestamp = page.locator(".source-line .when");
+  await expect(timestamp).toHaveText("· just now");
+  const metrics = await timestamp.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return {
+      fontSize: Number.parseFloat(getComputedStyle(element).fontSize),
+      left: box.left,
+      right: box.right,
+    };
+  });
+  expect(metrics.fontSize).toBeGreaterThanOrEqual(13);
+  expect(metrics.left).toBeGreaterThanOrEqual(0);
+  expect(metrics.right).toBeLessThanOrEqual(375);
 });
 
 test("mixed result exposes every claim and safe evidence destination, then re-checks", async ({
@@ -281,6 +332,79 @@ test("reduced motion renders the score and meter at their final state", async ({
   await expect(page.locator(".score-num")).toHaveText("52");
   await expect(page.locator(".meter .pin")).toHaveAttribute("style", /left: 52%/);
   await expect(page.locator(".meter .pin")).toHaveCSS("transition-duration", "0s");
+});
+
+test("score band labels stay readable, distinct, and contained at 375px", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await submitUrl(page);
+
+  const labels = page.locator(".meter-labels > span");
+  await expect(labels).toHaveText([
+    "No cap 0–29",
+    "Some cap 30–69",
+    "Full of cap 70–100",
+  ]);
+
+  const boxes = await labels.evaluateAll((elements) =>
+    elements.map((element) => {
+      const box = element.getBoundingClientRect();
+      return {
+        fontSize: Number.parseFloat(getComputedStyle(element).fontSize),
+        left: box.left,
+        right: box.right,
+      };
+    }),
+  );
+
+  for (const [index, box] of boxes.entries()) {
+    expect(box.fontSize, `band ${index + 1} meets the metadata minimum`).toBeGreaterThanOrEqual(13);
+    expect(box.left, `band ${index + 1} stays inside the viewport`).toBeGreaterThanOrEqual(0);
+    expect(box.right, `band ${index + 1} stays inside the viewport`).toBeLessThanOrEqual(375);
+    if (index > 0) {
+      expect(box.left, `band ${index + 1} does not overlap band ${index}`).toBeGreaterThanOrEqual(
+        boxes[index - 1].right,
+      );
+    }
+  }
+
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test("verdict pills pair readable semantic ink with labels and status dots", async ({
+  page,
+}) => {
+  await submitUrl(page);
+
+  for (const { selector, label } of [
+    { selector: ".v-true", label: "True" },
+    { selector: ".v-unv", label: "Unverifiable" },
+    { selector: ".v-false", label: "False" },
+  ]) {
+    const pill = page.locator(`.verdict-pill${selector}`).first();
+    await expect(pill).toHaveText(label);
+    const styles = await pill.evaluate((element) => {
+      const pillStyle = getComputedStyle(element);
+      const dotStyle = getComputedStyle(element, "::before");
+      return {
+        color: pillStyle.color,
+        backgroundColor: pillStyle.backgroundColor,
+        dotColor: dotStyle.backgroundColor,
+        dotWidth: Number.parseFloat(dotStyle.width),
+      };
+    });
+    const ratio = contrastRatio(
+      rgbChannels(styles.color),
+      rgbChannels(styles.backgroundColor),
+    );
+    expect.soft(ratio, `${label} pill text contrast`).toBeGreaterThanOrEqual(4.5);
+    expect(styles.dotColor, `${label} dot uses the same semantic ink`).toBe(styles.color);
+    expect(styles.dotWidth, `${label} status dot remains visible`).toBeGreaterThan(0);
+  }
 });
 
 test("upload can be selected, removed, reselected, and analyzed through multipart", async ({

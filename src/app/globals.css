@@ -19,10 +19,13 @@
   --subtle: #706b63;
 
   --good: #1d8a55;
+  --good-ink: #19784a;
   --good-dim: #e2f3e9;
   --warn: #9c6a0a;
+  --warn-ink: #8e6009;
   --warn-dim: #f8eed4;
   --bad: #c23f3e;
+  --bad-ink: #b83c3b;
   --bad-dim: #fbe7e4;
 
   --accent: #2f66d0;
@@ -675,7 +678,7 @@ input:disabled {
 
 .source-line .when {
   color: var(--subtle);
-  font: 500 0.78rem var(--mono);
+  font: 500 0.8125rem var(--mono);
 }
 
 .source-line .file-name {
@@ -704,7 +707,7 @@ input:disabled {
 .kicker {
   margin: 0;
   color: var(--subtle);
-  font: 600 0.68rem var(--mono);
+  font: 600 0.8125rem var(--mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -723,8 +726,10 @@ input:disabled {
 }
 
 .meter-wrap {
+  grid-column: 1 / -1;
   align-self: start;
-  width: 190px;
+  width: 100%;
+  min-width: 0;
 }
 
 .meter {
@@ -765,10 +770,22 @@ input:disabled {
 }
 
 .meter-labels {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 30fr 40fr 30fr;
   color: var(--subtle);
-  font: 500 0.6rem var(--mono);
+  font: 500 0.8125rem/1.4 var(--mono);
+}
+
+.meter-labels span {
+  min-width: 0;
+}
+
+.meter-labels span:nth-child(2) {
+  text-align: center;
+}
+
+.meter-labels span:last-child {
+  text-align: right;
 }
 
 .warn-c {
@@ -957,22 +974,22 @@ input:disabled {
 }
 
 .v-true {
-  color: var(--good);
+  color: var(--good-ink);
   background: var(--good-dim);
 }
 
 .v-mostly {
-  color: var(--warn);
+  color: var(--warn-ink);
   background: var(--warn-dim);
 }
 
 .v-false {
-  color: var(--bad);
+  color: var(--bad-ink);
   background: var(--bad-dim);
 }
 
 .v-unv {
-  color: var(--warn);
+  color: var(--warn-ink);
   background: var(--warn-dim);
 }
 

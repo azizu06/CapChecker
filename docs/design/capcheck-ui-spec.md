@@ -45,7 +45,10 @@ and are locked. Summary: `canvas #faf8f3`, `surface #ffffff`,
 `surface-raised #f5f2ea`, `border #e7e2d6`/`#cfc9ba`, `text #211f1b`,
 `text-muted #6b675f`, accessible metadata `#706b63`, decorative subtle
 `#98928a`; accent `#2f66d0`; verdict green
-`#1d8a55`/`#e2f3e9`, amber `#9c6a0a`/`#f8eed4`, red `#c23f3e`/`#fbe7e4`.
+`#1d8a55` (pill ink `#19784a`)/`#e2f3e9`, amber `#9c6a0a` (pill ink
+`#8e6009`)/`#f8eed4`, red `#c23f3e` (pill ink `#b83c3b`)/`#fbe7e4`.
+Compact verdict labels and their status dots use the pill inks; headings and
+meter bands use the standard semantic inks.
 
 Do not use decorative gradients. Semantic color must always be paired with an
 icon or label. Avoid large saturated fills; use tinted surface backgrounds

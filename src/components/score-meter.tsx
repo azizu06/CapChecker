@@ -37,9 +37,15 @@ export function ScoreMeter({ score }: { score: number }) {
         />
       </div>
       <div className="meter-labels" aria-label="Cap Score bands; higher is worse">
-        <span>No cap 0–29</span>
-        <span>Some cap 30–69</span>
-        <span>Full of cap 70–100</span>
+        <span>
+          No cap <br aria-hidden="true" />0–29
+        </span>
+        <span>
+          Some cap <br aria-hidden="true" />30–69
+        </span>
+        <span>
+          Full of cap <br aria-hidden="true" />70–100
+        </span>
       </div>
     </div>
   );

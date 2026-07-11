@@ -47,9 +47,11 @@ brown/grey, short blur radius, used sparingly on the one primary raised panel.
   accents (the brand mark, emphasized `cap`, and compact methodology icons).
 - Verdict/semantic colors are reserved for verdicts and must not be reused for
   decoration or generic interactivity:
-  - Green (`No cap`): ink `#1d8a55`, tint `#e2f3e9`.
-  - Amber (`Some cap`): ink `#9c6a0a`, tint `#f8eed4`.
-  - Red (`Full of cap`): ink `#c23f3e`, tint `#fbe7e4`.
+  - Green (`No cap`): ink `#1d8a55`, pill ink `#19784a`, tint `#e2f3e9`.
+  - Amber (`Some cap`): ink `#9c6a0a`, pill ink `#8e6009`, tint `#f8eed4`.
+  - Red (`Full of cap`): ink `#c23f3e`, pill ink `#b83c3b`, tint `#fbe7e4`.
+  The darker pill inks are used for compact verdict text and status dots against
+  their matching tints; headings and meter bands keep the standard semantic inks.
 - Minimal color is the anti-"mental clutter" rule. If a new element seems to
   need a new color, it probably needs restraint instead.
 
