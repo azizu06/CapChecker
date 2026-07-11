@@ -23,6 +23,9 @@ hackathon. The planning repository is the source of truth for product scope:
 6. Open one PR into `main`. Merge only after the `quality` check is green.
 7. Move the issue to Done after the PR merges.
 
+See `docs/agents/build-workflow.md` for the dependency rule, PR gate command,
+required CI, and merge policy.
+
 Do not commit secrets, downloaded demo videos, or cached creator content unless
 the event rules and licensing allow it. Commits are authored only as Aziz or the
 human teammate. Do not add AI co-author trailers.
