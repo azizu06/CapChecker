@@ -31,7 +31,7 @@ test.describe("opt-in live browser analysis", () => {
     } else if (source?.kind === "url") {
       await page.getByLabel("Video URL").fill(source.url);
     }
-    await page.getByRole("button", { name: "Analyze video" }).click();
+    await page.getByRole("button", { name: "Check it" }).click();
 
     await expect(
       page.getByText(/Downloading the source video|Staging the uploaded video/),
@@ -49,18 +49,16 @@ test.describe("opt-in live browser analysis", () => {
       timeout: 5 * 60_000,
     });
 
-    await expect(page.getByText("Cap Score · higher is worse")).toBeVisible({
+    await expect(page.getByRole("img", { name: /Cap Score \d+ out of 100/ })).toBeVisible({
       timeout: 10 * 60_000,
     });
-    await expect(
-      page.getByRole("heading", { name: "Claims reviewed" }),
-    ).toBeVisible();
+    await expect(page.getByRole("tab", { name: /Claims reviewed/ })).toBeVisible();
 
-    const evidenceButtons = page.getByRole("button", { name: "View evidence" });
-    const count = await evidenceButtons.count();
+    const claimCards = page.locator("details.claim");
+    const count = await claimCards.count();
     expect(count).toBeGreaterThan(0);
     for (let index = count - 1; index >= 0; index -= 1) {
-      await evidenceButtons.nth(index).click();
+      await claimCards.nth(index).locator("summary").click();
     }
     await expect(
       page.getByRole("link", { name: /Open source:.*opens in new tab/ }).first(),
