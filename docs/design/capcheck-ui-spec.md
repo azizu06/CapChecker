@@ -113,8 +113,9 @@ Use a compact wordmark row: shield/check icon, `CapCheck`, and the descriptor
 
 - The Cap Score is the strongest visual element, followed by verdict label and
   a one-sentence explanation.
-- Score bands: 0-39 `High risk`, 40-69 `Mixed`, 70-100 `Credible`. Always print
-  these labels; color alone is insufficient.
+- Cap Score measures how much misleading or unsupported content is present, so
+  higher is worse: 0-29 `No cap`, 30-69 `Some cap`, 70-100 `Full of cap`.
+  Always print the label and short explanation; color alone is insufficient.
 - Show the strongest citation or takeaway within the same result header area.
 - Reset and retry are secondary actions, visually quieter than Analyze.
 
