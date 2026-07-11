@@ -1,5 +1,12 @@
 import { FileVideo, Link2, RotateCcw, Upload, X } from "lucide-react";
-import { useId, type FormEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 
 import type { ErrorEvent } from "@/domain/analysis";
 
@@ -36,7 +43,6 @@ type Props = {
   loading: boolean;
   error: ErrorEvent["error"] | null;
   validation: string;
-  onValidationChange(value: string): void;
   onUrlChange(value: string): void;
   onFileChange(file: File | null): void;
   onSubmit(): void;
@@ -55,7 +61,6 @@ export function IntakePanel({
   loading,
   error,
   validation,
-  onValidationChange,
   onUrlChange,
   onFileChange,
   onSubmit,
@@ -64,24 +69,40 @@ export function IntakePanel({
 }: Props) {
   const inputId = useId();
   const fileId = useId();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadValidation, setUploadValidation] = useState("");
+
+  useEffect(() => {
+    if (!file && fileInputRef.current) fileInputRef.current.value = "";
+  }, [file]);
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
     onSubmit();
   };
 
-  const selectFile = (selected: File | undefined) => {
+  const selectFile = (event: ChangeEvent<HTMLInputElement>) => {
+    const selected = event.currentTarget.files?.[0];
     if (!selected) return;
     const message = validateUpload(selected);
     if (message) {
-      onValidationChange(message);
+      onFileChange(null);
+      setUploadValidation(message);
+      event.currentTarget.value = "";
       return;
     }
-    onValidationChange("");
+    setUploadValidation("");
     onFileChange(selected);
   };
 
   const describedBy = `${inputId}-help${validation ? ` ${inputId}-error` : ""}`;
+  const fileDescribedBy = `${fileId}-help${uploadValidation ? ` ${fileId}-error` : ""}`;
+
+  const removeFile = () => {
+    onFileChange(null);
+    setUploadValidation("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   return (
     <section className="intake-panel panel" aria-labelledby="intake-title">
@@ -127,17 +148,25 @@ export function IntakePanel({
           <Upload aria-hidden="true" />
           <span>
             <strong>{file ? "Video ready" : "Choose a video file"}</strong>
-            <small>MP4, MOV, or WebM · up to 50 MB</small>
+            <small id={`${fileId}-help`}>MP4, MOV, or WebM · up to 50 MB</small>
           </span>
           <input
             id={fileId}
+            ref={fileInputRef}
             className="visually-hidden"
             type="file"
             accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm"
             disabled={loading}
-            onChange={(event) => selectFile(event.target.files?.[0])}
+            aria-invalid={Boolean(uploadValidation)}
+            aria-describedby={fileDescribedBy}
+            onChange={selectFile}
           />
         </label>
+        {uploadValidation && (
+          <p id={`${fileId}-error`} className="field-error" role="alert">
+            {uploadValidation}
+          </p>
+        )}
         {file && (
           <div className="selected-file">
             <FileVideo aria-hidden="true" />
@@ -146,7 +175,7 @@ export function IntakePanel({
               type="button"
               aria-label={`Remove ${file.name}`}
               disabled={loading}
-              onClick={() => onFileChange(null)}
+              onClick={removeFile}
             >
               <X aria-hidden="true" />
             </button>

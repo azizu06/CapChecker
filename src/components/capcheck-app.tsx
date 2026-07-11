@@ -79,10 +79,12 @@ export function CapCheckApp() {
           ]);
           setScorecard(event.scorecard);
         } else {
+          setProgress([]);
           setError(event.error);
         }
       }
     } catch (cause) {
+      setProgress([]);
       setError({
         code: "ANALYSIS_FAILED",
         message:
@@ -137,7 +139,6 @@ export function CapCheckApp() {
           loading={loading}
           error={error}
           validation={validation}
-          onValidationChange={setValidation}
           onUrlChange={changeUrl}
           onFileChange={setFile}
           onSubmit={analyze}
@@ -145,11 +146,14 @@ export function CapCheckApp() {
           onReset={reset}
         />
       )}
-      {(loading || progress.length > 0) && (
+      {!scorecard && (loading || progress.length > 0) && (
         <ProgressTimeline progress={progress} />
       )}
       {scorecard && (
         <ScorecardView scorecard={scorecard} onReset={reset} onRetry={analyze} />
+      )}
+      {scorecard && progress.length > 0 && (
+        <ProgressTimeline progress={progress} />
       )}
     </main>
   );

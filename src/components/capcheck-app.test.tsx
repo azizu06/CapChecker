@@ -116,6 +116,64 @@ describe("CapCheckApp", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("clears a previously valid file when a later selection is invalid", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup({ applyAccept: false });
+    render(<CapCheckApp />);
+    const input = screen.getByLabelText(/choose a video file/i);
+    await user.upload(input, new File(["video"], "valid.mp4", { type: "video/mp4" }));
+    expect(screen.getByText("valid.mp4")).toBeInTheDocument();
+
+    await user.upload(input, new File(["bad"], "bad.exe", { type: "application/octet-stream" }));
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+
+    expect(screen.queryByText("valid.mp4")).not.toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("associates upload errors only with the file input", async () => {
+    vi.stubGlobal("fetch", vi.fn());
+    const user = userEvent.setup({ applyAccept: false });
+    render(<CapCheckApp />);
+    const fileInput = screen.getByLabelText(/choose a video file/i);
+    const urlInput = screen.getByLabelText(/video url/i);
+
+    await user.upload(fileInput, new File(["bad"], "bad.exe", { type: "application/octet-stream" }));
+
+    expect(fileInput).toHaveAttribute("aria-invalid", "true");
+    const uploadError = screen.getByRole("alert");
+    expect(fileInput.getAttribute("aria-describedby")).toContain(uploadError.id);
+    expect(urlInput).toHaveAttribute("aria-invalid", "false");
+  });
+
+  it("can select the same valid file immediately after removing it", async () => {
+    vi.stubGlobal("fetch", vi.fn());
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    const input = screen.getByLabelText(/choose a video file/i);
+    const file = new File(["video"], "same.mp4", { type: "video/mp4" });
+    await user.upload(input, file);
+    await user.click(screen.getByRole("button", { name: /remove same.mp4/i }));
+
+    await user.upload(input, file);
+
+    expect(screen.getByText("same.mp4")).toBeInTheDocument();
+  });
+
+  it("resets an invalid native selection so the same filename can be corrected", async () => {
+    vi.stubGlobal("fetch", vi.fn());
+    const user = userEvent.setup({ applyAccept: false });
+    render(<CapCheckApp />);
+    const input = screen.getByLabelText(/choose a video file/i);
+    await user.upload(input, new File(["bad"], "clip.mp4", { type: "text/plain" }));
+
+    await user.upload(input, new File(["video"], "clip.mp4", { type: "video/mp4" }));
+
+    expect(screen.getByText("clip.mp4")).toBeInTheDocument();
+    expect(input).toHaveAttribute("aria-invalid", "false");
+  });
+
   it("passes only an allowlisted fixture query scenario to the public route", async () => {
     window.history.replaceState({}, "", "/?fixture=scammy");
     const fetchMock = vi.fn().mockResolvedValue(
@@ -196,6 +254,22 @@ describe("CapCheckApp", () => {
     expect(input).toHaveValue("");
   });
 
+  it("clears active progress when the stream ends in a fatal error", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(sseResponse(
+      { type: "progress", stage: "fetching", message: "Fetching video" },
+      { type: "progress", stage: "processing", message: "Preparing transcript" },
+      DEMO_FATAL_ERROR,
+    )));
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await user.type(screen.getByLabelText(/video url/i), "https://example.com/video");
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(/safe to retry/i);
+    expect(screen.queryByRole("region", { name: /checking the claims/i }))
+      .not.toBeInTheDocument();
+  });
+
   it("does not retry after the retained URL becomes malformed", async () => {
     const fetchMock = vi.fn().mockResolvedValueOnce(sseResponse(DEMO_FATAL_ERROR));
     vi.stubGlobal("fetch", fetchMock);
@@ -266,5 +340,20 @@ describe("CapCheckApp", () => {
     expect(screen.getByText(/everyone on wall street agrees/i)).toBeInTheDocument();
     expect(screen.getByText("Find the original report")).toBeInTheDocument();
     expect(screen.getByText("61")).toBeInTheDocument();
+  });
+
+  it("places the verdict scorecard before the completed timeline", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
+      sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.mixed }),
+    ));
+    const user = userEvent.setup();
+    render(<CapCheckApp />);
+    await user.type(screen.getByLabelText(/video url/i), "https://example.com/video");
+    await user.click(screen.getByRole("button", { name: /analyze video/i }));
+    const scorecard = await screen.findByRole("region", { name: "Some cap" });
+    const timeline = screen.getByRole("region", { name: "Analysis complete" });
+
+    expect(scorecard.compareDocumentPosition(timeline) & Node.DOCUMENT_POSITION_FOLLOWING)
+      .toBeTruthy();
   });
 });
