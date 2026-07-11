@@ -21,6 +21,7 @@ type GeminiFilesClientOptions = {
   fetch?: typeof fetch;
   readFile?: ReadFile;
   requestTimeoutMs?: number;
+  uploadTimeoutMs?: number;
 };
 
 const transientStatuses = new Set([408, 429, 500, 502, 503, 504]);
@@ -75,18 +76,20 @@ export function createGeminiFilesClient({
   fetch: fetchImpl = globalThis.fetch,
   readFile = nodeReadFile as ReadFile,
   requestTimeoutMs = 30_000,
+  uploadTimeoutMs = 300_000,
 }: GeminiFilesClientOptions): VideoIngestionDependencies["geminiFiles"] {
   const apiHeaders = { "X-Goog-Api-Key": apiKey };
   const request = async (
     input: string,
     init: RequestInit,
     callerSignal: AbortSignal,
+    timeoutMs: number = requestTimeoutMs,
   ) => {
     const timeout = new AbortController();
     const timer = setTimeout(
       () =>
         timeout.abort(new DOMException("Request timed out", "TimeoutError")),
-      requestTimeoutMs,
+      timeoutMs,
     );
 
     try {
@@ -145,6 +148,7 @@ export function createGeminiFilesClient({
           }) as unknown as BodyInit,
         },
         signal,
+        uploadTimeoutMs,
       );
       if (!finalized.ok) throw requestError(finalized.status);
 

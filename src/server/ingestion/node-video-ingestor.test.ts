@@ -56,4 +56,36 @@ describe("createNodeVideoIngestor", () => {
       expect.objectContaining({ method: "DELETE" }),
     );
   });
+
+  it("caps yt-dlp downloads at the policy video-byte limit", async () => {
+    const ytDlpRun = vi
+      .fn()
+      .mockResolvedValue({ exitCode: 0, stdout: "", stderr: "" });
+    const ingestor = createNodeVideoIngestor({
+      apiKey: "test-api-key",
+      fetch: vi.fn() as unknown as typeof fetch,
+      policy: {
+        uploadAttempts: 2,
+        pollIntervalMs: 2_000,
+        maxPollAttempts: 60,
+        activationTimeoutMs: 120_000,
+        maxVideoBytes: 10 * 1024 * 1024,
+      },
+      ytDlpRun,
+    });
+
+    await ingestor
+      .withActiveFile(
+        { kind: "url", url: "https://www.youtube.com/shorts/demo123" },
+        { signal: new AbortController().signal, onProgress: vi.fn() },
+        async (file) => file,
+      )
+      .catch(() => undefined);
+
+    expect(ytDlpRun).toHaveBeenCalledWith(
+      expect.objectContaining({
+        args: expect.arrayContaining(["--max-filesize", "10485760"]),
+      }),
+    );
+  });
 });

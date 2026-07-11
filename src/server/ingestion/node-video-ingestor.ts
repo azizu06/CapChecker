@@ -3,6 +3,7 @@ import { detectVideoMimeType } from "./media-type";
 import { createNodeTemporaryFiles } from "./node-temp-files";
 import {
   createVideoIngestor,
+  DEFAULT_VIDEO_INGESTION_POLICY,
   type VideoIngestionPolicy,
 } from "./video-ingestion";
 import { createYtDlpDownloader, type ProcessRunner } from "./yt-dlp";
@@ -44,11 +45,13 @@ export function createNodeVideoIngestor({
   ytDlpExecutable,
   ytDlpRun,
 }: NodeVideoIngestorOptions) {
+  const resolvedPolicy = policy ?? DEFAULT_VIDEO_INGESTION_POLICY;
   return createVideoIngestor(
     {
       temporaryFiles: createNodeTemporaryFiles(),
       ytDlp: createYtDlpDownloader({
         executable: ytDlpExecutable,
+        maxFileSize: String(resolvedPolicy.maxVideoBytes),
         run: ytDlpRun,
       }),
       mime: { detect: detectVideoMimeType },
@@ -56,6 +59,6 @@ export function createNodeVideoIngestor({
       now: Date.now,
       sleep: abortableSleep,
     },
-    policy,
+    resolvedPolicy,
   );
 }

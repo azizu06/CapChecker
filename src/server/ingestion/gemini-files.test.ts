@@ -199,6 +199,57 @@ describe("createGeminiFilesClient", () => {
     }
   });
 
+  it("gives the bulk upload leg a longer budget than metadata requests", async () => {
+    vi.useFakeTimers();
+    try {
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce(
+          new Response(null, {
+            status: 200,
+            headers: {
+              "x-goog-upload-url": "https://upload.example/session-123",
+            },
+          }),
+        )
+        .mockImplementationOnce(
+          (_input: RequestInfo | URL, init?: RequestInit) =>
+            new Promise<Response>((_resolve, reject) => {
+              init?.signal?.addEventListener(
+                "abort",
+                () => reject(init.signal?.reason),
+                { once: true },
+              );
+            }),
+        );
+      const client = createGeminiFilesClient({
+        apiKey: "test-api-key",
+        fetch: fetchMock as typeof fetch,
+        readFile: vi.fn().mockResolvedValue(Buffer.from([1, 2, 3])),
+        requestTimeoutMs: 1_000,
+        uploadTimeoutMs: 10_000,
+      });
+
+      const upload = client.upload({
+        path: "/private/tmp/capcheck/video.mp4",
+        displayName: "video.mp4",
+        mimeType: "video/mp4",
+        signal: new AbortController().signal,
+      });
+      const expectation = expect(upload).rejects.toEqual(
+        new BoundaryError("Gemini Files request timed out", true),
+      );
+
+      await vi.advanceTimersByTimeAsync(1_001);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+
+      await vi.advanceTimersByTimeAsync(9_001);
+      await expectation;
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("treats an omitted Files state as bounded not-ready processing", async () => {
     const fetchMock = vi
       .fn()
