@@ -61,7 +61,7 @@ describe("CapCheckApp", () => {
     vi.stubGlobal("fetch", fetchMock);
     const user = userEvent.setup();
 
-    render(<CapCheckApp />);
+    const { container } = render(<CapCheckApp />);
     await submitUrl(user, "https://www.youtube.com/shorts/demo");
 
     expect(await screen.findByText("52")).toBeInTheDocument();
@@ -73,6 +73,37 @@ describe("CapCheckApp", () => {
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/analyze",
       expect.objectContaining({ method: "POST" }),
+    );
+    expect(container.querySelector(".video-facade")).toHaveAttribute(
+      "data-orientation",
+      "vertical",
+    );
+  });
+
+  it("marks the checked-video facade as landscape for a long-form source", async () => {
+    const landscapeScorecard = {
+      ...DEMO_SCORECARDS.mixed,
+      source: {
+        kind: "url" as const,
+        url: "https://www.youtube.com/watch?v=capcheck-long-form",
+        title: "Long-form market breakdown",
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        sseResponse({ type: "complete", scorecard: landscapeScorecard }),
+      ),
+    );
+    const user = userEvent.setup();
+    const { container } = render(<CapCheckApp />);
+
+    await submitUrl(user, landscapeScorecard.source.url);
+    await screen.findByText("52");
+
+    expect(container.querySelector(".video-facade")).toHaveAttribute(
+      "data-orientation",
+      "landscape",
     );
   });
 

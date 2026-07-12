@@ -664,7 +664,7 @@ input:disabled {
 
 .video-facade {
   display: grid;
-  aspect-ratio: 9 / 16;
+  aspect-ratio: 16 / 9;
   place-items: center;
   border-bottom: 1px solid var(--ink);
   background-color: var(--raised);
@@ -675,6 +675,10 @@ input:disabled {
     var(--border) 9px,
     var(--border) 10px
   );
+}
+
+.video-facade[data-orientation="vertical"] {
+  aspect-ratio: 9 / 16;
 }
 
 .video-facade svg {
