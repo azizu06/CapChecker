@@ -155,6 +155,26 @@ describe("createVideoIngestor", () => {
     );
   });
 
+  it("accepts the public YouTube watch URL produced by feed discovery", async () => {
+    const { ingestor, ytDlp } = makeHarness();
+    const url = "https://www.youtube.com/watch?v=demo123";
+
+    await ingestor.withActiveFile(
+      { kind: "url", url },
+      {
+        signal: new AbortController().signal,
+        onProgress: () => undefined,
+      },
+      async () => undefined,
+    );
+
+    expect(ytDlp.download).toHaveBeenCalledWith({
+      url,
+      directory: "/private/tmp/capcheck-123",
+      signal: expect.any(AbortSignal),
+    });
+  });
+
   it("stages a direct upload without calling yt-dlp", async () => {
     const {
       geminiFiles,
@@ -316,7 +336,7 @@ describe("createVideoIngestor", () => {
       new IngestionError({
         code: "UNSUPPORTED_VIDEO_URL",
         message:
-          "Use a public TikTok or YouTube Shorts link, or upload the video file instead.",
+          "Use a public TikTok or YouTube video link, or upload the video file instead.",
         retryable: false,
         offerUploadFallback: true,
       }),
