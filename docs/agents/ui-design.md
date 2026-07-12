@@ -12,10 +12,12 @@ spec; do not change any token, font, accent rule, tone, motion budget, or the
 results layout without explicit user sign-off. If an issue or reference seems
 to conflict with this section, stop and ask rather than silently redesigning.
 
-### Theme: cream light
+### Theme: cream grotesque-flat (1c/2a)
 
-Dark themes and the earlier navy + mint scheme are rejected. Use only the
-following surface and text tokens.
+The approved 1c landing and 2a results direction is flat, square, and
+typography-led. Dark themes, the earlier navy + mint scheme, rounded fintech
+cards, blue interaction accents, and decorative shadows are rejected. Use only
+the following surface and text tokens.
 
 | Token | Value | Use |
 | --- | --- | --- |
@@ -26,25 +28,24 @@ following surface and text tokens.
 | `border-strong` | `#cfc9ba` | hover/selected boundaries |
 | `text` | `#211f1b` | ink, primary text |
 | `text-muted` | `#6b675f` | supporting copy |
-| `text-subtle` | `#706b63` | essential small metadata |
+| `text-subtle` | `#706b63` | essential metadata at 14px or larger |
 | `decorative-subtle` | `#98928a` | nonessential decoration only |
 
-Shadows are soft and warm (not black drop shadows) — think a low-opacity warm
-brown/grey, short blur radius, used sparingly on the one primary raised panel.
+Surfaces are flat: use 1px ink or neutral rules for hierarchy and no card
+shadows. Components use square corners throughout.
 
 ### Typography
 
-- Display and headings: **Baloo 2** via `next/font/google` — bubbly, welcoming,
-  bold. This is a deliberate choice against blocky "safe" system fonts.
-- Body copy: **Nunito** via `next/font/google`.
+- Display, headings, body, and UI copy: **Instrument Sans** via
+  `next/font/google`. Do not restore the superseded Baloo 2 / Nunito pairing.
 - Monospace: **Geist Mono**, strictly reserved for data — timestamps, URLs,
   confidence percentages, counts. Never use monospace for prose or labels.
 
 ### Accent and semantic color
 
-- Primary accent: cool blue `#2f66d0` (hover `#2857b4`, dim/tint `#e8effb`).
-  Use it for interactive elements and the approved small decorative identity
-  accents (the brand mark, emphasized `cap`, and compact methodology icons).
+- Interaction accent: ink `#211f1b`. Links, focus rings, selected filters,
+  buttons, and the square identity mark use ink, underline, or inversion rather
+  than blue. Color is reserved for verdict meaning.
 - Verdict/semantic colors are reserved for verdicts and must not be reused for
   decoration or generic interactivity:
   - Green (`No cap`): ink `#1d8a55`, pill ink `#19784a`, tint `#e2f3e9`.
@@ -89,8 +90,8 @@ No long scroll. The results screen is:
    dead footer links or invent destinations, so the results never float alone
    on the page with nothing underneath.
 
-Verdict pills are bold, uppercase Nunito with a status dot — no colored
-left-border card stripes, and no monospace pills.
+Verdict pills remain compact, square, and explicit. No colored left-border card
+stripes and no decorative rounded pills.
 
 ### Component source
 

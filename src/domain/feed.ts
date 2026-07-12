@@ -25,7 +25,7 @@ export type CapLabel = z.infer<typeof CapLabelSchema>;
 
 export const CatalogItemSchema = z
   .object({
-    id: z.string().min(1),
+    id: z.uuid(),
     youtubeVideoId: z.string().min(1),
     url: HttpUrlSchema.nullable(),
     title: z.string().min(1),

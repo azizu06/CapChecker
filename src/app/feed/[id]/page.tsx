@@ -55,10 +55,13 @@ function DetailState({
 
 export default async function FeedDetail({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ feedState?: string }>;
 }) {
   const { id } = await params;
+  const { feedState } = await searchParams;
 
   let item: CatalogItem | null = null;
   try {
@@ -79,6 +82,20 @@ export default async function FeedDetail({
       <DetailState
         heading="We couldn't find that video."
         message="It may have been removed from the verified feed. Head back and pick another."
+      />
+    );
+  }
+
+  const fixtureUnavailable =
+    process.env.NODE_ENV !== "production" &&
+    process.env.CAPCHECK_FEED_MODE === "fixture" &&
+    feedState === "unavailable";
+
+  if (item.url === null || fixtureUnavailable) {
+    return (
+      <DetailState
+        heading="This YouTube video is unavailable."
+        message="The source video can no longer be played. Return to the feed to choose another vetted video."
       />
     );
   }

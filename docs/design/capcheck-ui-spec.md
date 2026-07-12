@@ -8,7 +8,7 @@ patterns, and responsive rules unless a coordinated issue changes this spec.
 
 CapCheck is a calm consumer trust tool for evaluating short-form financial
 claims. It should feel credible, legible from a projector, and approachable on
-a phone. The interface uses the locked cream light theme (see
+a phone. The interface uses the locked cream grotesque-flat 1c/2a theme (see
 [`docs/agents/ui-design.md`](../agents/ui-design.md) for the authoritative
 tokens, fonts, accent rule, and results layout), with color reserved for
 status and verdict meaning. It is not a trading terminal and should not
@@ -43,8 +43,8 @@ mapping are defined once in
 [`docs/agents/ui-design.md`](../agents/ui-design.md#locked-design-decisions)
 and are locked. Summary: `canvas #faf8f3`, `surface #ffffff`,
 `surface-raised #f5f2ea`, `border #e7e2d6`/`#cfc9ba`, `text #211f1b`,
-`text-muted #6b675f`, accessible metadata `#706b63`, decorative subtle
-`#98928a`; accent `#2f66d0`; verdict green
+`text-muted #6b675f`, accessible metadata `#706b63`; interaction ink
+`#211f1b`; verdict green
 `#1d8a55` (pill ink `#19784a`)/`#e2f3e9`, amber `#9c6a0a` (pill ink
 `#8e6009`)/`#f8eed4`, red `#c23f3e` (pill ink `#b83c3b`)/`#fbe7e4`.
 Compact verdict labels and their status dots use the pill inks; headings and
@@ -52,13 +52,13 @@ meter bands use the standard semantic inks.
 
 Do not use decorative gradients. Semantic color must always be paired with an
 icon or label. Avoid large saturated fills; use tinted surface backgrounds
-with strong foreground text. Accent blue may also appear in the approved small
-identity and methodology accents; it must not become a large decorative fill.
+with strong foreground text. Interactive state uses ink, underline, or ink
+inversion. Do not restore the superseded blue accent.
 
 ### Typography
 
-- Font family: Baloo 2 for display and headings, Nunito for body and UI copy
-  (both via `next/font/google`); Geist Mono only for URLs, source domains,
+- Font family: Instrument Sans for display, headings, body, and UI copy via
+  `next/font/google`; Geist Mono only for URLs, source domains,
   timestamps, confidence percentages, counts, and other compact data.
 - Display score: 4rem in the compact score header, weight 700, line-height 0.95.
 - Page title: `clamp(1.9rem, 3.8vw, 2.85rem)`, weight 700, line-height 1.12.
@@ -69,10 +69,9 @@ identity and methodology accents; it must not become a large decorative fill.
 ### Geometry and spacing
 
 - Spacing scale: `4, 8, 12, 16, 24, 32, 48, 64px` only.
-- Panel and card radius: 16px. Inputs and buttons: 12px. Pills: 999px.
-- Standard border: 1px solid `border`; selected/focus border: `border-strong`.
-- Shadow: a soft, warm, low-opacity shadow (not black) on the one primary
-  raised panel only — see the locked spec for the exact treatment.
+- Panel, card, input, button, and pill radius: 0. Geometry is square.
+- Standard boundary: 1px solid neutral or ink; selected/focus states use ink.
+- Shadow: none. Use rules, whitespace, and flat surface changes for hierarchy.
 - Content width: 1180px maximum, 24px desktop gutters, 16px mobile gutters.
 - Interactive controls: at least 44px tall; primary actions are 48px tall.
 
@@ -93,9 +92,10 @@ identity and methodology accents; it must not become a large decorative fill.
 
 ### App header
 
-Use a compact wordmark row: shield/check icon, `CapCheck`, and the descriptor
-`Financial advice, fact-checked`. Use `Check it` for the primary action. No full
-dashboard sidebar for the hackathon flow.
+Use the prepared square CapCheck image mark beside the `CapCheck` wordmark.
+The shared header carries the route navigation; analyzer context and actions
+must not add a second identity row. Use `Check it` for the primary action. No
+full dashboard sidebar for the hackathon flow.
 
 ### Intake panel
 
@@ -128,8 +128,8 @@ dashboard sidebar for the hackathon flow.
 - Cap Score measures how much misleading or unsupported content is present, so
   higher is worse: 0-29 `No cap`, 30-69 `Some cap`, 70-100 `Full of cap`.
   Always print the label and short explanation; color alone is insufficient.
-  Verdict pills are bold uppercase Nunito with a status dot, not a colored
-  card-border stripe.
+  Verdict pills are compact, square, and explicit, not a colored card-border
+  stripe.
 - Show the strongest citation or takeaway within the same result header area.
 - Reset and retry are secondary actions, visually quieter than Analyze.
 - Claims reviewed, hype language, and next actions render as tabs with count
@@ -153,8 +153,9 @@ dashboard sidebar for the hackathon flow.
 ## Interaction, accessibility, and motion
 
 - Keyboard order follows visual order. All interactive elements have visible
-  `2px` accent-colored (`#2f66d0`) focus rings with a `2px` offset.
-- Text and controls meet WCAG AA contrast. Muted text is not used below 14px.
+  `2px` ink (`#211f1b`) focus rings with a `2px` offset.
+- Text and controls meet WCAG AA contrast. Essential metadata uses `#706b63`
+  or darker and normal text is never smaller than 14px.
 - Buttons use verbs and preserve width while loading. Disabled state remains
   readable and explains itself through adjacent status text.
 - Motion lasts 120-220ms and communicates state. Under
@@ -170,9 +171,10 @@ components as the analyzer — no second palette, no gradients.
 ### Shared header and navigation
 
 - `/` (Feed) and `/analyze` share one compact, sticky CapCheck header: the
-  shield brand mark plus `Feed` and `Analyze` nav links.
-- The active route is visibly marked (accent text on an `--accent-dim` chip) and
-  carries `aria-current="page"`. Feed is active for `/` and any `/feed/*` detail.
+  prepared square image mark plus `Feed` and `Analyze` nav links.
+- The active route uses ink text with an underline and carries
+  `aria-current="page"`; do not restore the superseded accent chip. Feed is
+  active for `/` and any `/feed/*` detail.
 
 ### Feed home (`/`)
 

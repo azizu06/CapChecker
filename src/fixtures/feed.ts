@@ -1,141 +1,232 @@
-import { ScorecardSchema, type Scorecard } from "../domain/analysis";
-import { CatalogItemSchema, type CatalogItem } from "../domain/feed";
-import { DEMO_SCORECARDS } from "./scorecards";
+import { ScorecardSchema } from "../domain/analysis";
+import {
+  CatalogItemSchema,
+  type CatalogCategory,
+  type CatalogItem,
+} from "../domain/feed";
 
-const FIXTURE_ANALYZED_AT = "2026-07-11T15:00:00.000Z";
+const watchUrlFor = (id: string) =>
+  `https://www.youtube.com/watch?v=${id}`;
+const thumbnailFor = (id: string) =>
+  `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
-const thumbnailFor = (youtubeVideoId: string) =>
-  `https://i.ytimg.com/vi/${youtubeVideoId}/hqdefault.jpg`;
+type FixtureVideo = {
+  id: string;
+  youtubeVideoId: string;
+  title: string;
+  channelTitle: string;
+  durationSeconds: number;
+  category: CatalogCategory;
+  tldr: string;
+  capScore: number;
+  claim: string;
+  explanation: string;
+  evidenceTitle: string;
+  evidencePublisher: string;
+  evidenceUrl: string;
+  analyzedAt: string;
+};
 
-const watchUrlFor = (youtubeVideoId: string) =>
-  `https://www.youtube.com/watch?v=${youtubeVideoId}`;
-
-/**
- * A second vetted scorecard authored here (rather than reused from the demo
- * set) so the feed can show a distinct budgeting result. It flows through the
- * exact same `ScorecardSchema` contract as live analysis output.
- */
-const emergencyFundScorecard: Scorecard = ScorecardSchema.parse({
-  id: "feed-emergency-fund",
-  source: {
-    kind: "url",
-    url: watchUrlFor("p7HKvqRI_Bo"),
-    title: "How big should your emergency fund be?",
+const videos: FixtureVideo[] = [
+  {
+    id: "00000000-0000-4000-8000-000000000001",
+    youtubeVideoId: "bO0h3Of-WZ4",
+    title: "Investor.gov: Knowledge Worth Celebrating (Diversification)",
+    channelTitle: "U.S. Securities and Exchange Commission",
+    durationSeconds: 15,
+    category: "investing",
+    tldr: "A concise SEC reminder that diversification can reduce concentration risk.",
+    capScore: 5,
+    claim: "Diversifying investments can reduce portfolio risk.",
+    explanation:
+      "Investor.gov explains that spreading money among investments can reduce risk, while not eliminating losses.",
+    evidenceTitle: "Diversification",
+    evidencePublisher: "Investor.gov",
+    evidenceUrl: "https://www.investor.gov/introduction-investing/investing-basics/glossary/diversification",
+    analyzedAt: "2026-07-11T20:08:00.000Z",
   },
-  capScore: 11,
-  capLabel: "no-cap",
-  summary:
-    "The budgeting guidance matches consumer-finance regulators: keep three to six months of expenses in an accessible account.",
-  verifications: [
-    {
-      claim: {
-        id: "emergency-claim-1",
-        text: "An emergency fund should cover three to six months of expenses.",
-        kind: "factual",
-        checkable: true,
-        timestampSeconds: 18,
-      },
-      verdict: "true",
-      confidence: 0.95,
-      explanation:
-        "The CFPB recommends building savings that can cover several months of essential expenses.",
-      evidence: [
-        {
-          id: "emergency-evidence-1",
-          title: "An essential guide to building an emergency fund",
-          publisher: "Consumer Financial Protection Bureau",
-          url: "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/",
-          trustTier: "primary",
-          stance: "supports",
-          excerpt:
-            "A common guideline is to keep enough to cover three to six months of expenses.",
-        },
-      ],
-    },
-    {
-      claim: {
-        id: "emergency-claim-2",
-        text: "Emergency savings should stay in an account you can access quickly.",
-        kind: "factual",
-        checkable: true,
-        timestampSeconds: 47,
-      },
-      verdict: "mostly-true",
-      confidence: 0.9,
-      explanation:
-        "Regulators advise keeping emergency savings liquid, while noting the tradeoff with higher-yield but less-accessible options.",
-      evidence: [
-        {
-          id: "emergency-evidence-2",
-          title: "Where to keep your emergency fund",
-          publisher: "Consumer Financial Protection Bureau",
-          url: "https://www.consumerfinance.gov/about-us/blog/how-to-build-emergency-savings/",
-          trustTier: "high",
-          stance: "supports",
-          excerpt:
-            "Keep emergency savings somewhere safe and easy to reach when you need it.",
-        },
-      ],
-    },
-  ],
-  hypeFindings: [],
-  nextActions: [
-    {
-      id: "emergency-action-1",
-      label: "Size your fund",
-      description:
-        "Use the CFPB guide to estimate three to six months of your own essential expenses.",
-      evidenceId: "emergency-evidence-1",
-    },
-    {
-      id: "emergency-action-2",
-      label: "Pick an accessible account",
-      description:
-        "Compare liquid, insured options before moving your emergency savings.",
-      evidenceId: "emergency-evidence-2",
-    },
-  ],
-  generatedAt: FIXTURE_ANALYZED_AT,
-});
-
-const buildItem = (
-  input: Omit<CatalogItem, "thumbnailUrl" | "url" | "capScore" | "capLabel"> & {
-    url?: string;
+  {
+    id: "00000000-0000-4000-8000-000000000002",
+    youtubeVideoId: "ozbGWLtZdoY",
+    title: "What Goes Into Your Credit Score?",
+    channelTitle: "Two Cents",
+    durationSeconds: 294,
+    category: "credit",
+    tldr: "A practical overview of the payment and borrowing signals used in credit scores.",
+    capScore: 12,
+    claim: "Payment history is an important factor in credit scoring.",
+    explanation:
+      "The CFPB identifies bill-payment history as one of the inputs commonly used to calculate credit scores.",
+    evidenceTitle: "What is a credit score?",
+    evidencePublisher: "Consumer Financial Protection Bureau",
+    evidenceUrl: "https://www.consumerfinance.gov/ask-cfpb/what-is-a-credit-score-en-315/",
+    analyzedAt: "2026-07-11T20:07:00.000Z",
   },
-): CatalogItem =>
-  CatalogItemSchema.parse({
-    ...input,
-    url: input.url ?? watchUrlFor(input.youtubeVideoId),
-    thumbnailUrl: thumbnailFor(input.youtubeVideoId),
-    capScore: input.scorecard.capScore,
-    capLabel: input.scorecard.capLabel,
+  {
+    id: "00000000-0000-4000-8000-000000000003",
+    youtubeVideoId: "jwML94IOW0s",
+    title: "What is a credit score?",
+    channelTitle: "Khan Academy",
+    durationSeconds: 114,
+    category: "credit",
+    tldr: "A short explanation of how a credit score summarizes information in a credit report.",
+    capScore: 8,
+    claim: "A credit score is calculated from information in a credit report.",
+    explanation:
+      "The CFPB says scoring models use information from credit reports to calculate a score.",
+    evidenceTitle: "What is a credit score?",
+    evidencePublisher: "Consumer Financial Protection Bureau",
+    evidenceUrl: "https://www.consumerfinance.gov/ask-cfpb/what-is-a-credit-score-en-315/",
+    analyzedAt: "2026-07-11T20:06:00.000Z",
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000004",
+    youtubeVideoId: "6cRg9bnSnvg",
+    title: "How Do Tax Brackets Actually Work?",
+    channelTitle: "Two Cents",
+    durationSeconds: 415,
+    category: "taxes",
+    tldr: "A clear walkthrough of marginal tax brackets and why a raise does not tax every dollar at one higher rate.",
+    capScore: 9,
+    claim: "Federal income tax brackets apply different rates to different portions of taxable income.",
+    explanation:
+      "IRS rate schedules apply progressively higher rates only to taxable income within each bracket.",
+    evidenceTitle: "Federal income tax rates and brackets",
+    evidencePublisher: "Internal Revenue Service",
+    evidenceUrl: "https://www.irs.gov/filing/federal-income-tax-rates-and-brackets",
+    analyzedAt: "2026-07-11T20:05:00.000Z",
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000005",
+    youtubeVideoId: "vftjBTjFlzI",
+    title: "Why You NEED an Emergency Fund!",
+    channelTitle: "Two Cents",
+    durationSeconds: 425,
+    category: "budgeting",
+    tldr: "Emergency savings can absorb unexpected expenses without immediately relying on debt.",
+    capScore: 10,
+    claim: "An emergency fund can help cover unplanned expenses.",
+    explanation:
+      "The CFPB describes emergency savings as cash set aside for unplanned expenses or financial emergencies.",
+    evidenceTitle: "An essential guide to building an emergency fund",
+    evidencePublisher: "Consumer Financial Protection Bureau",
+    evidenceUrl: "https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/",
+    analyzedAt: "2026-07-11T20:04:00.000Z",
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000006",
+    youtubeVideoId: "sVKQn2I4HDM",
+    title: "Budgeting Basics!",
+    channelTitle: "Two Cents",
+    durationSeconds: 313,
+    category: "budgeting",
+    tldr: "A beginner-friendly method for comparing income, expenses, and savings goals.",
+    capScore: 7,
+    claim: "A budget compares income with spending and saving.",
+    explanation:
+      "The CFPB budgeting worksheet organizes income and expenses so households can see what remains for goals.",
+    evidenceTitle: "Creating a cash flow budget",
+    evidencePublisher: "Consumer Financial Protection Bureau",
+    evidenceUrl: "https://www.consumerfinance.gov/consumer-tools/educator-tools/your-money-your-goals/toolkit/",
+    analyzedAt: "2026-07-11T20:03:00.000Z",
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000007",
+    youtubeVideoId: "TNC1frNq20c",
+    title: "Are 401(k)s a Financial Silver Bullet?",
+    channelTitle: "Two Cents",
+    durationSeconds: 392,
+    category: "retirement",
+    tldr: "A balanced look at 401(k) tax advantages, employer plans, fees, and contribution tradeoffs.",
+    capScore: 14,
+    claim: "A 401(k) is an employer-sponsored retirement savings plan.",
+    explanation:
+      "The Department of Labor describes 401(k) plans as employer-sponsored defined contribution retirement plans.",
+    evidenceTitle: "Types of retirement plans",
+    evidencePublisher: "U.S. Department of Labor",
+    evidenceUrl: "https://www.dol.gov/general/topic/retirement/typesofplans",
+    analyzedAt: "2026-07-11T20:02:00.000Z",
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000008",
+    youtubeVideoId: "vMJ2dkSc8Ok",
+    title: "What The Heck Is an IRA?",
+    channelTitle: "Two Cents",
+    durationSeconds: 411,
+    category: "retirement",
+    tldr: "An accessible introduction to traditional and Roth individual retirement arrangements.",
+    capScore: 11,
+    claim: "Traditional and Roth IRAs have different tax treatment.",
+    explanation:
+      "IRS guidance distinguishes potentially deductible traditional IRA contributions from qualified tax-free Roth distributions.",
+    evidenceTitle: "Individual retirement arrangements",
+    evidencePublisher: "Internal Revenue Service",
+    evidenceUrl: "https://www.irs.gov/retirement-plans/individual-retirement-arrangements-iras",
+    analyzedAt: "2026-07-11T20:01:00.000Z",
+  },
+];
+
+const buildItem = (video: FixtureVideo): CatalogItem => {
+  const url = watchUrlFor(video.youtubeVideoId);
+  const evidenceId = `${video.youtubeVideoId}-evidence`;
+  const scorecard = ScorecardSchema.parse({
+    id: `feed-scorecard-${video.youtubeVideoId}`,
+    source: { kind: "url", url, title: video.title },
+    capScore: video.capScore,
+    capLabel: "no-cap",
+    summary: video.tldr,
+    verifications: [
+      {
+        claim: {
+          id: `${video.youtubeVideoId}-claim`,
+          text: video.claim,
+          kind: "factual",
+          checkable: true,
+          timestampSeconds: Math.min(12, video.durationSeconds),
+        },
+        verdict: "true",
+        confidence: 0.92,
+        explanation: video.explanation,
+        evidence: [
+          {
+            id: evidenceId,
+            title: video.evidenceTitle,
+            publisher: video.evidencePublisher,
+            url: video.evidenceUrl,
+            trustTier: "primary",
+            stance: "supports",
+            excerpt: video.explanation,
+          },
+        ],
+      },
+    ],
+    hypeFindings: [],
+    nextActions: [
+      {
+        id: `${video.youtubeVideoId}-action`,
+        label: "Read the primary guidance",
+        description: `Compare the video with ${video.evidencePublisher}'s guidance before acting.`,
+        evidenceId,
+      },
+    ],
+    generatedAt: video.analyzedAt,
   });
 
-const treasuryBills = buildItem({
-  id: "feed-item-treasury-bills",
-  youtubeVideoId: "PHe0bXAIuk0",
-  title: "How Treasury bills actually work",
-  channelTitle: "Principles by Ray Dalio",
-  durationSeconds: 1860,
-  category: "investing",
-  tldr: "A clear, source-backed explainer on short-term Treasury bills — no cap.",
-  scorecard: DEMO_SCORECARDS.legitimate,
-  analyzedAt: FIXTURE_ANALYZED_AT,
-});
+  return CatalogItemSchema.parse({
+    id: video.id,
+    youtubeVideoId: video.youtubeVideoId,
+    url,
+    title: video.title,
+    channelTitle: video.channelTitle,
+    thumbnailUrl: thumbnailFor(video.youtubeVideoId),
+    durationSeconds: video.durationSeconds,
+    category: video.category,
+    tldr: video.tldr,
+    capScore: scorecard.capScore,
+    capLabel: scorecard.capLabel,
+    scorecard,
+    analyzedAt: video.analyzedAt,
+  });
+};
 
-const emergencyFund = buildItem({
-  id: "feed-item-emergency-fund",
-  youtubeVideoId: "p7HKvqRI_Bo",
-  title: "How big should your emergency fund be?",
-  channelTitle: "TED-Ed",
-  durationSeconds: 312,
-  category: "budgeting",
-  tldr: "Three-to-six-months guidance that lines up with CFPB recommendations.",
-  scorecard: emergencyFundScorecard,
-  analyzedAt: FIXTURE_ANALYZED_AT,
-});
-
-export const FIXTURE_CATALOG_ITEMS: CatalogItem[] = [
-  treasuryBills,
-  emergencyFund,
-];
+export const FIXTURE_CATALOG_ITEMS: CatalogItem[] = videos.map(buildItem);

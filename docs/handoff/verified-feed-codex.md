@@ -1,6 +1,6 @@
 # Handoff: CapCheck Verified Feed (issues #25–#31)
 
-**Updated:** 2026-07-11 evening. **Hard deadline: 10:00 PM tonight (hackathon submission).**
+**Updated:** 2026-07-11 9:16 PM EDT. **Hard deadline: 10:00 PM tonight (hackathon submission).**
 Purpose: let any fresh agent (Codex or otherwise) continue this build mid-flight if the
 orchestrating session runs out of usage.
 
@@ -21,6 +21,34 @@ detail at `/feed/[id]`, analyzer moved to `/analyze`.
   live refresh is the flex, not the dependency.
 
 ## What is DONE
+
+- **Issue #29 / branch `issue-29/searchable-feed`:** searchable client-side feed,
+  All + five accessible category filters, clear/reset/no-match behavior, eight
+  metadata-verified public YouTube fixtures across every category, explicit
+  YouTube/stale/unavailable labels, loading/empty/error/retry/missing states,
+  and desktop/mobile behavior coverage. Compact metadata is now WCAG-AA sized
+  and colored; long title/channel/TLDR/timestamp surfaces wrap at 375px.
+- **PR #41 follow-up:** `docs/agents/ui-design.md` and
+  `docs/design/capcheck-ui-spec.md` now preserve the approved grotesque-flat
+  1c/2a system (Instrument Sans, square geometry, ink interaction, flat rules).
+  A real headed-browser screenshot pass was completed at desktop and 375px.
+  Impeccable was not installed in the active Codex skill inventory.
+- **Teammate integration:** merged `origin/main` at `efbf7d7`, preserving PRs
+  #43 (source orientation), #44 (logo/header), and #45 (landscape rail and
+  external-link wrapping), plus #46 (transparent logo), without editing their
+  analyzer-owned components.
+- **Issue #29 final local gate (Node 22.19.0):** lint and typecheck clean; 318
+  unit tests passed with 6 credential-gated skips; production build passed; 38
+  Playwright tests passed with 2 expected skips across desktop/mobile Chromium.
+- **Live catalog:** the eight fixture items were inserted into the approved
+  `dev-personal` Supabase catalog using server-only `.env.local` credentials;
+  persisted IDs use the table's UUID contract. The review-corrected durations
+  were re-seeded idempotently across all eight rows.
+- **PR #47 review fixes:** unavailable cards now navigate to a truthful detail
+  state with no iframe; category filters expose a named accessible group;
+  creator/TLDR/category/title search paths are asserted; console checks are
+  strict with deterministic thumbnail interception; stale header/navigation
+  spec language is reconciled with the approved ink/image system.
 
 - **PR #40 (issue #27, this PR):** migration `supabase/migrations/20260711120000_capcheck_verified_feed.sql`,
   `src/domain/feed.ts` (CatalogItem/RefreshRun Zod), `src/server/feed/catalog-repository.ts`
@@ -64,11 +92,9 @@ detail at `/feed/[id]`, analyzer moved to `/analyze`.
 3. Coordinator: review PR #39, apply `20260712002724_harden_feed_refresh.sql`, and verify the
    function-search-path advisor clears and the one-running-row index exists. Keep PR #39 open
    until review and CI are green.
-4. Launch issue #29 on a fresh worktree off updated main: search + category filters
-   (Investing/Credit/Taxes/Budgeting/Retirement + All), empty/no-match/reset states,
-   responsive grid, no horizontal overflow at 375px. Calm consumer tool; Mobbin refs in #25.
-5. Seed 6–10 real vetted videos (`npx tsx scripts/seed-feed.ts` for fixtures; live analyzer
-   runs on hand-picked short finance videos for real ones — only gate-passers enter).
+4. Review Issue #29 PR and keep it unmerged until CI and coordinator review are green.
+5. Seed the eight Issue #29 fixtures with `npx tsx scripts/seed-feed.ts` when the
+   approved Supabase service role is available; never print the key.
 6. Rehearse: two consecutive refreshes idempotent; fixture fallback with zero keys; mobile 375px;
    README demo notes. Close #27/#28/#29/#30 as PRs merge; update epic #25.
 7. Freeze ~9:15 PM. Submit by 10:00 PM.

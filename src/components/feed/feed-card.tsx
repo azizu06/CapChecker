@@ -1,4 +1,4 @@
-import { Clock } from "lucide-react";
+import { CirclePlay, Clock } from "lucide-react";
 import Link from "next/link";
 
 import { CATEGORY_LABELS, type CatalogItem } from "@/domain/feed";
@@ -6,11 +6,26 @@ import { formatCheckedAt, formatDuration } from "@/lib/format-feed";
 
 import { CapScorePill } from "./cap-score-pill";
 
-export function FeedCard({ item }: { item: CatalogItem }) {
+export function FeedCard({
+  item,
+  referenceTime,
+  detailState,
+}: {
+  item: CatalogItem;
+  referenceTime: number | null;
+  detailState?: "unavailable";
+}) {
   const duration = formatDuration(item.durationSeconds);
+  const stale =
+    referenceTime !== null &&
+    referenceTime - new Date(item.analyzedAt).getTime() >
+    30 * 24 * 60 * 60 * 1000;
 
   return (
-    <Link className="feed-card" href={`/feed/${item.id}`}>
+    <Link
+      className="feed-card"
+      href={`/feed/${item.id}${detailState === "unavailable" ? "?feedState=unavailable" : ""}`}
+    >
       <div className="feed-thumb">
         {/* Grid uses a static thumbnail image — never an embedded iframe. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -27,6 +42,12 @@ export function FeedCard({ item }: { item: CatalogItem }) {
         <span className="feed-category">{CATEGORY_LABELS[item.category]}</span>
         <h2 className="feed-card-title">{item.title}</h2>
         <p className="feed-channel">{item.channelTitle}</p>
+        <p className="feed-source">
+          <CirclePlay aria-hidden="true" />
+          <span>Source: YouTube</span>
+          {item.url === null && <span>Video unavailable</span>}
+          {stale && <span>Check may be stale</span>}
+        </p>
         <p className="feed-tldr">{item.tldr}</p>
         <div className="feed-card-foot">
           <CapScorePill capScore={item.capScore} capLabel={item.capLabel} />
