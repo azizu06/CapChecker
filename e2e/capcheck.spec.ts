@@ -31,6 +31,43 @@ async function expectSafeExternalLink(link: Locator) {
   await expect(link).toHaveAttribute("rel", /\bnoreferrer\b/);
 }
 
+async function expectExternalIconOnLastGlyphLine(link: Locator) {
+  const metrics = await link.evaluate((anchor) => {
+    const icon = anchor.querySelector("svg");
+    if (!icon) throw new Error("Expected an external-link icon");
+
+    const walker = document.createTreeWalker(anchor, NodeFilter.SHOW_TEXT);
+    let lastText: Text | null = null;
+    let lastIndex = -1;
+    while (walker.nextNode()) {
+      const text = walker.currentNode as Text;
+      for (let index = text.data.length - 1; index >= 0; index -= 1) {
+        if (!/[\s\u2060]/u.test(text.data[index])) {
+          lastText = text;
+          lastIndex = index;
+          break;
+        }
+      }
+    }
+    if (!lastText) throw new Error("Expected visible link text");
+
+    const range = document.createRange();
+    range.setStart(lastText, lastIndex);
+    range.setEnd(lastText, lastIndex + 1);
+    const glyph = range.getBoundingClientRect();
+    const iconBox = icon.getBoundingClientRect();
+    return {
+      glyphCenter: glyph.top + glyph.height / 2,
+      iconCenter: iconBox.top + iconBox.height / 2,
+      height: anchor.getBoundingClientRect().height,
+      lineHeight: Number.parseFloat(getComputedStyle(anchor).lineHeight),
+    };
+  });
+
+  expect(Math.abs(metrics.glyphCenter - metrics.iconCenter)).toBeLessThan(4);
+  return metrics;
+}
+
 async function openTab(page: Page, name: RegExp) {
   await page.getByRole("tab", { name }).click();
 }
@@ -224,9 +261,14 @@ test("mixed result exposes every claim and safe evidence destination, then re-ch
   await expect(page.getByText(/hype is shown separately and does not add points/)).toBeVisible();
   await expect(page.getByText(/Evidence may be high, medium, or low trust—or unavailable/)).toBeVisible();
   await expect(page.locator(".app-footer a")).toHaveCount(0);
-  await expectSafeExternalLink(
-    page.getByRole("link", { name: /Open the checked video/ }),
-  );
+  const checkedVideoLink = page.getByRole("link", { name: /Open the checked video/ });
+  await expectSafeExternalLink(checkedVideoLink);
+  await checkedVideoLink.evaluate((link) => {
+    link.style.display = "inline-block";
+    link.style.width = "150px";
+  });
+  const checkedVideoWrap = await expectExternalIconOnLastGlyphLine(checkedVideoLink);
+  expect(checkedVideoWrap.height).toBeGreaterThan(checkedVideoWrap.lineHeight * 1.5);
 
   // Claims tab is active by default.
   await expect(page.getByRole("tab", { name: /Claims reviewed/ })).toHaveAttribute(
@@ -250,6 +292,7 @@ test("mixed result exposes every claim and safe evidence destination, then re-ch
     await expect(card.getByText(/trust$|Primary source/).first()).toBeVisible();
     for (const link of await card.getByRole("link").all()) {
       await expectSafeExternalLink(link);
+      await expectExternalIconOnLastGlyphLine(link);
     }
     await summary.click();
     await expect(card).not.toHaveAttribute("open", /.*/);
@@ -265,9 +308,9 @@ test("mixed result exposes every claim and safe evidence destination, then re-ch
   // Opinions are not fact-checked and expose no evidence links.
   await expect(skippedOpinion.getByRole("link")).toHaveCount(0);
 
-  await expectSafeExternalLink(
-    page.getByRole("link", { name: /Open strongest source/ }),
-  );
+  const strongestSource = page.getByRole("link", { name: /Open strongest source/ });
+  await expectSafeExternalLink(strongestSource);
+  await expectExternalIconOnLastGlyphLine(strongestSource);
 
   // Hype language lives in its own tab.
   await openTab(page, /Hype language/);
@@ -293,11 +336,13 @@ test("mixed result exposes every claim and safe evidence destination, then re-ch
     name: /Open evidence source: Understanding investment risk/,
   });
   await expectSafeExternalLink(indexSource);
+  await expectExternalIconOnLastGlyphLine(indexSource);
   await expect(indexSource).toHaveAttribute(
     "href",
     "https://www.spglobal.com/spdji/en/indices/equity/sp-500/",
   );
   await expectSafeExternalLink(riskSource);
+  await expectExternalIconOnLastGlyphLine(riskSource);
   await expect(riskSource).toHaveAttribute(
     "href",
     "https://www.finra.org/investors/investing/investing-basics/risk",
@@ -317,6 +362,34 @@ test("mixed result exposes every claim and safe evidence destination, then re-ch
   await page.getByRole("button", { name: "Check another" }).click();
   await expect(page.getByLabel("Video URL")).toBeVisible();
   await expect(page.getByLabel(/Choose a video file/)).toBeVisible();
+});
+
+test("desktop landscape results emphasize the embed without changing the vertical rail", async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium-desktop", "desktop rail sizing");
+
+  await submitUrl(page);
+  const verticalGrid = page.locator(".result-grid");
+  const verticalRail = page.locator(".source-rail");
+  await expect(verticalGrid).toHaveAttribute("data-embed", "vertical");
+  expect((await verticalRail.boundingBox())?.width).toBeCloseTo(300, 0);
+
+  await submitUrl(page, "partialFailure");
+  const landscapeGrid = page.locator(".result-grid");
+  const landscapeRail = page.locator(".source-rail");
+  await expect(landscapeGrid).toHaveAttribute("data-embed", "landscape");
+  expect((await landscapeRail.boundingBox())?.width).toBeCloseTo(400, 0);
+
+  const facadeBox = await landscapeRail.locator(".video-facade").boundingBox();
+  expect(facadeBox?.width).toBeGreaterThanOrEqual(398);
+  expect(facadeBox!.width / facadeBox!.height).toBeCloseTo(16 / 9, 2);
+  await expect(landscapeRail.locator(".source-details")).toHaveCSS(
+    "font-size",
+    "12px",
+  );
+  expect((await landscapeRail.getByRole("button", { name: "Run again" }).boundingBox())?.height)
+    .toBeLessThan(44);
 });
 
 test("result tabs support the complete keyboard navigation pattern", async ({ page }) => {
