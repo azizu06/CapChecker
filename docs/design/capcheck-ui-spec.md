@@ -161,6 +161,49 @@ dashboard sidebar for the hackathon flow.
   `prefers-reduced-motion: reduce`, remove transforms, pulses, and smooth scroll.
 - Fatal errors retain the submitted input and present a clear retry action.
 
+## Verified Feed (persisted results)
+
+The Verified Feed is CapCheck's browse surface for videos that were analyzed and
+kept. It reuses the same tokens, Cap Score semantics (higher = worse), and claim
+components as the analyzer — no second palette, no gradients.
+
+### Shared header and navigation
+
+- `/` (Feed) and `/analyze` share one compact, sticky CapCheck header: the
+  shield brand mark plus `Feed` and `Analyze` nav links.
+- The active route is visibly marked (accent text on an `--accent-dim` chip) and
+  carries `aria-current="page"`. Feed is active for `/` and any `/feed/*` detail.
+
+### Feed home (`/`)
+
+- A short intro (kicker + title + lede) sits above a responsive card grid
+  (`auto-fill, minmax(280px, 1fr)`), following Vimeo-style scannability.
+- Each card is a single link to `/feed/[id]` containing: a static thumbnail
+  image (never an iframe in the grid), duration badge, category pill, title,
+  channel, one-line TLDR, a Cap Score pill (score + label tone), and a
+  Geist-Mono "Checked <date>" stamp.
+- Empty and database-error states are accessible cards (error uses
+  `role="alert"`) with plain, recoverable copy.
+
+### Feed detail (`/feed/[id]`)
+
+- Back-to-feed link, title, and a meta line (channel · duration · checked date).
+- One attributed YouTube embed via `youtube-nocookie.com`, with a descriptive
+  `title` attribute and `allowFullScreen`; it is the only iframe in the feature.
+- Reuses the compact score header (CountUp + ScoreMeter), the summary/TLDR, and
+  the claim `<details>` cards with trust tiers and safe (`noopener noreferrer`,
+  new-tab) citation links, then an analysis timestamp.
+- Not-found and database-error states render inline with a working back link so
+  the reader is never stranded.
+
+### Persistence contract
+
+- Catalog and refresh-run storage lives in Supabase (`public.capcheck_*`) with a
+  unique YouTube identity and RLS that allows anon reads but no anon writes.
+- Reads go through a server-side repository; writes require the service-role key
+  and never reach client code or browser output. Fixture and seed data flow
+  through the same `CatalogItem` / `Scorecard` runtime contract as live results.
+
 ## QA contract
 
 Playwright must exercise every visible button, link, input, upload control,
