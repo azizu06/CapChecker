@@ -86,6 +86,24 @@ type YouTubeDiscoveryOptions = {
   now?: () => number;
   queries?: readonly string[];
   requestTimeoutMs?: number;
+  maxAttempts?: number;
+  retryBaseDelayMs?: number;
+};
+
+const waitForRetry = async (delayMs: number, signal: AbortSignal) => {
+  if (signal.aborted) throw signal.reason;
+  if (delayMs <= 0) return;
+  await new Promise<void>((resolve, reject) => {
+    const timer = setTimeout(resolve, delayMs);
+    signal.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timer);
+        reject(signal.reason);
+      },
+      { once: true },
+    );
+  });
 };
 
 const fetchJson = async (
@@ -93,29 +111,38 @@ const fetchJson = async (
   url: URL,
   signal: AbortSignal,
   requestTimeoutMs: number,
+  maxAttempts: number,
+  retryBaseDelayMs: number,
 ): Promise<unknown> => {
-  const timeout = new AbortController();
-  const timer = setTimeout(
-    () => timeout.abort(new DOMException("Request timed out", "TimeoutError")),
-    requestTimeoutMs,
-  );
-  let response: Response;
-  try {
-    response = await fetchImpl(url, {
-      signal: AbortSignal.any([signal, timeout.signal]),
-    });
-  } catch (cause) {
-    if (signal.aborted) throw cause;
-    throw youTubeQuotaError();
-  } finally {
-    clearTimeout(timer);
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const timeout = new AbortController();
+    const timer = setTimeout(
+      () => timeout.abort(new DOMException("Request timed out", "TimeoutError")),
+      requestTimeoutMs,
+    );
+    try {
+      const response = await fetchImpl(url, {
+        signal: AbortSignal.any([signal, timeout.signal]),
+      });
+      if (response.ok) {
+        try {
+          return await response.json();
+        } catch {
+          throw youTubeQuotaError();
+        }
+      }
+      const retryable = response.status === 429 || response.status >= 500;
+      if (!retryable || attempt === maxAttempts) throw youTubeQuotaError();
+    } catch (cause) {
+      if (signal.aborted) throw signal.reason;
+      if (cause instanceof Error && cause.name === "RefreshError") throw cause;
+      if (attempt === maxAttempts) throw youTubeQuotaError();
+    } finally {
+      clearTimeout(timer);
+    }
+    await waitForRetry(retryBaseDelayMs * attempt, signal);
   }
-  if (!response.ok) throw youTubeQuotaError();
-  try {
-    return await response.json();
-  } catch {
-    throw youTubeQuotaError();
-  }
+  throw youTubeQuotaError();
 };
 
 /**
@@ -133,6 +160,8 @@ export function createYouTubeDiscovery({
   now = () => Date.now(),
   queries = DEFAULT_DISCOVERY_QUERIES,
   requestTimeoutMs = 10_000,
+  maxAttempts = 3,
+  retryBaseDelayMs = 150,
 }: YouTubeDiscoveryOptions): YouTubeDiscoveryPort {
   if (queries.length === 0) {
     throw new TypeError("At least one discovery query is required");
@@ -153,7 +182,14 @@ export function createYouTubeDiscovery({
       searchUrl.searchParams.set("key", apiKey);
 
       const search = SearchResponseSchema.safeParse(
-        await fetchJson(fetchImpl, searchUrl, signal, requestTimeoutMs),
+        await fetchJson(
+          fetchImpl,
+          searchUrl,
+          signal,
+          requestTimeoutMs,
+          maxAttempts,
+          retryBaseDelayMs,
+        ),
       );
       if (!search.success) throw youTubeQuotaError();
 
@@ -168,7 +204,14 @@ export function createYouTubeDiscovery({
       videosUrl.searchParams.set("key", apiKey);
 
       const videos = VideosResponseSchema.safeParse(
-        await fetchJson(fetchImpl, videosUrl, signal, requestTimeoutMs),
+        await fetchJson(
+          fetchImpl,
+          videosUrl,
+          signal,
+          requestTimeoutMs,
+          maxAttempts,
+          retryBaseDelayMs,
+        ),
       );
       if (!videos.success) throw youTubeQuotaError();
 

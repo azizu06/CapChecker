@@ -71,7 +71,8 @@ export function createRefreshRunner(dependencies: RefreshRunnerDependencies) {
           runId = await dependencies.catalog.createRun({
             startedAt: now().toISOString(),
           });
-        } catch {
+        } catch (cause) {
+          if (cause instanceof RefreshError) throw cause;
           throw catalogWriteError();
         }
 
@@ -147,20 +148,24 @@ export function createRefreshRunner(dependencies: RefreshRunnerDependencies) {
           } catch {
             throw catalogWriteError();
           }
-          counts.kept += 1;
-          accepted = {
-            youtubeVideoId: item.youtubeVideoId,
-            title: item.title,
-            category: item.category,
-            capScore: item.capScore,
-            tldr: item.tldr,
-            inserted,
-          };
+          if (inserted) {
+            counts.kept += 1;
+            accepted = {
+              youtubeVideoId: item.youtubeVideoId,
+              title: item.title,
+              category: item.category,
+              capScore: item.capScore,
+              tldr: item.tldr,
+              inserted: true,
+            };
+          } else {
+            counts.duplicate += 1;
+          }
           break;
         }
 
         if (runId) {
-          await safeCompleteRun(dependencies.catalog, {
+          await dependencies.catalog.completeRun({
             runId,
             status: "completed",
             counts,
@@ -178,13 +183,16 @@ export function createRefreshRunner(dependencies: RefreshRunnerDependencies) {
       } catch (cause) {
         const error = toRefreshError(cause);
         if (runId) {
-          await safeCompleteRun(dependencies.catalog, {
+          const finalized = await safeCompleteRun(dependencies.catalog, {
             runId,
             status: "failed",
             counts,
             completedAt: now().toISOString(),
             errorCode: error.code,
           });
+          if (!finalized) {
+            await safeReleaseRun(dependencies.catalog, runId);
+          }
         }
         yield errorEvent(error);
       } finally {
@@ -218,7 +226,17 @@ const safeCompleteRun = async (
 ) => {
   try {
     await catalog.completeRun(input);
+    return true;
   } catch {
-    // Swallow: the primary outcome is already decided and streamed.
+    return false;
+  }
+};
+
+const safeReleaseRun = async (catalog: RefreshCatalogPort, runId: string) => {
+  try {
+    await catalog.releaseRun({ runId });
+  } catch {
+    // A total database outage cannot be repaired in-process; the run remains
+    // visible for operator recovery rather than being reported as complete.
   }
 };

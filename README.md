@@ -152,15 +152,16 @@ Refresh code lives under `src/server/feed/refresh/`:
   finance-category mapping.
 - `refresh-runner.ts` — single-flight orchestration, run bookkeeping, idempotent
   upsert, and safe failure that never touches existing catalog rows.
-- `catalog-port-adapter.ts` — TODO seam the orchestrator completes against Lane
-  B's `CatalogRepository` (issue #30). Until then, live refresh reports itself
-  unavailable and fixture mode uses an in-memory catalog.
+- `catalog-port-adapter.ts` — maps refresh items and run bookkeeping onto the
+  shared `CatalogRepository`; fixture mode and the feed page share one cached
+  repository, while production writes through the server-only Supabase client.
 
 Fixture mode (`CAPCHECK_ANALYSIS_MODE=fixture`) runs the whole flow against
-deterministic discovery + the fixture scorecard + an in-memory catalog, so two
+deterministic discovery + the fixture scorecard + the fixture catalog, so two
 consecutive refreshes prove idempotency (first accepts, second reports a
 duplicate) with no credentials. Live mode additionally requires a server-only
-`YOUTUBE_API_KEY` (plus `GEMINI_API_KEY` and `FINNHUB_KEY`).
+`YOUTUBE_API_KEY` (plus `GEMINI_API_KEY`, `FINNHUB_KEY`, and
+`SUPABASE_SERVICE_ROLE_KEY`).
 
 Opt-in live smoke test (never part of CI):
 
@@ -169,6 +170,7 @@ CAPCHECK_LIVE_REFRESH=1 \
 YOUTUBE_API_KEY=... \
 GEMINI_API_KEY=... \
 FINNHUB_KEY=... \
+SUPABASE_SERVICE_ROLE_KEY=... \
 npm run test:unit -- src/server/feed/refresh/refresh.live.test.ts
 ```
 

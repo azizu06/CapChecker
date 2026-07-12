@@ -52,6 +52,7 @@ export async function* parseRefreshStream(
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  let completed = false;
 
   try {
     while (true) {
@@ -67,7 +68,10 @@ export async function* parseRefreshStream(
         nextFrame = readFrame(buffer);
       }
 
-      if (done) break;
+      if (done) {
+        completed = true;
+        break;
+      }
     }
 
     if (buffer.trim().length > 0) throw new RefreshStreamError();
@@ -75,6 +79,11 @@ export async function* parseRefreshStream(
     if (error instanceof RefreshStreamError) throw error;
     throw new RefreshStreamError();
   } finally {
+    if (!completed) {
+      await reader.cancel(
+        new DOMException("Refresh stream consumer stopped", "AbortError"),
+      );
+    }
     reader.releaseLock();
   }
 }

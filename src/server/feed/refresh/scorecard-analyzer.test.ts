@@ -59,4 +59,61 @@ describe("createScorecardAnalyzer", () => {
       }),
     ).rejects.toMatchObject({ name: "RefreshError" });
   });
+
+  it("turns an analysis deadline into a sanitized retryable failure", async () => {
+    const analyze = createScorecardAnalyzer({
+      timeoutMs: 5,
+      createStream: () =>
+        async function* stream(_source, signal) {
+          await new Promise<void>((_resolve, reject) => {
+            signal.addEventListener("abort", () => reject(signal.reason), {
+              once: true,
+            });
+          });
+        },
+    });
+
+    await expect(
+      analyze({
+        url: "https://www.youtube.com/watch?v=x",
+        signal: new AbortController().signal,
+      }),
+    ).rejects.toMatchObject({ code: "ANALYSIS_FAILED", retryable: true });
+  });
+
+  it("preserves caller abort reason and closes the analyzer stream", async () => {
+    let cleanedUp = false;
+    let markStarted!: () => void;
+    const started = new Promise<void>((resolve) => {
+      markStarted = resolve;
+    });
+    const analyze = createScorecardAnalyzer({
+      createStream: () =>
+        async function* stream(_source, signal) {
+          try {
+            yield { type: "progress", stage: "fetching", message: "Loading" };
+            await new Promise<void>((_resolve, reject) => {
+              markStarted();
+              signal.addEventListener("abort", () => reject(signal.reason), {
+                once: true,
+              });
+            });
+          } finally {
+            cleanedUp = true;
+          }
+        },
+    });
+    const controller = new AbortController();
+    const reason = new DOMException("user left", "AbortError");
+    const result = analyze({
+      url: "https://www.youtube.com/watch?v=x",
+      signal: controller.signal,
+    });
+
+    await started;
+    controller.abort(reason);
+
+    await expect(result).rejects.toBe(reason);
+    expect(cleanedUp).toBe(true);
+  });
 });

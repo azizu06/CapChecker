@@ -1,6 +1,7 @@
 import { TriangleAlert } from "lucide-react";
 
 import { FeedCard } from "@/components/feed/feed-card";
+import { RefreshFeedButton } from "@/components/refresh-feed-button";
 import type { CatalogItem } from "@/domain/feed";
 import { getCatalogRepository } from "@/server/feed/catalog-repository";
 
@@ -27,6 +28,7 @@ export default async function FeedHome() {
           only if its claims held up. Open one to see the Cap Score, the
           evidence, and the citations behind it.
         </p>
+        <RefreshFeedButton />
       </section>
 
       {failed ? (

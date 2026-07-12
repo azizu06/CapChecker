@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { parseRefreshStream, RefreshStreamError } from "./refresh-stream";
 
@@ -52,5 +52,26 @@ describe("parseRefreshStream", () => {
       ))
         void _event;
     }).rejects.toBeInstanceOf(RefreshStreamError);
+  });
+
+  it("cancels the response reader when the consumer stops early", async () => {
+    const cancel = vi.fn();
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(
+          new TextEncoder().encode(
+            'data: {"type":"stage","stage":"discovering","message":"Searching"}\n\n',
+          ),
+        );
+      },
+      cancel,
+    });
+
+    for await (const event of parseRefreshStream(new Response(body))) {
+      expect(event.type).toBe("stage");
+      break;
+    }
+
+    expect(cancel).toHaveBeenCalledTimes(1);
   });
 });

@@ -1511,6 +1511,22 @@ input:disabled {
   font-size: 1.02rem;
 }
 
+.feed-intro .refresh-feed {
+  margin-top: 20px;
+}
+
+.refresh-feed .primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.refresh-feed .primary:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
 .feed-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

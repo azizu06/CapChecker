@@ -98,4 +98,17 @@ describe("screenCandidate", () => {
     );
     expect(result).toEqual({ ok: false, reason: "No supported finance category" });
   });
+
+  it("rejects missing or unsafe display metadata", () => {
+    const unsafe = [
+      candidate({ title: "   " }),
+      candidate({ channelTitle: "" }),
+      candidate({ thumbnailUrl: "javascript:alert(1)" }),
+      candidate({ thumbnailUrl: "" }),
+    ];
+
+    for (const video of unsafe) {
+      expect(screenCandidate(video).ok).toBe(false);
+    }
+  });
 });

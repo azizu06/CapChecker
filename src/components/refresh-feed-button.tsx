@@ -1,6 +1,7 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 
 import { parseRefreshStream } from "@/lib/refresh-stream";
@@ -29,6 +30,7 @@ const summarize = (counts: RefreshCounts) =>
  * `primary` / `helper` / `field-error` classes.
  */
 export function RefreshFeedButton({ onRefreshed, endpoint = "/api/feed/refresh" }: Props) {
+  const router = useRouter();
   const [running, setRunning] = useState(false);
   const [stageText, setStageText] = useState("");
   const [summary, setSummary] = useState("");
@@ -64,14 +66,17 @@ export function RefreshFeedButton({ onRefreshed, endpoint = "/api/feed/refresh" 
         }
       }
 
-      if (result) onRefreshed?.(result);
+      if (result) {
+        onRefreshed?.(result);
+        router.refresh();
+      }
     } catch {
       setError("CapCheck could not finish the feed refresh. Please try again.");
     } finally {
       inFlight.current = false;
       setRunning(false);
     }
-  }, [endpoint, onRefreshed]);
+  }, [endpoint, onRefreshed, router]);
 
   return (
     <div className="refresh-feed">

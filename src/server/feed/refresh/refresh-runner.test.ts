@@ -2,7 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { Scorecard } from "@/domain/analysis";
 import { DEMO_SCORECARDS } from "@/fixtures/scorecards";
+import { InMemoryCatalogRepository } from "@/server/feed/catalog-repository";
 
+import { createSupabaseRefreshCatalogPort } from "./catalog-port-adapter";
 import { youTubeQuotaError } from "./errors";
 import type { RefreshEvent } from "./events";
 import { createInMemoryCatalog } from "./in-memory-catalog";
@@ -130,6 +132,26 @@ describe("refresh runner", () => {
     expect(analyze).not.toHaveBeenCalled();
   });
 
+  it("counts an upsert race as a duplicate instead of a kept item", async () => {
+    const catalog = createInMemoryCatalog();
+    catalog.hasVideo = async () => false;
+    catalog.upsertItem = async () => ({ inserted: false });
+    const runner = createRefreshRunner({
+      discovery: staticDiscovery([candidate()]),
+      analyze: analyzeWith(DEMO_SCORECARDS.legitimate),
+      catalog,
+      now: NOW,
+    });
+
+    const events = await drain(runner.run(new AbortController().signal));
+    const complete = events.find((event) => event.type === "complete");
+
+    expect(complete).toMatchObject({
+      counts: { discovered: 1, analyzed: 1, kept: 0, rejected: 0, duplicate: 1 },
+      accepted: null,
+    });
+  });
+
   it("fails safely on YouTube quota failure without touching existing rows", async () => {
     const catalog = createInMemoryCatalog([seededItem()]);
     const runner = createRefreshRunner({
@@ -154,6 +176,61 @@ describe("refresh runner", () => {
     expect(catalog.items.size).toBe(1);
     expect(catalog.items.has("existing-vid")).toBe(true);
     expect(catalog.runs[0]).toMatchObject({ status: "failed" });
+  });
+
+  it("emits a safe failure and marks the run failed when completion persistence fails", async () => {
+    const catalog = createInMemoryCatalog();
+    const completeRun = catalog.completeRun.bind(catalog);
+    catalog.completeRun = vi
+      .fn<typeof catalog.completeRun>()
+      .mockRejectedValueOnce(new Error("database unavailable"))
+      .mockImplementation(completeRun);
+    const runner = createRefreshRunner({
+      discovery: staticDiscovery([]),
+      analyze: analyzeWith(DEMO_SCORECARDS.legitimate),
+      catalog,
+      now: NOW,
+    });
+
+    const events = await drain(runner.run(new AbortController().signal));
+
+    expect(events.some((event) => event.type === "complete")).toBe(false);
+    expect(events.at(-1)).toMatchObject({
+      type: "error",
+      error: { code: "CATALOG_WRITE_FAILED", retryable: true },
+    });
+    expect(catalog.runs[0]).toMatchObject({
+      status: "failed",
+      errorCode: "CATALOG_WRITE_FAILED",
+    });
+  });
+
+  it("releases the run lock when both finalization writes fail", async () => {
+    const baseCatalog = createInMemoryCatalog();
+    const releaseRun = vi.fn(async ({ runId }: { runId: string }) => {
+      const index = baseCatalog.runs.findIndex((run) => run.id === runId);
+      if (index >= 0) baseCatalog.runs.splice(index, 1);
+    });
+    const catalog = {
+      ...baseCatalog,
+      completeRun: vi.fn().mockRejectedValue(new Error("database unavailable")),
+      releaseRun,
+    };
+    const runner = createRefreshRunner({
+      discovery: staticDiscovery([]),
+      analyze: analyzeWith(DEMO_SCORECARDS.legitimate),
+      catalog,
+      now: NOW,
+    });
+
+    const events = await drain(runner.run(new AbortController().signal));
+
+    expect(events.at(-1)).toMatchObject({
+      type: "error",
+      error: { code: "CATALOG_WRITE_FAILED" },
+    });
+    expect(releaseRun).toHaveBeenCalledWith({ runId: "run-1" });
+    expect(baseCatalog.runs).toHaveLength(0);
   });
 
   it("never leaks internals in a failure message", async () => {
@@ -211,6 +288,41 @@ describe("refresh runner", () => {
     expect(runner.isRunning()).toBe(false);
   });
 
+  it("rejects concurrent refreshes across runners that share repository state", async () => {
+    const repository = new InMemoryCatalogRepository();
+    const dependencies = {
+      discovery: staticDiscovery([candidate()]),
+      analyze: analyzeWith(DEMO_SCORECARDS.legitimate),
+      now: NOW,
+    };
+    const firstRunner = createRefreshRunner({
+      ...dependencies,
+      catalog: createSupabaseRefreshCatalogPort(repository),
+    });
+    const secondRunner = createRefreshRunner({
+      ...dependencies,
+      catalog: createSupabaseRefreshCatalogPort(repository),
+    });
+    const first = firstRunner.run(new AbortController().signal);
+    await first.next();
+    await first.next();
+
+    const second = await drain(secondRunner.run(new AbortController().signal));
+
+    expect(second).toEqual([
+      { type: "stage", stage: "starting", message: "Preparing the feed refresh" },
+      {
+        type: "error",
+        error: {
+          code: "REFRESH_IN_PROGRESS",
+          message: expect.stringContaining("already running"),
+          retryable: true,
+        },
+      },
+    ]);
+    await drain(first);
+  });
+
   it("allows a fresh refresh after a prior failure", async () => {
     const catalog = createInMemoryCatalog();
     const discovery: YouTubeDiscoveryPort = {
@@ -234,6 +346,41 @@ describe("refresh runner", () => {
     const complete = secondEvents.find((event) => event.type === "complete");
     expect(complete).toMatchObject({ counts: { kept: 1 } });
     expect(catalog.items.has("vid-index")).toBe(true);
+  });
+
+  it("releases single-flight after caller cancellation", async () => {
+    const catalog = createInMemoryCatalog();
+    const analyze = vi
+      .fn<AnalyzeVideo>()
+      .mockImplementationOnce(({ signal }) =>
+        new Promise<Scorecard>((_resolve, reject) => {
+          signal.addEventListener("abort", () => reject(signal.reason), {
+            once: true,
+          });
+        }),
+      )
+      .mockResolvedValue(DEMO_SCORECARDS.legitimate);
+    const runner = createRefreshRunner({
+      discovery: staticDiscovery([candidate()]),
+      analyze,
+      catalog,
+      now: NOW,
+    });
+    const controller = new AbortController();
+    const first = runner.run(controller.signal);
+
+    await first.next();
+    await first.next();
+    await first.next();
+    await first.next();
+    const blocked = first.next();
+    controller.abort(new DOMException("reader stopped", "AbortError"));
+    await blocked;
+    await drain(first);
+
+    expect(runner.isRunning()).toBe(false);
+    const retry = await drain(runner.run(new AbortController().signal));
+    expect(retry.at(-1)).toMatchObject({ type: "complete", counts: { kept: 1 } });
   });
 
   it("completes with no acceptance when candidates are exhausted", async () => {

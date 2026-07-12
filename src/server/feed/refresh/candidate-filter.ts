@@ -102,6 +102,18 @@ export type PreparedCandidate = {
   category: FinanceCategory;
 };
 
+const isSafeDisplayText = (value: string): boolean =>
+  value.trim().length > 0 && !/[\u0000-\u001f\u007f]/.test(value);
+
+const isHttpUrl = (value: string): boolean => {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
 /**
  * Metadata-only pre-filter applied before analysis: duration, embeddability,
  * public/processed status, age-restriction, and finance-category mapping. This
@@ -130,6 +142,12 @@ export const screenCandidate = (
   }
   if (video.ageRestricted) {
     return { ok: false, reason: "Age restricted" };
+  }
+  if (!isSafeDisplayText(video.title) || !isSafeDisplayText(video.channelTitle)) {
+    return { ok: false, reason: "Missing or unsafe display metadata" };
+  }
+  if (!isHttpUrl(video.thumbnailUrl)) {
+    return { ok: false, reason: "Missing or unsafe thumbnail" };
   }
   const category = mapCategory(`${video.title} ${video.description}`);
   if (category === null) {

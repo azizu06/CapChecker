@@ -60,6 +60,7 @@ export interface RefreshCatalogPort {
     completedAt: string;
     errorCode?: string;
   }): Promise<void>;
+  releaseRun(input: { runId: string }): Promise<void>;
 }
 
 /** A raw candidate returned by YouTube discovery, before filtering. */

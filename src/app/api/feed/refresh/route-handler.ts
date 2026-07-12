@@ -33,7 +33,7 @@ export type RefreshRunner = {
 
 type RefreshHandlerDependencies = {
   /** Returns the process-wide runner. Throwing signals an unconfigured feed. */
-  getRunner(): RefreshRunner;
+  getRunner(): RefreshRunner | Promise<RefreshRunner>;
 };
 
 /**
@@ -46,7 +46,7 @@ export function createRefreshHandler({ getRunner }: RefreshHandlerDependencies) 
   return async function refresh(request: Request): Promise<Response> {
     let runner: RefreshRunner;
     try {
-      runner = getRunner();
+      runner = await getRunner();
     } catch {
       return errorResponse(
         503,
@@ -56,7 +56,7 @@ export function createRefreshHandler({ getRunner }: RefreshHandlerDependencies) 
     }
 
     const refreshController = new AbortController();
-    const abortRefresh = () => refreshController.abort();
+    const abortRefresh = () => refreshController.abort(request.signal.reason);
     let streamCancelled = false;
     if (request.signal.aborted) abortRefresh();
     request.signal.addEventListener("abort", abortRefresh, { once: true });
@@ -78,9 +78,9 @@ export function createRefreshHandler({ getRunner }: RefreshHandlerDependencies) 
           if (!streamCancelled) controller.close();
         }
       },
-      cancel() {
+      cancel(reason) {
         streamCancelled = true;
-        refreshController.abort();
+        refreshController.abort(reason);
         request.signal.removeEventListener("abort", abortRefresh);
       },
     });

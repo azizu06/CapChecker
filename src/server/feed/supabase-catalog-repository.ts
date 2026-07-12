@@ -6,6 +6,7 @@ import {
   catalogItemToRow,
   rowToCatalogItem,
   rowToRefreshRun,
+  RefreshRunAlreadyActiveError,
   type CatalogFilter,
   type CatalogItemRow,
   type CatalogRepository,
@@ -87,25 +88,27 @@ export class SupabaseCatalogRepository implements CatalogRepository {
 
   async upsertItem(item: CatalogItem): Promise<{ inserted: boolean }> {
     const writer = this.requireWriter();
-
-    const { data: existing, error: lookupError } = await writer
-      .from(CATALOG_TABLE)
-      .select("id")
-      .eq("youtube_video_id", item.youtubeVideoId)
-      .maybeSingle();
-    if (lookupError) {
-      throw new Error(`Failed to check catalog item: ${lookupError.message}`);
-    }
-
     const row = catalogItemToRow(item);
-    const { error } = await writer
+    const { error: insertError } = await writer
       .from(CATALOG_TABLE)
-      .upsert(row, { onConflict: "youtube_video_id" });
-    if (error) {
-      throw new Error(`Failed to upsert catalog item: ${error.message}`);
+      .insert(row)
+      .select("id")
+      .single();
+    if (!insertError) return { inserted: true };
+    if (insertError.code !== "23505") {
+      throw new Error(`Failed to insert catalog item: ${insertError.message}`);
     }
 
-    return { inserted: !existing };
+    const updateRow = { ...row };
+    delete updateRow.id;
+    const { error: updateError } = await writer
+      .from(CATALOG_TABLE)
+      .update(updateRow)
+      .eq("youtube_video_id", item.youtubeVideoId);
+    if (updateError) {
+      throw new Error(`Failed to update catalog item: ${updateError.message}`);
+    }
+    return { inserted: false };
   }
 
   async createRefreshRun(input: NewRefreshRun = {}): Promise<RefreshRun> {
@@ -114,6 +117,7 @@ export class SupabaseCatalogRepository implements CatalogRepository {
       .from(REFRESH_TABLE)
       .insert({
         status: input.status ?? "running",
+        started_at: input.startedAt,
         discovered_count: input.discoveredCount ?? 0,
         analyzed_count: input.analyzedCount ?? 0,
         kept_count: input.keptCount ?? 0,
@@ -123,6 +127,7 @@ export class SupabaseCatalogRepository implements CatalogRepository {
       .select()
       .single();
 
+    if (error?.code === "23505") throw new RefreshRunAlreadyActiveError();
     if (error) throw new Error(`Failed to create refresh run: ${error.message}`);
     return rowToRefreshRun(data as RefreshRunRow);
   }
@@ -155,6 +160,12 @@ export class SupabaseCatalogRepository implements CatalogRepository {
 
     if (error) throw new Error(`Failed to update refresh run: ${error.message}`);
     return rowToRefreshRun(data as RefreshRunRow);
+  }
+
+  async deleteRefreshRun(id: string): Promise<void> {
+    const writer = this.requireWriter();
+    const { error } = await writer.from(REFRESH_TABLE).delete().eq("id", id);
+    if (error) throw new Error(`Failed to release refresh run: ${error.message}`);
   }
 }
 

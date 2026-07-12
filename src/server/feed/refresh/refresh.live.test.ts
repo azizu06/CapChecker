@@ -31,7 +31,10 @@ describe.skipIf(!liveEnabled)("live feed refresh", () => {
     "runs one real discovery + analysis pass end to end",
     async () => {
       const runner = createRefreshRunner({
-        discovery: createYouTubeDiscovery({ apiKey: process.env.YOUTUBE_API_KEY! }),
+        discovery: createYouTubeDiscovery({
+          apiKey: process.env.YOUTUBE_API_KEY!,
+          now: () => 0,
+        }),
         analyze: createScorecardAnalyzer({
           createStream: () =>
             createNodeLiveAnalysisOrchestrator({
@@ -40,6 +43,7 @@ describe.skipIf(!liveEnabled)("live feed refresh", () => {
             }),
         }),
         catalog: createInMemoryCatalog(),
+        candidateLimit: 1,
       });
 
       const events: RefreshEvent[] = [];
@@ -47,9 +51,23 @@ describe.skipIf(!liveEnabled)("live feed refresh", () => {
         events.push(event);
       }
 
-      const terminal = events.at(-1);
-      expect(terminal?.type === "complete" || terminal?.type === "error").toBe(true);
       console.log("live refresh evidence:", JSON.stringify(events, null, 2));
+      expect(events.some((event) => event.type === "error")).toBe(false);
+      const terminal = events.at(-1);
+      expect(terminal).toMatchObject({
+        type: "complete",
+        status: "completed",
+        counts: {
+          discovered: 1,
+          analyzed: 1,
+        },
+      });
+      if (terminal?.type === "complete") {
+        const { discovered, analyzed, kept, rejected, duplicate } = terminal.counts;
+        expect(discovered).toBeLessThanOrEqual(1);
+        expect(analyzed).toBeLessThanOrEqual(discovered);
+        expect(kept + rejected + duplicate).toBeLessThanOrEqual(discovered);
+      }
     },
     180_000,
   );

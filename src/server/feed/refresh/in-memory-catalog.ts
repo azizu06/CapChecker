@@ -57,5 +57,9 @@ export function createInMemoryCatalog(
         run.errorCode = errorCode;
       }
     },
+    async releaseRun({ runId }) {
+      const index = runs.findIndex((entry) => entry.id === runId);
+      if (index >= 0) runs.splice(index, 1);
+    },
   };
 }

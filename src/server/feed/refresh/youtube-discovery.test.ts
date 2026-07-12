@@ -98,6 +98,104 @@ describe("createYouTubeDiscovery", () => {
     });
   });
 
+  it("retries bounded 429 and 5xx responses before succeeding", async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(null, { status: 429 }))
+      .mockResolvedValueOnce(new Response(null, { status: 503 }))
+      .mockResolvedValueOnce(Response.json(searchBody))
+      .mockResolvedValueOnce(Response.json(videosBody));
+    const discovery = createYouTubeDiscovery({
+      apiKey: "yt-key",
+      fetch: fetch as typeof globalThis.fetch,
+      now: () => 0,
+      retryBaseDelayMs: 0,
+    });
+
+    await expect(
+      discovery.discover({ limit: 5, signal: new AbortController().signal }),
+    ).resolves.toHaveLength(1);
+    expect(fetch).toHaveBeenCalledTimes(4);
+  });
+
+  it("retries a network failure before succeeding", async () => {
+    const fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError("network down"))
+      .mockResolvedValueOnce(Response.json(searchBody))
+      .mockResolvedValueOnce(Response.json(videosBody));
+    const discovery = createYouTubeDiscovery({
+      apiKey: "yt-key",
+      fetch: fetch as typeof globalThis.fetch,
+      now: () => 0,
+      retryBaseDelayMs: 0,
+    });
+
+    await expect(
+      discovery.discover({ limit: 5, signal: new AbortController().signal }),
+    ).resolves.toHaveLength(1);
+    expect(fetch).toHaveBeenCalledTimes(3);
+  });
+
+  it("stops after the configured retry budget is exhausted", async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response(null, { status: 429 }));
+    const discovery = createYouTubeDiscovery({
+      apiKey: "yt-key",
+      fetch: fetch as typeof globalThis.fetch,
+      now: () => 0,
+      maxAttempts: 2,
+      retryBaseDelayMs: 0,
+    });
+
+    await expect(
+      discovery.discover({ limit: 5, signal: new AbortController().signal }),
+    ).rejects.toMatchObject({ code: "YOUTUBE_UNAVAILABLE" });
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("retries timed-out requests only within the configured budget", async () => {
+    const fetch = vi.fn((_url: URL, init?: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener("abort", () => reject(init.signal?.reason), {
+          once: true,
+        });
+      }),
+    );
+    const discovery = createYouTubeDiscovery({
+      apiKey: "yt-key",
+      fetch: fetch as typeof globalThis.fetch,
+      now: () => 0,
+      requestTimeoutMs: 5,
+      maxAttempts: 2,
+      retryBaseDelayMs: 0,
+    });
+
+    await expect(
+      discovery.discover({ limit: 5, signal: new AbortController().signal }),
+    ).rejects.toMatchObject({ code: "YOUTUBE_UNAVAILABLE" });
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it("preserves the caller's exact abort reason without retrying", async () => {
+    const reason = new DOMException("user left", "AbortError");
+    const controller = new AbortController();
+    controller.abort(reason);
+    const fetch = vi.fn((_url: URL, init?: RequestInit) =>
+      Promise.reject(init?.signal?.reason),
+    );
+    const discovery = createYouTubeDiscovery({
+      apiKey: "yt-key",
+      fetch: fetch as typeof globalThis.fetch,
+      now: () => 0,
+      retryBaseDelayMs: 0,
+    });
+
+    await expect(
+      discovery.discover({ limit: 5, signal: controller.signal }),
+    ).rejects.toBe(reason);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it("returns an empty list when search finds nothing", async () => {
     const fetch = vi.fn().mockResolvedValueOnce(Response.json({ items: [] }));
     const discovery = createYouTubeDiscovery({
