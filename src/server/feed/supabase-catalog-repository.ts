@@ -17,6 +17,7 @@ import {
 
 const CATALOG_TABLE = "capcheck_catalog_items";
 const REFRESH_TABLE = "capcheck_refresh_runs";
+const STALE_REFRESH_MS = 15 * 60 * 1000;
 
 const CATALOG_COLUMNS =
   "id, youtube_video_id, url, title, channel_title, thumbnail_url, duration_seconds, category, tldr, cap_score, cap_label, scorecard, analyzed_at";
@@ -113,6 +114,22 @@ export class SupabaseCatalogRepository implements CatalogRepository {
 
   async createRefreshRun(input: NewRefreshRun = {}): Promise<RefreshRun> {
     const writer = this.requireWriter();
+    const recoveredAt = new Date().toISOString();
+    const staleBefore = new Date(Date.now() - STALE_REFRESH_MS).toISOString();
+    const { error: recoveryError } = await writer
+      .from(REFRESH_TABLE)
+      .update({
+        status: "failed",
+        completed_at: recoveredAt,
+        error: "STALE_REFRESH_RECOVERED",
+      })
+      .eq("status", "running")
+      .lt("started_at", staleBefore);
+    if (recoveryError) {
+      throw new Error(
+        `Failed to recover stale refresh runs: ${recoveryError.message}`,
+      );
+    }
     const { data, error } = await writer
       .from(REFRESH_TABLE)
       .insert({

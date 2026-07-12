@@ -33,11 +33,13 @@ detail at `/feed/[id]`, analyzer moved to `/analyze`.
   is mounted and reloads the server feed after success. Repository-backed atomic single-flight,
   duplicate races, safe finalization failure, unsafe metadata rejection, bounded YouTube retries,
   SSE/analyzer cancellation, and desktop/mobile refresh/retry coverage are implemented.
-- **PR #39 deterministic evidence (2026-07-12):** lint and typecheck clean; 290 unit tests passed
+- **PR #39 deterministic evidence (2026-07-12):** lint and typecheck clean; 296 unit tests passed
   with 6 credential-gated skips; production build passed; Playwright passed 35 with 1 existing
   skip across desktop/mobile. Diagnosis localized the initial live failure to discovery emitting a
   YouTube `/watch?v=` URL that ingestion rejected before temp allocation. A regression test now
   covers that seam; the original bounded one-candidate live smoke passed in 92.72 seconds.
+- **PR #41 compatibility:** merged `origin/main` at `08620b7`; the grotesque-flat UI remains
+  authoritative and Issue #28 adds only the feed button mount plus its small scoped styles.
 - **Contract notes discovered by Lane A** (authoritative in `src/domain/analysis.ts`):
   cap labels are `"no-cap" | "some-cap" | "full-of-cap"`; verdicts
   `"true" | "mostly-true" | "unverifiable" | "false"`; trust tiers at

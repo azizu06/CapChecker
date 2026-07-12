@@ -105,7 +105,20 @@ test("verified feed lists vetted cards and opens the detail embed", async ({
 
 test("refreshes twice with truthful counts, reloads the feed, and retries safely", async ({
   page,
-}) => {
+}, testInfo) => {
+  if (testInfo.project.name === "mobile-chromium") {
+    await page.setViewportSize({ width: 375, height: 812 });
+  }
+  const runtimeErrors: string[] = [];
+  page.on("console", (message) => {
+    if (
+      message.type() === "error" &&
+      !message.text().startsWith("Failed to load resource:")
+    ) {
+      runtimeErrors.push(message.text());
+    }
+  });
+  page.on("pageerror", (error) => runtimeErrors.push(error.message));
   let refreshRequests = 0;
   page.on("request", (request) => {
     if (request.method() === "POST" && request.url().includes("/api/feed/refresh")) {
@@ -114,6 +127,9 @@ test("refreshes twice with truthful counts, reloads the feed, and retries safely
   });
   await page.goto("/");
   const button = page.locator(".refresh-feed button");
+  await button.focus();
+  await expect(button).toBeFocused();
+  await expect(button).toHaveCSS("outline-style", "solid");
   let releaseRequest!: () => void;
   const requestGate = new Promise<void>((resolve) => {
     releaseRequest = resolve;
@@ -167,4 +183,10 @@ test("refreshes twice with truthful counts, reloads the feed, and retries safely
     "1 found · 0 analyzed · 0 kept · 0 rejected · 1 duplicate",
     { timeout: 15_000 },
   );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  expect(runtimeErrors).toEqual([]);
 });
