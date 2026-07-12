@@ -2,10 +2,7 @@ import { z } from "zod";
 
 import { ClaimSchema } from "@/domain/analysis";
 import type { ProgressEvent } from "@/domain/analysis";
-import type {
-  ActiveGeminiFile,
-  VideoIngestionSource,
-} from "@/server/ingestion/video-ingestion";
+import type { VideoIngestionSource } from "@/server/ingestion/video-ingestion";
 
 export const QuantitativeClaimSchema = z
   .object({
@@ -53,17 +50,23 @@ type ExtractionOptions = {
   onProgress(event: ProgressEvent): void;
 };
 
+type GeminiVideoReference = {
+  name?: string;
+  uri: string;
+  mimeType?: string;
+};
+
 type ClaimExtractionIngestor = {
   withActiveFile<Result>(
     source: VideoIngestionSource,
     options: ExtractionOptions,
-    consume: (file: ActiveGeminiFile) => Promise<Result>,
+    consume: (file: GeminiVideoReference) => Promise<Result>,
   ): Promise<Result>;
 };
 
 type GeminiClaimGenerator = {
   generate(input: {
-    file: ActiveGeminiFile;
+    file: GeminiVideoReference;
     signal: AbortSignal;
   }): Promise<unknown>;
 };

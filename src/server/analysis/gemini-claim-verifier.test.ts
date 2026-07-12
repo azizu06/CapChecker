@@ -180,7 +180,9 @@ describe("Gemini claim verifier", () => {
       "The company increased revenue by five percent.",
     );
     expect(body.contents[0].parts[0].text).toContain("Use Google Search");
-    expect(body.generationConfig).toBeUndefined();
+    expect(body.generationConfig).toEqual({
+      thinkingConfig: { thinkingLevel: "low" },
+    });
     const classificationBody = JSON.parse(String(fetch.mock.calls[1][1]?.body));
     expect(classificationBody.contents[1]).toEqual(signedSearchTurn);
     expect(classificationBody.generationConfig.responseJsonSchema.required).toEqual([
@@ -188,6 +190,9 @@ describe("Gemini claim verifier", () => {
       "confidence",
       "explanation",
     ]);
+    expect(classificationBody.generationConfig.thinkingConfig).toEqual({
+      thinkingLevel: "low",
+    });
   });
 
   it("does not grant authority from hostile page titles or substring hostnames", async () => {

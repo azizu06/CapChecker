@@ -185,7 +185,42 @@ const tikTokHosts = new Set([
   "vt.tiktok.com",
 ]);
 
+export const normalizeYouTubeVideoUrl = (value: string) => {
+  try {
+    const url = new URL(value);
+    if (
+      !["http:", "https:"].includes(url.protocol) ||
+      url.username ||
+      url.password
+    ) {
+      return undefined;
+    }
+
+    const parts = url.pathname.split("/").filter(Boolean);
+    let videoId: string | undefined;
+    if (youtubeHosts.has(url.hostname)) {
+      videoId =
+        parts[0] === "shorts" && parts[1]
+          ? parts[1]
+          : parts[0] === "watch"
+            ? url.searchParams.get("v") ?? undefined
+            : undefined;
+    } else if (url.hostname === "youtu.be") {
+      videoId = parts[0];
+    }
+    return videoId
+      ? `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`
+      : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+export const isYouTubeVideoUrl = (value: string) =>
+  normalizeYouTubeVideoUrl(value) !== undefined;
+
 const isSupportedVideoUrl = (value: string) => {
+  if (isYouTubeVideoUrl(value)) return true;
   try {
     const url = new URL(value);
     if (
@@ -197,11 +232,6 @@ const isSupportedVideoUrl = (value: string) => {
     }
 
     const parts = url.pathname.split("/").filter(Boolean);
-    if (youtubeHosts.has(url.hostname)) {
-      if (parts[0] === "shorts") return Boolean(parts[1]);
-      return parts[0] === "watch" && Boolean(url.searchParams.get("v"));
-    }
-    if (url.hostname === "youtu.be") return Boolean(parts[0]);
     if (tikTokHosts.has(url.hostname)) return parts.length > 0;
     return false;
   } catch {

@@ -90,6 +90,7 @@ describe("Gemini scorecard synthesizer", () => {
     });
     const request = JSON.parse(fetch.mock.calls[0][1].body as string);
     expect(request.generationConfig).toMatchObject({
+      thinkingConfig: { thinkingLevel: "low" },
       responseMimeType: "application/json",
       responseJsonSchema: {
         properties: {

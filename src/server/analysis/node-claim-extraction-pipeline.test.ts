@@ -9,6 +9,98 @@ const MP4_BYTES = Uint8Array.from([
 ]);
 
 describe("createNodeClaimExtractionPipeline", () => {
+  it("sends a public YouTube URL directly to Gemini without downloading or uploading it", async () => {
+    const extraction = {
+      transcript: [{ timestampSeconds: 1, text: "Index funds reduce risk." }],
+      claims: [
+        {
+          id: "claim-1",
+          text: "Index funds reduce risk.",
+          timestampSeconds: 1,
+          kind: "factual",
+          checkable: true,
+        },
+      ],
+    };
+    const fetch = vi.fn().mockResolvedValue(
+      Response.json({
+        candidates: [
+          { content: { parts: [{ text: JSON.stringify(extraction) }] } },
+        ],
+      }),
+    );
+    const ytDlpRun = vi.fn();
+    const pipeline = createNodeClaimExtractionPipeline({
+      apiKey: "test-api-key",
+      fetch,
+      ytDlpRun,
+    });
+    const progress: unknown[] = [];
+
+    await expect(
+      pipeline.extract(
+        { kind: "url", url: "https://www.youtube.com/shorts/demo" },
+        {
+          signal: new AbortController().signal,
+          onProgress: (event) => progress.push(event),
+        },
+      ),
+    ).resolves.toEqual(extraction);
+
+    expect(ytDlpRun).not.toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledOnce();
+    const body = JSON.parse(String(fetch.mock.calls[0][1]?.body));
+    expect(body.contents[0].parts[0]).toEqual({
+      fileData: {
+        fileUri: "https://www.youtube.com/watch?v=demo",
+      },
+    });
+    expect(progress).toEqual([
+      {
+        type: "progress",
+        stage: "fetching",
+        message: "Sending the public YouTube video to Gemini",
+      },
+      {
+        type: "progress",
+        stage: "processing",
+        message: "Preparing the video with Gemini",
+      },
+      {
+        type: "progress",
+        stage: "extracting",
+        message: "Extracting transcript and financial claims",
+      },
+    ]);
+  });
+
+  it("falls back to yt-dlp when Gemini rejects the direct YouTube URL", async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response(null, { status: 503 }));
+    const ytDlpRun = vi.fn().mockResolvedValue({
+      exitCode: 1,
+      stdout: "",
+      stderr: "source unavailable",
+    });
+    const pipeline = createNodeClaimExtractionPipeline({
+      apiKey: "test-api-key",
+      fetch,
+      ytDlpRun,
+    });
+
+    await expect(
+      pipeline.extract(
+        { kind: "url", url: "https://youtu.be/demo" },
+        {
+          signal: new AbortController().signal,
+          onProgress: () => undefined,
+        },
+      ),
+    ).rejects.toMatchObject({ code: "SOURCE_VIDEO_UNAVAILABLE" });
+
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(ytDlpRun).toHaveBeenCalledOnce();
+  });
+
   it("extracts claims inside the ACTIVE-file lease and leaves cleanup to ingestion", async () => {
     const extraction = {
       transcript: [

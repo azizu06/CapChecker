@@ -92,6 +92,7 @@ describe("Gemini claim generator", () => {
       "Every claim containing a number",
     );
     expect(body.generationConfig).toMatchObject({
+      thinkingConfig: { thinkingLevel: "low" },
       responseMimeType: "application/json",
       responseJsonSchema: {
         type: "object",
