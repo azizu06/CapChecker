@@ -174,6 +174,33 @@ SUPABASE_SERVICE_ROLE_KEY=... \
 npm run test:unit -- src/server/feed/refresh/refresh.live.test.ts
 ```
 
+### Demo runbook
+
+Seed the persisted Supabase catalog before the demo. The seed is idempotent, so
+it is safe to run again if the catalog has already been prepared:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=... \
+NEXT_PUBLIC_SUPABASE_ANON_KEY=... \
+SUPABASE_SERVICE_ROLE_KEY=... \
+npx tsx scripts/seed-feed.ts
+```
+
+For a credential-free rehearsal, keep `CAPCHECK_ANALYSIS_MODE=fixture` and
+`CAPCHECK_FEED_MODE=fixture`, start the app, and click **Refresh feed** twice.
+The first refresh adds the deterministic candidate and the second reports one
+duplicate without adding another card.
+
+For the live demo, configure the Supabase variables above plus
+`YOUTUBE_API_KEY`, `GEMINI_API_KEY`, and `FINNHUB_KEY`, and do not set
+`CAPCHECK_FEED_MODE=fixture`. Click **Refresh feed** once and wait for the final
+counts before trying again. If the UI reports a retryable YouTube, Gemini,
+timeout, or database failure, keep the page open and retry once after the
+upstream service recovers. Do not clear or reseed the catalog: failed refreshes
+leave the last good persisted cards unchanged. If the retry also fails, reload
+the page and continue the demo from those persisted cards and their detail
+pages instead of depending on another live refresh.
+
 ## UI design contract
 
 All user-facing work follows the shared tokens, component anatomy, responsive
