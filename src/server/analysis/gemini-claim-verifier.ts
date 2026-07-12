@@ -321,6 +321,16 @@ export function createGeminiClaimVerifier({
   }
 
   const request = async (body: unknown, signal: AbortSignal) => {
+    const requestBody =
+      body && typeof body === "object" && !Array.isArray(body)
+        ? {
+            ...body,
+            generationConfig: {
+              ...((body as { generationConfig?: object }).generationConfig ?? {}),
+              thinkingConfig: { thinkingLevel: "low" },
+            },
+          }
+        : body;
     let response: Response | undefined;
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
       const timeout = new AbortController();
@@ -337,7 +347,7 @@ export function createGeminiClaimVerifier({
               "Content-Type": "application/json",
               "X-Goog-Api-Key": apiKey,
             },
-            body: JSON.stringify(body),
+            body: JSON.stringify(requestBody),
             signal: AbortSignal.any([signal, timeout.signal]),
           },
         );

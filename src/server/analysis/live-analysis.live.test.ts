@@ -46,9 +46,27 @@ describe.skipIf(!enabled)("live analysis smoke", () => {
       finnhubApiKey: process.env.FINNHUB_KEY!,
     });
     const events = [];
+    const startedAt = performance.now();
+    const timings: Array<{
+      stage: string;
+      elapsedMs: number;
+      detail?: string;
+    }> = [];
     for await (const event of stream(source, new AbortController().signal)) {
       events.push(AnalysisEventSchema.parse(event));
+      timings.push({
+        stage: event.type === "progress" ? event.stage : event.type,
+        elapsedMs: Math.round(performance.now() - startedAt),
+        detail:
+          event.type === "progress"
+            ? event.message
+            : event.type === "complete"
+              ? `${event.scorecard.verifications.length} verified, ${event.scorecard.skippedClaims?.length ?? 0} skipped, Cap Score ${event.scorecard.capScore}`
+              : event.error.code,
+      });
     }
+
+    console.info(`[live-analysis-timing] ${JSON.stringify(timings)}`);
 
     expect(
       events.flatMap((event) =>

@@ -163,6 +163,7 @@ export function createGeminiScorecardSynthesizer({
           },
         ],
         generationConfig: {
+          thinkingConfig: { thinkingLevel: "low" },
           responseMimeType: "application/json",
           responseJsonSchema,
         },

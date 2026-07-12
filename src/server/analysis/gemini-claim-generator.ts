@@ -1,5 +1,3 @@
-import type { ActiveGeminiFile } from "@/server/ingestion/video-ingestion";
-
 const DEFAULT_BASE_URL = "https://generativelanguage.googleapis.com";
 const DEFAULT_MODEL = "gemini-3.5-flash";
 const transientStatuses = new Set([408, 429, 500, 502, 503, 504]);
@@ -105,7 +103,11 @@ type GeminiClaimGeneratorOptions = {
 };
 
 type GenerateInput = {
-  file: ActiveGeminiFile;
+  file: {
+    name?: string;
+    uri: string;
+    mimeType?: string;
+  };
   signal: AbortSignal;
 };
 
@@ -196,7 +198,7 @@ export function createGeminiClaimGenerator({
                       {
                         fileData: {
                           fileUri: file.uri,
-                          mimeType: file.mimeType,
+                          ...(file.mimeType ? { mimeType: file.mimeType } : {}),
                         },
                       },
                       { text: extractionPrompt },
@@ -204,6 +206,7 @@ export function createGeminiClaimGenerator({
                   },
                 ],
                 generationConfig: {
+                  thinkingConfig: { thinkingLevel: "low" },
                   responseMimeType: "application/json",
                   responseJsonSchema,
                 },

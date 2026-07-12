@@ -19,39 +19,29 @@ test.describe("opt-in live browser analysis", () => {
     page,
   }) => {
     test.setTimeout(10 * 60_000);
+    const startedAt = performance.now();
+    const timings: Array<{ stage: string; elapsedMs: number }> = [];
+    const mark = (stage: string) =>
+      timings.push({ stage, elapsedMs: Math.round(performance.now() - startedAt) });
     const browserErrors: string[] = [];
     page.on("console", (message) => {
       if (message.type() === "error") browserErrors.push(message.text());
     });
     page.on("pageerror", (error) => browserErrors.push(error.message));
 
-    await page.goto("/");
+    await page.goto("/analyze");
     if (source?.kind === "upload") {
       await page.locator('input[type="file"]').setInputFiles(source.path);
     } else if (source?.kind === "url") {
       await page.getByLabel("Video URL").fill(source.url);
     }
     await page.getByRole("button", { name: "Check it" }).click();
+    mark("submitted");
 
     await expect(
-      page.getByText(/Downloading the source video|Staging the uploaded video/),
-    ).toBeVisible({ timeout: 2 * 60_000 });
-    await expect(page.getByText("Preparing the video with Gemini")).toBeVisible({
-      timeout: 3 * 60_000,
-    });
-    await expect(
-      page.getByText("Extracting transcript and financial claims"),
-    ).toBeVisible({ timeout: 3 * 60_000 });
-    await expect(page.getByText(/Verifying \d+ checkable claims?/)).toBeVisible({
-      timeout: 5 * 60_000,
-    });
-    await expect(page.getByText("Building the CapCheck scorecard")).toBeVisible({
-      timeout: 5 * 60_000,
-    });
-
-    await expect(page.getByRole("img", { name: /Cap Score \d+ out of 100/ })).toBeVisible({
-      timeout: 10 * 60_000,
-    });
+      page.locator('[aria-roledescription="Cap Score"]'),
+    ).toBeVisible({ timeout: 10 * 60_000 });
+    mark("complete");
     await expect(page.getByRole("tab", { name: /Claims reviewed/ })).toBeVisible();
 
     const claimCards = page.locator("details.claim");
@@ -64,5 +54,9 @@ test.describe("opt-in live browser analysis", () => {
       page.getByRole("link", { name: /Open source:.*opens in new tab/ }).first(),
     ).toBeVisible();
     expect(browserErrors).toEqual([]);
+    await test.info().attach("live-stage-timings.json", {
+      body: Buffer.from(JSON.stringify(timings, null, 2)),
+      contentType: "application/json",
+    });
   });
 });

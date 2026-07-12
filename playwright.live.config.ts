@@ -8,6 +8,8 @@ const liveEnvironment = Object.fromEntries(
 // Prevent a local dotenv file from silently turning this live smoke into the
 // deterministic fixture path.
 liveEnvironment.CAPCHECK_ANALYSIS_MODE = "live";
+const livePort = process.env.CAPCHECK_LIVE_PORT ?? "3317";
+const liveBaseUrl = `http://127.0.0.1:${livePort}`;
 
 export default defineConfig({
   testDir: "./e2e-live",
@@ -17,9 +19,11 @@ export default defineConfig({
   retries: 0,
   reporter: "list",
   use: {
-    baseURL: "http://127.0.0.1:3100",
+    baseURL: liveBaseUrl,
     screenshot: "only-on-failure",
-    trace: "retain-on-failure",
+    trace:
+      process.env.CAPCHECK_LIVE_TRACE === "1" ? "on" : "retain-on-failure",
+    video: process.env.CAPCHECK_LIVE_VIDEO === "1" ? "on" : "off",
   },
   projects: [
     {
@@ -28,8 +32,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev -- --hostname 127.0.0.1 --port 3100",
-    url: "http://127.0.0.1:3100",
+    command: `npm run dev -- --hostname 127.0.0.1 --port ${livePort}`,
+    url: `${liveBaseUrl}/analyze`,
     env: liveEnvironment,
     reuseExistingServer: false,
     timeout: 120_000,
