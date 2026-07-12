@@ -6,6 +6,7 @@ import {
 
 import type { Scorecard } from "@/domain/analysis";
 import { formatTimestamp } from "@/lib/format-timestamp";
+import { sourceOrientation } from "@/lib/source-orientation";
 
 import { ClaimCard } from "./claim-card";
 import { HowItWorks } from "./how-it-works";
@@ -213,7 +214,11 @@ export function ScorecardView({
         </div>
 
         <aside className="source-rail" aria-label="Checked video">
-          <div className="video-facade" aria-hidden="true">
+          <div
+            className="video-facade"
+            data-orientation={sourceOrientation(scorecard.source)}
+            aria-hidden="true"
+          >
             <Play />
           </div>
           <div className="source-details">

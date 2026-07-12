@@ -207,6 +207,13 @@ test("mixed result exposes every claim and safe evidence destination, then re-ch
     ),
   ).toBeVisible();
   await expect(page.getByText(/Checked:/)).toBeVisible();
+  const videoFacade = page.locator(".video-facade");
+  await expect(videoFacade).toHaveAttribute("data-orientation", "vertical");
+  const videoFacadeRatio = await videoFacade.evaluate((element) => {
+    const { width, height } = element.getBoundingClientRect();
+    return width / height;
+  });
+  expect(videoFacadeRatio).toBeCloseTo(9 / 16, 2);
   await expect(page.getByText(/Verdict weights determine the score/)).toBeVisible();
   await expect(page.getByText(/hype is shown separately and does not add points/)).toBeVisible();
   await expect(page.getByText(/Evidence may be high, medium, or low trust—or unavailable/)).toBeVisible();
