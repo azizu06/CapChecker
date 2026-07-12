@@ -33,15 +33,22 @@ detail at `/feed/[id]`, analyzer moved to `/analyze`.
   1c/2a system (Instrument Sans, square geometry, ink interaction, flat rules).
   A real headed-browser screenshot pass was completed at desktop and 375px.
   Impeccable was not installed in the active Codex skill inventory.
-- **Teammate integration:** merged `origin/main` at `424a865`, preserving PRs
+- **Teammate integration:** merged `origin/main` at `efbf7d7`, preserving PRs
   #43 (source orientation), #44 (logo/header), and #45 (landscape rail and
-  external-link wrapping) without editing their analyzer-owned components.
-- **Issue #29 final local gate (Node 22.19.0):** lint and typecheck clean; 317
+  external-link wrapping), plus #46 (transparent logo), without editing their
+  analyzer-owned components.
+- **Issue #29 final local gate (Node 22.19.0):** lint and typecheck clean; 318
   unit tests passed with 6 credential-gated skips; production build passed; 38
   Playwright tests passed with 2 expected skips across desktop/mobile Chromium.
 - **Live catalog:** the eight fixture items were inserted into the approved
   `dev-personal` Supabase catalog using server-only `.env.local` credentials;
-  persisted IDs now use the table's UUID contract.
+  persisted IDs use the table's UUID contract. The review-corrected durations
+  were re-seeded idempotently across all eight rows.
+- **PR #47 review fixes:** unavailable cards now navigate to a truthful detail
+  state with no iframe; category filters expose a named accessible group;
+  creator/TLDR/category/title search paths are asserted; console checks are
+  strict with deterministic thumbnail interception; stale header/navigation
+  spec language is reconciled with the approved ink/image system.
 
 - **PR #40 (issue #27, this PR):** migration `supabase/migrations/20260711120000_capcheck_verified_feed.sql`,
   `src/domain/feed.ts` (CatalogItem/RefreshRun Zod), `src/server/feed/catalog-repository.ts`

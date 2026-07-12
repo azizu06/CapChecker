@@ -18,7 +18,13 @@ const subscribeToReferenceTime = () => () => undefined;
 const getClientReferenceTime = () => clientReferenceTime;
 const getServerReferenceTime = () => null;
 
-export function FeedExplorer({ items }: { items: readonly CatalogItem[] }) {
+export function FeedExplorer({
+  items,
+  detailState,
+}: {
+  items: readonly CatalogItem[];
+  detailState?: "unavailable";
+}) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<CatalogCategory | "all">("all");
   const referenceTime = useSyncExternalStore(
@@ -86,7 +92,11 @@ export function FeedExplorer({ items }: { items: readonly CatalogItem[] }) {
       </div>
 
       <div className="feed-filter-row">
-        <div className="feed-filters" aria-label="Filter by category">
+        <div
+          className="feed-filters"
+          role="group"
+          aria-label="Filter by category"
+        >
           <button
             type="button"
             aria-pressed={category === "all"}
@@ -126,7 +136,11 @@ export function FeedExplorer({ items }: { items: readonly CatalogItem[] }) {
         <ul className="feed-grid" aria-label="Verified videos">
           {visibleItems.map((item) => (
             <li key={item.id}>
-              <FeedCard item={item} referenceTime={referenceTime} />
+              <FeedCard
+                item={item}
+                referenceTime={referenceTime}
+                detailState={item.url === null ? detailState : undefined}
+              />
             </li>
           ))}
         </ul>

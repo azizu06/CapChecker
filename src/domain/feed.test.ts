@@ -35,6 +35,21 @@ describe("CatalogItemSchema", () => {
     }
   });
 
+  it("keeps reviewed YouTube durations aligned with current metadata", () => {
+    const durations = Object.fromEntries(
+      FIXTURE_CATALOG_ITEMS.map((fixture) => [
+        fixture.youtubeVideoId,
+        fixture.durationSeconds,
+      ]),
+    );
+
+    expect(durations).toMatchObject({
+      "bO0h3Of-WZ4": 15,
+      "6cRg9bnSnvg": 415,
+      TNC1frNq20c: 392,
+    });
+  });
+
   it("rejects a category outside the approved set", () => {
     expect(
       CatalogItemSchema.safeParse({ ...item, category: "crypto" }).success,

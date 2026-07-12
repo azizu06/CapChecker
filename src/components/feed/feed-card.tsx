@@ -9,9 +9,11 @@ import { CapScorePill } from "./cap-score-pill";
 export function FeedCard({
   item,
   referenceTime,
+  detailState,
 }: {
   item: CatalogItem;
   referenceTime: number | null;
+  detailState?: "unavailable";
 }) {
   const duration = formatDuration(item.durationSeconds);
   const stale =
@@ -20,7 +22,10 @@ export function FeedCard({
     30 * 24 * 60 * 60 * 1000;
 
   return (
-    <Link className="feed-card" href={`/feed/${item.id}`}>
+    <Link
+      className="feed-card"
+      href={`/feed/${item.id}${detailState === "unavailable" ? "?feedState=unavailable" : ""}`}
+    >
       <div className="feed-thumb">
         {/* Grid uses a static thumbnail image — never an embedded iframe. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}

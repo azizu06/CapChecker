@@ -1,4 +1,19 @@
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
+
+const TRANSPARENT_PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+  "base64",
+);
+
+async function mockYoutubeThumbnails(page: Page) {
+  await page.route("https://i.ytimg.com/**", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "image/png",
+      body: TRANSPARENT_PNG,
+    }),
+  );
+}
 
 async function expectSafeExternalLink(link: Locator) {
   await expect(link).toBeVisible();
@@ -113,13 +128,11 @@ test("searches, filters, resets, and recovers across every feed state", async ({
   if (testInfo.project.name === "mobile-chromium") {
     await page.setViewportSize({ width: 375, height: 812 });
   }
+  await mockYoutubeThumbnails(page);
   await page.emulateMedia({ reducedMotion: "reduce" });
   const runtimeErrors: string[] = [];
   page.on("console", (message) => {
-    if (
-      message.type() === "error" &&
-      !message.text().startsWith("Failed to load resource:")
-    ) {
+    if (message.type() === "error") {
       runtimeErrors.push(message.text());
     }
   });
@@ -174,6 +187,12 @@ test("searches, filters, resets, and recovers across every feed state", async ({
 
   await page.goto("/?feedState=unavailable");
   await expect(page.getByText("Video unavailable")).toBeVisible();
+  await page.locator(".feed-card").click();
+  await expect(
+    page.getByText("This YouTube video is unavailable."),
+  ).toBeVisible();
+  await expect(page.locator(".feed-detail iframe")).toHaveCount(0);
+  await page.getByRole("link", { name: /back to feed/i }).click();
   await page.goto("/feed/does-not-exist");
   await expect(page.getByText(/couldn't find that video/i)).toBeVisible();
   await page.getByRole("link", { name: /back to feed/i }).click();
@@ -193,12 +212,10 @@ test("refreshes twice with truthful counts, reloads the feed, and retries safely
   if (testInfo.project.name === "mobile-chromium") {
     await page.setViewportSize({ width: 375, height: 812 });
   }
+  await mockYoutubeThumbnails(page);
   const runtimeErrors: string[] = [];
   page.on("console", (message) => {
-    if (
-      message.type() === "error" &&
-      !message.text().startsWith("Failed to load resource:")
-    ) {
+    if (message.type() === "error") {
       runtimeErrors.push(message.text());
     }
   });
@@ -254,7 +271,11 @@ test("refreshes twice with truthful counts, reloads the feed, and retries safely
   await page.route("**/api/feed/refresh", async (route) => {
     if (failNext) {
       failNext = false;
-      await route.abort("failed");
+      await route.fulfill({
+        status: 200,
+        contentType: "text/event-stream",
+        body: "invalid refresh stream",
+      });
       return;
     }
     await route.continue();

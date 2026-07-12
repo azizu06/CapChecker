@@ -92,9 +92,10 @@ inversion. Do not restore the superseded blue accent.
 
 ### App header
 
-Use a compact wordmark row: shield/check icon, `CapCheck`, and the descriptor
-`Financial advice, fact-checked`. Use `Check it` for the primary action. No full
-dashboard sidebar for the hackathon flow.
+Use the prepared square CapCheck image mark beside the `CapCheck` wordmark.
+The shared header carries the route navigation; analyzer context and actions
+must not add a second identity row. Use `Check it` for the primary action. No
+full dashboard sidebar for the hackathon flow.
 
 ### Intake panel
 
@@ -170,9 +171,10 @@ components as the analyzer — no second palette, no gradients.
 ### Shared header and navigation
 
 - `/` (Feed) and `/analyze` share one compact, sticky CapCheck header: the
-  shield brand mark plus `Feed` and `Analyze` nav links.
-- The active route is visibly marked (accent text on an `--accent-dim` chip) and
-  carries `aria-current="page"`. Feed is active for `/` and any `/feed/*` detail.
+  prepared square image mark plus `Feed` and `Analyze` nav links.
+- The active route uses ink text with an underline and carries
+  `aria-current="page"`; do not restore the superseded accent chip. Feed is
+  active for `/` and any `/feed/*` detail.
 
 ### Feed home (`/`)
 

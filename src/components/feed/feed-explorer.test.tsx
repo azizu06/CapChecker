@@ -29,11 +29,26 @@ describe("FeedExplorer", () => {
     expect(screen.getAllByRole("listitem")).toHaveLength(
       FIXTURE_CATALOG_ITEMS.length,
     );
+
+    await user.type(search, "Khan Academy");
+    expect(
+      screen.getByRole("link", { name: /what is a credit score/i }),
+    ).toBeVisible();
+    await user.click(screen.getByRole("button", { name: /clear search/i }));
+
+    await user.type(search, "tax advantages");
+    expect(
+      screen.getByRole("link", { name: /financial silver bullet/i }),
+    ).toBeVisible();
   });
 
   it("filters by finance category and resets every active filter", async () => {
     const user = userEvent.setup();
     render(<FeedExplorer items={FIXTURE_CATALOG_ITEMS} />);
+
+    expect(
+      screen.getByRole("group", { name: "Filter by category" }),
+    ).toBeVisible();
 
     await user.click(screen.getByRole("button", { name: "Budgeting" }));
 

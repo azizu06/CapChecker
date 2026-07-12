@@ -83,7 +83,10 @@ export default async function FeedHome({
           </div>
         </div>
       ) : (
-        <FeedExplorer items={items} />
+        <FeedExplorer
+          items={items}
+          detailState={fixtureState === "unavailable" ? "unavailable" : undefined}
+        />
       )}
     </main>
   );
