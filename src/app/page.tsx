@@ -2,8 +2,10 @@ import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
 
 import { FeedExplorer } from "@/components/feed/feed-explorer";
+import { PortfolioDemoNotice } from "@/components/portfolio-demo-notice";
 import { RefreshFeedButton } from "@/components/refresh-feed-button";
 import type { CatalogItem } from "@/domain/feed";
+import { isPortfolioDemoMode } from "@/lib/portfolio-mode";
 import { getCatalogRepository } from "@/server/feed/catalog-repository";
 
 export const dynamic = "force-dynamic";
@@ -15,6 +17,7 @@ export default async function FeedHome({
 }) {
   let items: CatalogItem[] = [];
   let failed = false;
+  const portfolioDemo = isPortfolioDemoMode();
   const { feedState } = await searchParams;
   const fixtureState =
     process.env.NODE_ENV !== "production" &&
@@ -55,7 +58,11 @@ export default async function FeedHome({
           only if its claims held up. Open one to see the Cap Score, the
           evidence, and the citations behind it.
         </p>
-        <RefreshFeedButton />
+        {portfolioDemo ? (
+          <PortfolioDemoNotice feature="refresh" />
+        ) : (
+          <RefreshFeedButton />
+        )}
       </section>
 
       {failed ? (

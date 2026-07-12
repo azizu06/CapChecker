@@ -5,9 +5,25 @@ scorecard. A user can paste a video URL or upload a video, follow the analysis
 stages, and inspect the evidence behind each supported, contradicted, or
 unverifiable claim.
 
-This repository contains the Bloomberg Hackathon 2026 application. Local and
-browser tests use deterministic fixtures, while live mode streams the real
-analysis pipelines through the same runtime-validated contracts.
+Built for BloomKnights 2026, CapCheck combines Gemini video understanding,
+Google Search grounding, Finnhub market data, and a Supabase-backed Verified
+Feed.
+
+> **Project status:** Complete and preserved as a read-only portfolio showcase.
+> Browse the deployed app at [capcheck-sigma.vercel.app](https://capcheck-sigma.vercel.app/).
+> The persisted feed and evidence pages remain live; paid/private analysis and
+> refresh integrations were retired after the hackathon.
+
+## What shipped
+
+- URL and upload intake with streamed analysis progress.
+- Gemini claim extraction, grounded verification, and deterministic Cap Scores.
+- Finnhub function calling for quantitative market claims.
+- A searchable, category-filtered catalog of CapCheck-vetted YouTube videos.
+- Supabase persistence, idempotent refresh runs, reliability gating, and safe
+  failure behavior.
+- Responsive, accessible feed, detail, and scorecard experiences backed by
+  deterministic unit and Playwright coverage.
 
 ## Local setup
 
@@ -71,11 +87,10 @@ The shared seam is the Zod-validated `AnalysisEvent` contract in
 completion, and error events that a live adapter must produce. The UI consumes
 only the SSE response from `/api/analyze`; it does not import either adapter.
 
-Lane A can introduce the live yt-dlp, Gemini, and evidence-grounding adapter by
-selecting it on the server while preserving the route and `AnalysisEvent`
-stream. Lane B can continue working against fixtures. Contract changes require
-a coordinated update to schemas, fixtures, adapter tests, parser tests, and UI
-tests before either lane depends on them.
+The production implementation selects the live yt-dlp, Gemini, Search
+grounding, and Finnhub adapters while preserving the same `AnalysisEvent`
+stream used by deterministic fixtures. Contract changes require coordinated
+updates to schemas, fixtures, adapter tests, parser tests, and UI tests.
 
 The live claim-extraction entry point is
 `createNodeClaimExtractionPipeline` in
@@ -162,6 +177,11 @@ consecutive refreshes prove idempotency (first accepts, second reports a
 duplicate) with no credentials. Live mode additionally requires a server-only
 `YOUTUBE_API_KEY` (plus `GEMINI_API_KEY`, `FINNHUB_KEY`, and
 `SUPABASE_SERVICE_ROLE_KEY`).
+
+The hosted portfolio deployment intentionally omits those private credentials.
+It reads the persisted catalog through the public Supabase anon key under RLS,
+while live refresh and analysis render an archived-demo state instead of
+calling external providers.
 
 Opt-in live smoke test (never part of CI):
 
