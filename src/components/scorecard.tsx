@@ -32,10 +32,12 @@ const displayUrl = (url: string) => url.replace(/^https?:\/\//, "");
 
 export function ScorecardView({
   scorecard,
+  uploadPreviewUrl,
   onRunAgain,
   onCheckAnother,
 }: {
   scorecard: Scorecard;
+  uploadPreviewUrl: string | null;
   onRunAgain(): void;
   onCheckAnother(): void;
 }) {
@@ -214,13 +216,23 @@ export function ScorecardView({
         </div>
 
         <aside className="source-rail" aria-label="Checked video">
-          <div
-            className="video-facade"
-            data-orientation={embedOrientation}
-            aria-hidden="true"
-          >
-            <Play />
-          </div>
+          {scorecard.source.kind === "upload" && uploadPreviewUrl ? (
+            <video
+              className="video-facade video-preview"
+              src={uploadPreviewUrl}
+              controls
+              preload="metadata"
+              aria-label={`Play uploaded video: ${scorecard.source.fileName}`}
+            />
+          ) : (
+            <div
+              className="video-facade"
+              data-orientation={embedOrientation}
+              aria-hidden="true"
+            >
+              <Play />
+            </div>
+          )}
           <div className="source-details">
             <span>Checked: <b>{sourceTitle}</b></span>
             {scorecard.source.kind === "url" ? (

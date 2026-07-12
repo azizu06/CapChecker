@@ -218,6 +218,34 @@ describe("CapCheckApp", () => {
     expect((request.body as FormData).get("file")).toEqual(file);
   });
 
+  it("plays the submitted upload in the completed result and releases its preview", async () => {
+    const createObjectURL = vi.fn(() => "blob:capcheck-upload-preview");
+    const revokeObjectURL = vi.fn();
+    vi.stubGlobal("URL", Object.assign(URL, { createObjectURL, revokeObjectURL }));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.partialFailure }),
+      ),
+    );
+    const user = userEvent.setup();
+    const { unmount } = render(<CapCheckApp />);
+    const file = new File(["video"], "earnings-demo.mp4", { type: "video/mp4" });
+
+    await user.upload(screen.getByLabelText(/choose a video file/i), file);
+    await user.click(checkItButton());
+
+    const preview = await screen.findByLabelText(
+      "Play uploaded video: demo-earnings-claims.mp4",
+    );
+    expect(preview).toHaveAttribute("src", "blob:capcheck-upload-preview");
+    expect(preview).toHaveAttribute("controls");
+    expect(createObjectURL).toHaveBeenCalledWith(file);
+
+    unmount();
+    expect(revokeObjectURL).toHaveBeenCalledWith("blob:capcheck-upload-preview");
+  });
+
   it("allows a selected upload to be removed", async () => {
     vi.stubGlobal("fetch", vi.fn());
     const user = userEvent.setup();
