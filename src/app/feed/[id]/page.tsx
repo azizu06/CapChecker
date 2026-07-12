@@ -142,7 +142,7 @@ export default async function FeedDetail({
             className={`score-num ${tone}`}
             aria-label={`Cap Score ${item.capScore} out of 100`}
           >
-            <CountUp to={item.capScore} />
+            <CountUp to={item.capScore} animate={false} />
           </div>
           <h2 id="feed-score-title" className={tone}>
             {CAP_LABELS[item.capLabel]}

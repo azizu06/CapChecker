@@ -15,6 +15,16 @@ async function mockYoutubeThumbnails(page: Page) {
   );
 }
 
+async function mockYoutubeEmbed(page: Page) {
+  await page.route("https://www.youtube-nocookie.com/embed/**", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "text/html",
+      body: "<!doctype html><title>Mock YouTube embed</title>",
+    }),
+  );
+}
+
 async function expectSafeExternalLink(link: Locator) {
   await expect(link).toBeVisible();
   const href = await link.getAttribute("href");
@@ -27,6 +37,14 @@ async function expectSafeExternalLink(link: Locator) {
 test("verified feed lists vetted cards and opens the detail embed", async ({
   page,
 }) => {
+  await mockYoutubeThumbnails(page);
+  await mockYoutubeEmbed(page);
+  const runtimeErrors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") runtimeErrors.push(message.text());
+  });
+  page.on("pageerror", (error) => runtimeErrors.push(error.message));
+
   await page.goto("/");
 
   // Shared header exposes the active Feed route.
@@ -120,6 +138,7 @@ test("verified feed lists vetted cards and opens the detail embed", async ({
   await backLink.click();
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator(".feed-card").first()).toBeVisible();
+  expect(runtimeErrors).toEqual([]);
 });
 
 test("searches, filters, resets, and recovers across every feed state", async ({

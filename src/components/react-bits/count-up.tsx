@@ -17,6 +17,7 @@ type CountUpProps = {
   from?: number;
   durationMs?: number;
   className?: string;
+  animate?: boolean;
 };
 
 // Animate only when we can both detect motion preference and drive frames.
@@ -33,14 +34,17 @@ export function CountUp({
   from = 0,
   durationMs = 200,
   className,
+  animate = true,
 }: CountUpProps) {
-  const [value, setValue] = useState(() => (canAnimate() ? from : to));
+  const [value, setValue] = useState(() =>
+    animate && canAnimate() ? from : to,
+  );
   const frameRef = useRef<number | null>(null);
 
   useEffect(() => {
     // The initializer already resolves the resting value; only animate when we
     // can drive frames, updating state asynchronously inside the rAF callback.
-    if (!canAnimate()) return;
+    if (!animate || !canAnimate()) return;
 
     const start = performance.now();
     const tick = (now: number) => {
@@ -57,7 +61,7 @@ export function CountUp({
     return () => {
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
     };
-  }, [to, from, durationMs]);
+  }, [to, from, durationMs, animate]);
 
   return <span className={className}>{value}</span>;
 }
