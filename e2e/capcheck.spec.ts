@@ -59,10 +59,16 @@ test("loads the fixture-ready CapCheck intake without runtime errors", async ({
   await gotoReady(page, "/analyze");
 
   await expect(page).toHaveTitle(/CapCheck/);
-  await expect(
-    page.locator(".app-header").getByText("CapCheck", { exact: true }),
-  ).toBeVisible();
-  await expect(page.getByText("Financial advice, fact-checked")).toBeVisible();
+  await expect(page.getByRole("link", { name: "CapCheck" })).toBeVisible();
+  await expect(page.locator(".site-header .brand-mark img")).toHaveAttribute(
+    "src",
+    "/logo-mark.png",
+  );
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
+    "href",
+    /\/icon\.png/,
+  );
+  await expect(page.locator(".app-header")).toHaveCount(0);
   await expect(
     page.getByRole("heading", {
       name: "Is that stock tip cap? Check before you act.",

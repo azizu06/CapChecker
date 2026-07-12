@@ -153,9 +153,6 @@ export function CapCheckApp() {
     return (
       <main className="app app--results">
         <header className="results-header">
-          <span className="brand-mark" aria-hidden="true" />
-          <strong>CapCheck</strong>
-          <span className="tagline">Financial advice, fact-checked</span>
           <form className="mini-intake" onSubmit={analyzeNext} noValidate>
             <input
               type="url"
@@ -187,11 +184,6 @@ export function CapCheckApp() {
 
   return (
     <main className="app app--landing">
-      <header className="app-header">
-        <span className="brand-mark" aria-hidden="true" />
-        <strong>CapCheck</strong>
-        <span className="tagline">Financial advice, fact-checked</span>
-      </header>
       <div className="landing-grid">
         <section className="hero" aria-labelledby="page-title">
           <h1 id="page-title">
