@@ -1,5 +1,4 @@
 import {
-  ExternalLink,
   Play,
   ShieldCheck,
 } from "lucide-react";
@@ -9,6 +8,7 @@ import { formatTimestamp } from "@/lib/format-timestamp";
 import { sourceOrientation } from "@/lib/source-orientation";
 
 import { ClaimCard } from "./claim-card";
+import { ExternalLinkLabel } from "./external-link-label";
 import { HowItWorks } from "./how-it-works";
 import { CountUp } from "./react-bits/count-up";
 import { ResultsTabs, type ResultsTab } from "./results-tabs";
@@ -50,6 +50,7 @@ export function ScorecardView({
   );
 
   const tone = toneClass[scorecard.capLabel];
+  const embedOrientation = sourceOrientation(scorecard.source);
   const sourceTitle =
     scorecard.source.title ??
     (scorecard.source.kind === "upload" ? scorecard.source.fileName : "this video");
@@ -122,8 +123,7 @@ export function ScorecardView({
                       rel="noopener noreferrer"
                       aria-label={`Open evidence source: ${evidence.title} (opens in new tab)`}
                     >
-                      {evidence.title}
-                      <ExternalLink aria-hidden="true" />
+                      <ExternalLinkLabel text={evidence.title} />
                     </a>
                   ) : (
                     action.url && (
@@ -133,8 +133,7 @@ export function ScorecardView({
                         rel="noopener noreferrer"
                         aria-label={`${action.label} (opens in new tab)`}
                       >
-                        Open resource
-                        <ExternalLink aria-hidden="true" />
+                        <ExternalLinkLabel text="Open resource" />
                       </a>
                     )
                   )}
@@ -172,7 +171,7 @@ export function ScorecardView({
 
   return (
     <div className="main">
-      <div className="result-grid">
+      <div className="result-grid" data-embed={embedOrientation}>
         <div className="result-content">
           <section
             className="score-section"
@@ -203,8 +202,9 @@ export function ScorecardView({
                     rel="noopener noreferrer"
                     aria-label={`Open strongest source: ${strongest.title} (opens in new tab)`}
                   >
-                    {strongest.publisher} — {strongest.title}
-                    <ExternalLink aria-hidden="true" />
+                    <ExternalLinkLabel
+                      text={`${strongest.publisher} — ${strongest.title}`}
+                    />
                   </a>
                 </span>
               )}
@@ -216,7 +216,7 @@ export function ScorecardView({
         <aside className="source-rail" aria-label="Checked video">
           <div
             className="video-facade"
-            data-orientation={sourceOrientation(scorecard.source)}
+            data-orientation={embedOrientation}
             aria-hidden="true"
           >
             <Play />
@@ -230,8 +230,7 @@ export function ScorecardView({
                 rel="noopener noreferrer"
                 aria-label="Open the checked video (opens in new tab)"
               >
-                {displayUrl(scorecard.source.url)}
-                <ExternalLink aria-hidden="true" />
+                <ExternalLinkLabel text={displayUrl(scorecard.source.url)} />
               </a>
             ) : (
               <span className="file-name">{scorecard.source.fileName}</span>

@@ -1,7 +1,9 @@
-import { ChevronDown, ExternalLink, TriangleAlert } from "lucide-react";
+import { ChevronDown, TriangleAlert } from "lucide-react";
 
 import type { Evidence, OpinionClaim, Verification } from "@/domain/analysis";
 import { formatTimestamp } from "@/lib/format-timestamp";
+
+import { ExternalLinkLabel } from "./external-link-label";
 
 const verdictPills = {
   true: { label: "True", tone: "v-true" },
@@ -52,8 +54,7 @@ const EvidenceBlock = ({ evidence }: { evidence: Evidence }) => (
         rel="noopener noreferrer"
         aria-label={`Open source: ${evidence.title} (opens in new tab)`}
       >
-        {evidence.publisher} — {evidence.title}
-        <ExternalLink aria-hidden="true" />
+        <ExternalLinkLabel text={`${evidence.publisher} — ${evidence.title}`} />
       </a>
     </footer>
   </div>

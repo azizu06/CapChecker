@@ -83,6 +83,10 @@ describe("CapCheckApp", () => {
       "data-orientation",
       "vertical",
     );
+    expect(container.querySelector(".result-grid")).toHaveAttribute(
+      "data-embed",
+      "vertical",
+    );
   });
 
   it("marks the checked-video facade as landscape for a long-form source", async () => {
@@ -110,6 +114,34 @@ describe("CapCheckApp", () => {
       "data-orientation",
       "landscape",
     );
+    expect(container.querySelector(".result-grid")).toHaveAttribute(
+      "data-embed",
+      "landscape",
+    );
+  });
+
+  it("joins every external-link icon to the final visible character", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        sseResponse({ type: "complete", scorecard: DEMO_SCORECARDS.mixed }),
+      ),
+    );
+    const user = userEvent.setup();
+    const { container } = render(<CapCheckApp />);
+
+    await submitUrl(user);
+    await screen.findByText("52");
+
+    const externalIcons = container.querySelectorAll(
+      ".strongest a svg, .source-details a svg, .evidence a svg, .steps a svg",
+    );
+    expect(externalIcons.length).toBeGreaterThan(0);
+    for (const icon of externalIcons) {
+      const tail = icon.closest(".external-link-tail");
+      expect(tail).not.toBeNull();
+      expect(tail?.textContent).toHaveLength(1);
+    }
   });
 
   it("shows the complete accessible Cap Score bands", async () => {
