@@ -18,7 +18,7 @@ const allowedScenarios = new Set([
   "fatal",
 ]);
 
-export function CapCheckApp() {
+export function CapCheckApp({ readOnly = false }: { readOnly?: boolean } = {}) {
   const [url, setUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [nextUrl, setNextUrl] = useState("");
@@ -52,6 +52,7 @@ export function CapCheckApp() {
   }, [uploadPreviewUrl]);
 
   const performAnalysis = async (submitUrl: string, submitFile: File | null) => {
+    if (readOnly) return;
     setValidation("");
     setMiniError("");
     setError(null);
@@ -110,7 +111,7 @@ export function CapCheckApp() {
   };
 
   const analyze = () => {
-    if (loading) return;
+    if (readOnly || loading) return;
     const validationMessage = validateSubmission(url, file);
     if (validationMessage) {
       setError(null);
@@ -122,7 +123,7 @@ export function CapCheckApp() {
 
   const analyzeNext = (event: FormEvent) => {
     event.preventDefault();
-    if (loading) return;
+    if (readOnly || loading) return;
     const validationMessage = validateSubmission(nextUrl, null);
     if (validationMessage) {
       setMiniError(validationMessage);
@@ -209,6 +210,7 @@ export function CapCheckApp() {
           url={url}
           file={file}
           loading={loading}
+          readOnly={readOnly}
           error={error}
           validation={validation}
           onUrlChange={changeUrl}

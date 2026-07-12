@@ -180,8 +180,8 @@ duplicate) with no credentials. Live mode additionally requires a server-only
 
 The hosted portfolio deployment intentionally omits those private credentials.
 It reads the persisted catalog through the public Supabase anon key under RLS,
-while live refresh and analysis render an archived-demo state instead of
-calling external providers.
+while the original refresh and analysis interfaces remain visible but disabled
+instead of calling external providers.
 
 Opt-in live smoke test (never part of CI):
 

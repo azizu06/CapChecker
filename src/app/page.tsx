@@ -2,7 +2,6 @@ import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
 
 import { FeedExplorer } from "@/components/feed/feed-explorer";
-import { PortfolioDemoNotice } from "@/components/portfolio-demo-notice";
 import { RefreshFeedButton } from "@/components/refresh-feed-button";
 import type { CatalogItem } from "@/domain/feed";
 import { isPortfolioDemoMode } from "@/lib/portfolio-mode";
@@ -58,11 +57,7 @@ export default async function FeedHome({
           only if its claims held up. Open one to see the Cap Score, the
           evidence, and the citations behind it.
         </p>
-        {portfolioDemo ? (
-          <PortfolioDemoNotice feature="refresh" />
-        ) : (
-          <RefreshFeedButton />
-        )}
+        <RefreshFeedButton readOnly={portfolioDemo} />
       </section>
 
       {failed ? (
