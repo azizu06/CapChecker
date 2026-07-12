@@ -26,8 +26,8 @@ test("verified feed lists vetted cards and opens the detail embed", async ({
   await expect(siteHeader).toHaveCSS("border-bottom-color", "rgb(33, 31, 27)");
 
   const siteMark = siteHeader.locator(".brand-mark");
-  await expect(siteMark).toHaveCSS("width", "24px");
-  await expect(siteMark).toHaveCSS("height", "24px");
+  await expect(siteMark).toHaveCSS("width", "28px");
+  await expect(siteMark).toHaveCSS("height", "28px");
   await expect(siteMark.locator("img")).toHaveAttribute("src", "/logo-mark.png");
   await expect(siteMark.locator("img")).toHaveAttribute("alt", "");
 
