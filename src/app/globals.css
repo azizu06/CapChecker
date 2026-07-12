@@ -719,6 +719,7 @@ input:disabled {
   }
 
   .result-grid[data-embed="landscape"] .source-rail {
+    margin-top: 48px;
     top: 56px;
   }
 
