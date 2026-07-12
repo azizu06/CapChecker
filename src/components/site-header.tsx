@@ -1,6 +1,5 @@
 "use client";
 
-import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -20,9 +19,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <Link className="site-brand" href="/">
-        <span className="brand-mark" aria-hidden="true">
-          <ShieldCheck />
-        </span>
+        <span className="brand-mark" aria-hidden="true" />
         <strong>CapCheck</strong>
       </Link>
       <nav className="site-nav" aria-label="Primary">
