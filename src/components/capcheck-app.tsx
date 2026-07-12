@@ -28,6 +28,7 @@ export function CapCheckApp() {
   const [progress, setProgress] = useState<UiProgress[]>([]);
   const [scorecard, setScorecard] = useState<Scorecard | null>(null);
   const [loading, setLoading] = useState(false);
+  const [uploadPreviewUrl, setUploadPreviewUrl] = useState<string | null>(null);
 
   const scenario = useMemo(() => {
     if (typeof window === "undefined") return undefined;
@@ -41,6 +42,17 @@ export function CapCheckApp() {
       delete document.documentElement.dataset.capcheckHydrated;
     };
   }, []);
+
+  useEffect(() => {
+    if (!file) {
+      setUploadPreviewUrl(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setUploadPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
 
   const performAnalysis = async (submitUrl: string, submitFile: File | null) => {
     setValidation("");
@@ -175,6 +187,7 @@ export function CapCheckApp() {
         )}
         <ScorecardView
           scorecard={scorecard}
+          uploadPreviewUrl={uploadPreviewUrl}
           onRunAgain={() => void performAnalysis(url, file)}
           onCheckAnother={reset}
         />
