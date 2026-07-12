@@ -3,6 +3,7 @@ import {
   REFRESH_IN_PROGRESS,
   RefreshError,
   catalogWriteError,
+  refreshFinalizationError,
 } from "./errors";
 import type { AcceptedSummary, RefreshEvent, RefreshStage } from "./events";
 import { evaluateReliability } from "./reliability-gate";
@@ -55,6 +56,7 @@ export function createRefreshRunner(dependencies: RefreshRunnerDependencies) {
     isRunning: () => running,
 
     async *run(signal: AbortSignal): AsyncGenerator<RefreshEvent> {
+      if (signal.aborted) return;
       if (running) {
         yield errorEvent(REFRESH_IN_PROGRESS);
         return;
@@ -63,6 +65,7 @@ export function createRefreshRunner(dependencies: RefreshRunnerDependencies) {
 
       const counts = zeroCounts();
       let runId: string | undefined;
+      let catalogWriteCommitted = false;
 
       try {
         yield stage("starting", "Preparing the feed refresh");
@@ -82,11 +85,12 @@ export function createRefreshRunner(dependencies: RefreshRunnerDependencies) {
           signal,
         });
         counts.discovered = discovered.length;
+        if (signal.aborted) throw signal.reason;
 
         let accepted: AcceptedSummary | null = null;
 
         for (const video of discovered) {
-          if (signal.aborted) break;
+          if (signal.aborted) throw signal.reason;
 
           yield stage("screening", `Screening "${displayTitle(video.title)}"`);
           const screened = screenCandidate(video);
@@ -145,6 +149,7 @@ export function createRefreshRunner(dependencies: RefreshRunnerDependencies) {
           let inserted: boolean;
           try {
             ({ inserted } = await dependencies.catalog.upsertItem(item));
+            catalogWriteCommitted = true;
           } catch {
             throw catalogWriteError();
           }
@@ -181,7 +186,22 @@ export function createRefreshRunner(dependencies: RefreshRunnerDependencies) {
         );
         yield { type: "complete", status: "completed", counts, accepted };
       } catch (cause) {
-        const error = toRefreshError(cause);
+        if (signal.aborted) {
+          if (runId) {
+            const finalized = await safeCompleteRun(dependencies.catalog, {
+              runId,
+              status: "failed",
+              counts,
+              completedAt: now().toISOString(),
+              errorCode: "REFRESH_CANCELLED",
+            });
+            if (!finalized) await safeReleaseRun(dependencies.catalog, runId);
+          }
+          throw signal.reason;
+        }
+        const error = catalogWriteCommitted
+          ? refreshFinalizationError()
+          : toRefreshError(cause);
         if (runId) {
           const finalized = await safeCompleteRun(dependencies.catalog, {
             runId,
@@ -190,7 +210,7 @@ export function createRefreshRunner(dependencies: RefreshRunnerDependencies) {
             completedAt: now().toISOString(),
             errorCode: error.code,
           });
-          if (!finalized) {
+          if (!finalized && !catalogWriteCommitted) {
             await safeReleaseRun(dependencies.catalog, runId);
           }
         }

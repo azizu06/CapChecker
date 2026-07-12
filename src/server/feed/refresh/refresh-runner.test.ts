@@ -64,6 +64,25 @@ const seededItem = (): NewCatalogItem => ({
 });
 
 describe("refresh runner", () => {
+  it("does nothing when the caller signal is already aborted", async () => {
+    const catalog = createInMemoryCatalog();
+    const runner = createRefreshRunner({
+      discovery: staticDiscovery([candidate()]),
+      analyze: analyzeWith(DEMO_SCORECARDS.legitimate),
+      catalog,
+      now: NOW,
+    });
+    const controller = new AbortController();
+    controller.abort(new DOMException("request already closed", "AbortError"));
+
+    const events = await drain(runner.run(controller.signal));
+
+    expect(events).toEqual([]);
+    expect(catalog.runs).toEqual([]);
+    expect(catalog.items.size).toBe(0);
+    expect(runner.isRunning()).toBe(false);
+  });
+
   it("accepts one vetted candidate and upserts it idempotently", async () => {
     const catalog = createInMemoryCatalog();
     const runner = createRefreshRunner({
@@ -203,6 +222,41 @@ describe("refresh runner", () => {
       status: "failed",
       errorCode: "CATALOG_WRITE_FAILED",
     });
+  });
+
+  it("truthfully preserves an accepted item and failed audit row when completion fails", async () => {
+    const catalog = createInMemoryCatalog();
+    const completeRun = catalog.completeRun.bind(catalog);
+    const releaseRun = vi.spyOn(catalog, "releaseRun");
+    catalog.completeRun = vi.fn(async (input) => {
+      if (input.status === "completed") {
+        throw new Error("completion write failed");
+      }
+      await completeRun(input);
+    });
+    const runner = createRefreshRunner({
+      discovery: staticDiscovery([candidate()]),
+      analyze: analyzeWith(DEMO_SCORECARDS.legitimate),
+      catalog,
+      now: NOW,
+    });
+
+    const events = await drain(runner.run(new AbortController().signal));
+    const terminal = events.at(-1);
+
+    expect(terminal).toMatchObject({
+      type: "error",
+      error: { code: "REFRESH_FINALIZATION_FAILED", retryable: true },
+    });
+    expect(terminal?.type === "error" ? terminal.error.message : "").toContain(
+      "saved",
+    );
+    expect(catalog.items.has("vid-index")).toBe(true);
+    expect(catalog.runs[0]).toMatchObject({
+      status: "failed",
+      errorCode: "REFRESH_FINALIZATION_FAILED",
+    });
+    expect(releaseRun).not.toHaveBeenCalled();
   });
 
   it("releases the run lock when both finalization writes fail", async () => {
@@ -374,13 +428,52 @@ describe("refresh runner", () => {
     await first.next();
     await first.next();
     const blocked = first.next();
-    controller.abort(new DOMException("reader stopped", "AbortError"));
-    await blocked;
-    await drain(first);
+    const reason = new DOMException("reader stopped", "AbortError");
+    controller.abort(reason);
+    await expect(blocked).rejects.toBe(reason);
 
     expect(runner.isRunning()).toBe(false);
+    expect(catalog.runs[0]).toMatchObject({
+      status: "failed",
+      errorCode: "REFRESH_CANCELLED",
+    });
     const retry = await drain(runner.run(new AbortController().signal));
     expect(retry.at(-1)).toMatchObject({ type: "complete", counts: { kept: 1 } });
+  });
+
+  it("preserves cancellation at the candidate boundary without a false complete", async () => {
+    const catalog = createInMemoryCatalog();
+    const controller = new AbortController();
+    const reason = new DOMException("request closed", "AbortError");
+    const runner = createRefreshRunner({
+      discovery: {
+        async discover() {
+          controller.abort(reason);
+          return [candidate()];
+        },
+      },
+      analyze: analyzeWith(DEMO_SCORECARDS.legitimate),
+      catalog,
+      now: NOW,
+    });
+    const events: RefreshEvent[] = [];
+    let caught: unknown;
+
+    try {
+      for await (const event of runner.run(controller.signal)) events.push(event);
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).toBe(reason);
+    expect(events.some((event) => event.type === "complete")).toBe(false);
+    expect(events.some((event) => event.type === "error")).toBe(false);
+    expect(catalog.items.size).toBe(0);
+    expect(catalog.runs[0]).toMatchObject({
+      status: "failed",
+      errorCode: "REFRESH_CANCELLED",
+    });
+    expect(runner.isRunning()).toBe(false);
   });
 
   it("completes with no acceptance when candidates are exhausted", async () => {

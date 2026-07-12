@@ -40,3 +40,10 @@ export const catalogWriteError = () =>
     "We could not save the refreshed feed. The existing feed is unchanged — try again shortly.",
     true,
   );
+
+export const refreshFinalizationError = () =>
+  new RefreshError(
+    "REFRESH_FINALIZATION_FAILED",
+    "The vetted video was saved, but CapCheck could not finish recording the refresh. The feed may already include it — reload before retrying.",
+    true,
+  );
