@@ -174,7 +174,7 @@ test("checked-time metadata stays readable and contained at 375px", async ({
   await page.setViewportSize({ width: 375, height: 812 });
   await submitUrl(page);
 
-  const timestamp = page.locator(".source-line .when");
+  const timestamp = page.locator(".source-details .when");
   await expect(timestamp).toHaveText("· just now");
   const metrics = await timestamp.evaluate((element) => {
     const box = element.getBoundingClientRect();
