@@ -28,7 +28,10 @@ export function CapCheckApp() {
   const [progress, setProgress] = useState<UiProgress[]>([]);
   const [scorecard, setScorecard] = useState<Scorecard | null>(null);
   const [loading, setLoading] = useState(false);
-  const [uploadPreviewUrl, setUploadPreviewUrl] = useState<string | null>(null);
+  const uploadPreviewUrl = useMemo(
+    () => (file ? URL.createObjectURL(file) : null),
+    [file],
+  );
 
   const scenario = useMemo(() => {
     if (typeof window === "undefined") return undefined;
@@ -44,15 +47,9 @@ export function CapCheckApp() {
   }, []);
 
   useEffect(() => {
-    if (!file) {
-      setUploadPreviewUrl(null);
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(file);
-    setUploadPreviewUrl(objectUrl);
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [file]);
+    if (!uploadPreviewUrl) return;
+    return () => URL.revokeObjectURL(uploadPreviewUrl);
+  }, [uploadPreviewUrl]);
 
   const performAnalysis = async (submitUrl: string, submitFile: File | null) => {
     setValidation("");
