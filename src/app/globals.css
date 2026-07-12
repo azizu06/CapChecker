@@ -122,25 +122,16 @@ input:disabled {
 }
 
 .brand-mark {
-  width: 12px;
-  height: 12px;
+  width: 24px;
+  height: 24px;
   flex: none;
-  background: var(--ink);
 }
 
-.app-header strong,
-.results-header strong {
-  font: 600 19px/1 var(--display);
-  letter-spacing: -0.02em;
-}
-
-.tagline {
-  margin-left: auto;
-  color: var(--ink);
-  font: 500 11px/1.3 var(--mono);
-  letter-spacing: 0.14em;
-  text-align: right;
-  text-transform: uppercase;
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .landing-grid {
@@ -1054,12 +1045,6 @@ input:disabled {
   font-size: 19px;
   font-weight: 600;
   letter-spacing: -0.02em;
-}
-
-.site-brand .brand-mark {
-  width: 12px;
-  height: 12px;
-  background: var(--ink);
 }
 
 .site-nav {
