@@ -17,6 +17,7 @@ type Props = {
   /** Called after a successful refresh so the feed can reload. */
   onRefreshed?: (result: RefreshResult) => void;
   endpoint?: string;
+  readOnly?: boolean;
 };
 
 const summarize = (counts: RefreshCounts) =>
@@ -29,7 +30,11 @@ const summarize = (counts: RefreshCounts) =>
  * `onRefreshed` to reload the catalog. Uses shared cream tokens via existing
  * `primary` / `helper` / `field-error` classes.
  */
-export function RefreshFeedButton({ onRefreshed, endpoint = "/api/feed/refresh" }: Props) {
+export function RefreshFeedButton({
+  onRefreshed,
+  endpoint = "/api/feed/refresh",
+  readOnly = false,
+}: Props) {
   const router = useRouter();
   const [running, setRunning] = useState(false);
   const [stageText, setStageText] = useState("");
@@ -38,7 +43,7 @@ export function RefreshFeedButton({ onRefreshed, endpoint = "/api/feed/refresh" 
   const inFlight = useRef(false);
 
   const refresh = useCallback(async () => {
-    if (inFlight.current) return;
+    if (readOnly || inFlight.current) return;
     inFlight.current = true;
     setRunning(true);
     setStageText("Starting refresh…");
@@ -76,7 +81,7 @@ export function RefreshFeedButton({ onRefreshed, endpoint = "/api/feed/refresh" 
       inFlight.current = false;
       setRunning(false);
     }
-  }, [endpoint, onRefreshed, router]);
+  }, [endpoint, onRefreshed, readOnly, router]);
 
   return (
     <div className="refresh-feed">
@@ -84,12 +89,15 @@ export function RefreshFeedButton({ onRefreshed, endpoint = "/api/feed/refresh" 
         type="button"
         className="primary"
         onClick={refresh}
-        disabled={running}
+        disabled={readOnly || running}
         aria-busy={running}
       >
         <RefreshCw aria-hidden="true" />
         {running ? "Refreshing…" : "Refresh feed"}
       </button>
+      {readOnly && (
+        <p className="helper">Portfolio demo — live refresh is disabled.</p>
+      )}
       {running && stageText && (
         <p className="helper" role="status" aria-live="polite">
           {stageText}

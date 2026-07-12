@@ -41,6 +41,7 @@ type Props = {
   url: string;
   file: File | null;
   loading: boolean;
+  readOnly?: boolean;
   error: ErrorEvent["error"] | null;
   validation: string;
   onUrlChange(value: string): void;
@@ -59,6 +60,7 @@ export function IntakePanel({
   url,
   file,
   loading,
+  readOnly = false,
   error,
   validation,
   onUrlChange,
@@ -116,18 +118,20 @@ export function IntakePanel({
             id={inputId}
             type="url"
             value={url}
-            disabled={loading || Boolean(file)}
+            disabled={readOnly || loading || Boolean(file)}
             aria-invalid={Boolean(validation)}
             aria-describedby={describedBy}
             placeholder="https://www.youtube.com/shorts/…"
             onChange={(event) => onUrlChange(event.target.value)}
           />
-          <button className="primary" type="submit" disabled={loading}>
+          <button className="primary" type="submit" disabled={readOnly || loading}>
             {loading ? "Checking…" : "Check it"}
           </button>
         </div>
         <p id={`${inputId}-help`} className="helper">
-          YouTube, TikTok, and Reels links work. Analysis takes about a minute.
+          {readOnly
+            ? "Portfolio demo — live analysis is disabled."
+            : "YouTube, TikTok, and Reels links work. Analysis takes about a minute."}
         </p>
         {validation && (
           <p id={`${inputId}-error`} className="field-error" role="alert">
@@ -137,9 +141,9 @@ export function IntakePanel({
 
         <div className="divider">or upload a video</div>
         <label
-          className={`drop-zone${file ? " selected" : ""}${loading ? " disabled" : ""}`}
+          className={`drop-zone${file ? " selected" : ""}${readOnly || loading ? " disabled" : ""}`}
           htmlFor={fileId}
-          aria-disabled={loading}
+          aria-disabled={readOnly || loading}
         >
           <Upload aria-hidden="true" />
           <span>
@@ -152,7 +156,7 @@ export function IntakePanel({
             className="visually-hidden"
             type="file"
             accept="video/mp4,video/quicktime,video/webm,.mp4,.mov,.webm"
-            disabled={loading}
+            disabled={readOnly || loading}
             aria-invalid={Boolean(uploadValidation)}
             aria-describedby={fileDescribedBy}
             onChange={selectFile}

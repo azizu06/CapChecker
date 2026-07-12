@@ -52,6 +52,23 @@ describe("CapCheckApp", () => {
     expect(screen.getByText(/choose a video file/i)).toBeInTheDocument();
   });
 
+  it("preserves the analyzer UI while disabling retired production actions", () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const { container } = render(<CapCheckApp readOnly />);
+
+    expect(
+      screen.getByRole("heading", { name: /is that stock tip/i }),
+    ).toBeVisible();
+    expect(landingUrlInput()).toBeDisabled();
+    expect(checkItButton()).toBeDisabled();
+    expect(screen.getByLabelText(/choose a video file/i)).toBeDisabled();
+    expect(screen.getByText(/live analysis is disabled/i)).toBeVisible();
+
+    fireEvent.submit(container.querySelector(".intake form")!);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("submits a valid URL through the public stream and renders the scorecard", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       sseResponse(
