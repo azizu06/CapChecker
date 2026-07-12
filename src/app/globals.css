@@ -718,6 +718,10 @@ input:disabled {
     grid-template-columns: minmax(0, 1fr) 400px;
   }
 
+  .result-grid[data-embed="landscape"] .source-rail {
+    top: 56px;
+  }
+
   .result-grid[data-embed="landscape"] .source-details {
     gap: 4px;
     padding: 12px;
