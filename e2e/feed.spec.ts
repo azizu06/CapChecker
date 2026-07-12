@@ -106,3 +106,91 @@ test("verified feed lists vetted cards and opens the detail embed", async ({
   await expect(page).toHaveURL(/\/$/);
   await expect(page.locator(".feed-card").first()).toBeVisible();
 });
+
+test("refreshes twice with truthful counts, reloads the feed, and retries safely", async ({
+  page,
+}, testInfo) => {
+  if (testInfo.project.name === "mobile-chromium") {
+    await page.setViewportSize({ width: 375, height: 812 });
+  }
+  const runtimeErrors: string[] = [];
+  page.on("console", (message) => {
+    if (
+      message.type() === "error" &&
+      !message.text().startsWith("Failed to load resource:")
+    ) {
+      runtimeErrors.push(message.text());
+    }
+  });
+  page.on("pageerror", (error) => runtimeErrors.push(error.message));
+  let refreshRequests = 0;
+  page.on("request", (request) => {
+    if (request.method() === "POST" && request.url().includes("/api/feed/refresh")) {
+      refreshRequests += 1;
+    }
+  });
+  await page.goto("/");
+  const button = page.locator(".refresh-feed button");
+  await button.focus();
+  await expect(button).toBeFocused();
+  await expect(button).toHaveCSS("outline-style", "solid");
+  let releaseRequest!: () => void;
+  const requestGate = new Promise<void>((resolve) => {
+    releaseRequest = resolve;
+  });
+  await page.route("**/api/feed/refresh", async (route) => {
+    await requestGate;
+    await route.continue();
+  });
+
+  await button.evaluate((element) => {
+    const control = element as HTMLButtonElement;
+    control.click();
+    control.click();
+  });
+  await expect(button).toBeDisabled();
+  expect(refreshRequests).toBe(1);
+  releaseRequest();
+  await expect(page.getByRole("status")).toContainText(/1 found.*(1 analyzed|1 duplicate)/, {
+    timeout: 15_000,
+  });
+  await page.unroute("**/api/feed/refresh");
+  await expect(
+    page.getByRole("link", { name: /Index funds explained for beginners/i }),
+  ).toBeVisible();
+
+  await button.click();
+  await expect(page.getByRole("status")).toContainText(
+    "1 found · 0 analyzed · 0 kept · 0 rejected · 1 duplicate",
+    { timeout: 15_000 },
+  );
+  expect(refreshRequests).toBe(2);
+
+  let failNext = true;
+  await page.route("**/api/feed/refresh", async (route) => {
+    if (failNext) {
+      failNext = false;
+      await route.abort("failed");
+      return;
+    }
+    await route.continue();
+  });
+  await button.click();
+  const refreshAlert = page.locator(".refresh-feed [role='alert']");
+  await expect(refreshAlert).toContainText(
+    "CapCheck could not finish the feed refresh",
+  );
+
+  await button.click();
+  await expect(refreshAlert).toHaveCount(0);
+  await expect(page.getByRole("status")).toContainText(
+    "1 found · 0 analyzed · 0 kept · 0 rejected · 1 duplicate",
+    { timeout: 15_000 },
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  expect(runtimeErrors).toEqual([]);
+});

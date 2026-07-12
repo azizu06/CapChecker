@@ -130,6 +130,50 @@ The implementation and verification approach is documented in
 [`docs/agents/testing.md`](docs/agents/testing.md). Product scope and domain
 language live in [`CONTEXT.md`](CONTEXT.md).
 
+## Verified Feed refresh
+
+`POST /api/feed/refresh` discovers one new public YouTube candidate, screens it,
+reuses the existing analyzer, applies the frozen reliability gate, and upserts
+an accepted card — streaming the same SSE shape as `/api/analyze`: `stage`
+events, then one terminal `complete` (with `discovered / analyzed / kept /
+rejected / duplicate` counts and the accepted card, if any) or `error` event.
+Client code consumes it with `parseRefreshStream` in `src/lib/refresh-stream.ts`;
+the minimal `RefreshFeedButton` in `src/components/refresh-feed-button.tsx`
+drives it.
+
+Refresh code lives under `src/server/feed/refresh/`:
+
+- `reliability-gate.ts` — the frozen correctness core (Cap Score 0–29 and
+  `no-cap`, zero `false` verdicts, at most one `unverifiable`, at least one
+  `primary`/`high` citation, plus TLDR + category + timestamp present).
+- `youtube-discovery.ts` — YouTube Data API v3 adapter (search.list →
+  videos.list) behind a port, with a deterministic fake.
+- `candidate-filter.ts` — duration / embeddable / public / safe screening and
+  finance-category mapping.
+- `refresh-runner.ts` — single-flight orchestration, run bookkeeping, idempotent
+  upsert, and safe failure that never touches existing catalog rows.
+- `catalog-port-adapter.ts` — maps refresh items and run bookkeeping onto the
+  shared `CatalogRepository`; fixture mode and the feed page share one cached
+  repository, while production writes through the server-only Supabase client.
+
+Fixture mode (`CAPCHECK_ANALYSIS_MODE=fixture`) runs the whole flow against
+deterministic discovery + the fixture scorecard + the fixture catalog, so two
+consecutive refreshes prove idempotency (first accepts, second reports a
+duplicate) with no credentials. Live mode additionally requires a server-only
+`YOUTUBE_API_KEY` (plus `GEMINI_API_KEY`, `FINNHUB_KEY`, and
+`SUPABASE_SERVICE_ROLE_KEY`).
+
+Opt-in live smoke test (never part of CI):
+
+```bash
+CAPCHECK_LIVE_REFRESH=1 \
+YOUTUBE_API_KEY=... \
+GEMINI_API_KEY=... \
+FINNHUB_KEY=... \
+SUPABASE_SERVICE_ROLE_KEY=... \
+npm run test:unit -- src/server/feed/refresh/refresh.live.test.ts
+```
+
 ## UI design contract
 
 All user-facing work follows the shared tokens, component anatomy, responsive
