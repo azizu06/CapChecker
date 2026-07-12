@@ -19,7 +19,11 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <Link className="site-brand" href="/">
-        <span className="brand-mark" aria-hidden="true" />
+        <span className="brand-mark" aria-hidden="true">
+          {/* The prepared brand asset is intentionally served as-is. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-mark.png" alt="" />
+        </span>
         <strong>CapCheck</strong>
       </Link>
       <nav className="site-nav" aria-label="Primary">

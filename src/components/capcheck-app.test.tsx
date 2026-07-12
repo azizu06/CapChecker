@@ -45,7 +45,8 @@ describe("CapCheckApp", () => {
     expect(
       screen.getByRole("heading", { name: /is that stock tip/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Financial advice, fact-checked")).toBeInTheDocument();
+    expect(document.querySelector(".app-header")).not.toBeInTheDocument();
+    expect(screen.queryByText("Financial advice, fact-checked")).not.toBeInTheDocument();
     expect(landingUrlInput()).toBeInTheDocument();
     expect(checkItButton()).toBeInTheDocument();
     expect(screen.getByText(/choose a video file/i)).toBeInTheDocument();
@@ -65,7 +66,11 @@ describe("CapCheckApp", () => {
     await submitUrl(user, "https://www.youtube.com/shorts/demo");
 
     expect(await screen.findByText("52")).toBeInTheDocument();
-    expect(screen.getByText("Financial advice, fact-checked")).toBeVisible();
+    expect(container.querySelector(".results-header .brand-mark")).not.toBeInTheDocument();
+    expect(screen.queryByText("Financial advice, fact-checked")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: "Check another video URL" }),
+    ).toBeVisible();
     expect(screen.getByRole("heading", { name: "Some cap" })).toBeInTheDocument();
     expect(
       screen.getByText(/The video mixes a supported market fact/),
