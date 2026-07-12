@@ -27,12 +27,23 @@ detail at `/feed/[id]`, analyzer moved to `/analyze`.
   (interface + fake + fixture + lazy Supabase impl in `supabase-catalog-repository.ts`),
   `/` feed grid, `/feed/[id]` detail with nocookie embed, `SiteHeader`, `scripts/seed-feed.ts`
   (run with `tsx`), `src/fixtures/feed.ts` (2 vetted items), `e2e/feed.spec.ts`. All checks green.
-- **PR #39 (issue #28):** everything under `src/server/feed/refresh/` — YouTube Data API v3
-  discovery port, candidate filter, analyzer reuse via `createNodeLiveAnalysisOrchestrator`,
-  pure `reliability-gate.ts`, single-flight `refresh-runner.ts` with run counts, SSE route
-  `src/app/api/feed/refresh/route.ts`, `src/lib/refresh-stream.ts`, `RefreshFeedButton`
-  component (not yet placed on the page). 256 unit tests green. Opt-in live smoke test gated
-  on `CAPCHECK_LIVE_REFRESH=1`.
+- **PR #39 (issue #28):** integrated against PR #40 persistence. The refresh adapter now maps
+  catalog IDs and run counts onto `CatalogRepository`; fixture refresh and feed reads share the
+  same cached repository; production requires the server-only Supabase writer. The feed button
+  is mounted and reloads the server feed after success. Repository-backed atomic single-flight,
+  duplicate races, safe finalization failure, unsafe metadata rejection, bounded YouTube retries,
+  SSE/analyzer cancellation, and desktop/mobile refresh/retry coverage are implemented.
+- **PR #39 deterministic evidence (2026-07-12):** lint and typecheck clean; 300 unit tests passed
+  with 6 credential-gated skips; production build passed; Playwright passed 35 with 1 existing
+  skip across desktop/mobile. Diagnosis localized the initial live failure to discovery emitting a
+  YouTube `/watch?v=` URL that ingestion rejected before temp allocation. A regression test now
+  covers that seam; the exact-revision bounded one-candidate live smoke passed in 66.05 seconds.
+- **Final correctness review:** post-save run-finalization failure now reports that the item was
+  saved and preserves a failed audit row; pre-abort creates no run; mid-run abort preserves the
+  exact cancellation and finalizes `REFRESH_CANCELLED`; the hardening migration deterministically
+  reconciles multiple legacy running rows before adding the unique index.
+- **PR #41 compatibility:** merged `origin/main` at `08620b7`; the grotesque-flat UI remains
+  authoritative and Issue #28 adds only the feed button mount plus its small scoped styles.
 - **Contract notes discovered by Lane A** (authoritative in `src/domain/analysis.ts`):
   cap labels are `"no-cap" | "some-cap" | "full-of-cap"`; verdicts
   `"true" | "mostly-true" | "unverifiable" | "false"`; trust tiers at
@@ -50,10 +61,9 @@ detail at `/feed/[id]`, analyzer moved to `/analyze`.
 2. **Apply the committed migration to dev-personal** (Supabase MCP `apply_migration`,
    project_id `gcsradzqlidemdkebloa`, use the SQL file verbatim) and verify anon can SELECT
    but not INSERT.
-3. In the `issue-28-feed-refresh` worktree: merge updated main, implement
-   `src/server/feed/refresh/catalog-port-adapter.ts` (adapt Lane B's `CatalogRepository` to
-   `RefreshCatalogPort` — it currently throws by design), place `RefreshFeedButton` on the
-   feed page, run lint/typecheck/unit/e2e, push, merge PR #39.
+3. Coordinator: review PR #39, apply `20260712002724_harden_feed_refresh.sql`, and verify the
+   function-search-path advisor clears and the one-running-row index exists. Keep PR #39 open
+   until review and CI are green.
 4. Launch issue #29 on a fresh worktree off updated main: search + category filters
    (Investing/Credit/Taxes/Budgeting/Retirement + All), empty/no-match/reset states,
    responsive grid, no horizontal overflow at 375px. Calm consumer tool; Mobbin refs in #25.

@@ -198,7 +198,8 @@ const isSupportedVideoUrl = (value: string) => {
 
     const parts = url.pathname.split("/").filter(Boolean);
     if (youtubeHosts.has(url.hostname)) {
-      return parts[0] === "shorts" && Boolean(parts[1]);
+      if (parts[0] === "shorts") return Boolean(parts[1]);
+      return parts[0] === "watch" && Boolean(url.searchParams.get("v"));
     }
     if (url.hostname === "youtu.be") return Boolean(parts[0]);
     if (tikTokHosts.has(url.hostname)) return parts.length > 0;
@@ -242,7 +243,7 @@ export function createVideoIngestor(
         throw new IngestionError({
           code: "UNSUPPORTED_VIDEO_URL",
           message:
-            "Use a public TikTok or YouTube Shorts link, or upload the video file instead.",
+            "Use a public TikTok or YouTube video link, or upload the video file instead.",
           retryable: false,
           offerUploadFallback: true,
         });

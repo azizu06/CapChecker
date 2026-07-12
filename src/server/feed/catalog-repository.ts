@@ -14,6 +14,7 @@ export type CatalogFilter = {
 
 export type NewRefreshRun = {
   status?: RefreshRunStatus;
+  startedAt?: string;
   discoveredCount?: number;
   analyzedCount?: number;
   keptCount?: number;
@@ -41,6 +42,14 @@ export interface CatalogRepository {
   upsertItem(item: CatalogItem): Promise<{ inserted: boolean }>;
   createRefreshRun(input?: NewRefreshRun): Promise<RefreshRun>;
   updateRefreshRun(id: string, patch: RefreshRunPatch): Promise<RefreshRun>;
+  deleteRefreshRun(id: string): Promise<void>;
+}
+
+export class RefreshRunAlreadyActiveError extends Error {
+  constructor() {
+    super("A refresh run is already active");
+    this.name = "RefreshRunAlreadyActiveError";
+  }
 }
 
 /** Raw shape of a `capcheck_catalog_items` row (snake_case). */
@@ -180,6 +189,9 @@ export class InMemoryCatalogRepository implements CatalogRepository {
   }
 
   async createRefreshRun(input: NewRefreshRun = {}): Promise<RefreshRun> {
+    if ([...this.runs.values()].some((run) => run.status === "running")) {
+      throw new RefreshRunAlreadyActiveError();
+    }
     this.sequence += 1;
     const run = RefreshRunSchema.parse({
       id: `refresh-run-${this.sequence}`,
@@ -189,7 +201,7 @@ export class InMemoryCatalogRepository implements CatalogRepository {
       keptCount: input.keptCount ?? 0,
       rejectedCount: input.rejectedCount ?? 0,
       duplicateCount: input.duplicateCount ?? 0,
-      startedAt: new Date().toISOString(),
+      startedAt: input.startedAt ?? new Date().toISOString(),
       completedAt: null,
       error: null,
     });
@@ -207,6 +219,10 @@ export class InMemoryCatalogRepository implements CatalogRepository {
     this.runs.set(id, updated);
     return updated;
   }
+
+  async deleteRefreshRun(id: string): Promise<void> {
+    this.runs.delete(id);
+  }
 }
 
 export function createFixtureCatalogRepository(): CatalogRepository {
@@ -219,7 +235,9 @@ const hasSupabaseEnv = (): boolean =>
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   );
 
-let cached: CatalogRepository | undefined;
+const repositoryCache = globalThis as typeof globalThis & {
+  __capcheckCatalogRepository?: CatalogRepository;
+};
 
 /**
  * Resolve the active repository. Uses Supabase when its env vars are present,
@@ -228,16 +246,18 @@ let cached: CatalogRepository | undefined;
  * lazily so the fixture/test path never pulls in server-only modules.
  */
 export async function getCatalogRepository(): Promise<CatalogRepository> {
-  if (cached) return cached;
+  if (repositoryCache.__capcheckCatalogRepository) {
+    return repositoryCache.__capcheckCatalogRepository;
+  }
 
   if (process.env.CAPCHECK_FEED_MODE === "fixture" || !hasSupabaseEnv()) {
-    cached = createFixtureCatalogRepository();
-    return cached;
+    repositoryCache.__capcheckCatalogRepository = createFixtureCatalogRepository();
+    return repositoryCache.__capcheckCatalogRepository;
   }
 
   const { createSupabaseCatalogRepository } = await import(
     "./supabase-catalog-repository"
   );
-  cached = createSupabaseCatalogRepository();
-  return cached;
+  repositoryCache.__capcheckCatalogRepository = createSupabaseCatalogRepository();
+  return repositoryCache.__capcheckCatalogRepository;
 }

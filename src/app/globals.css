@@ -1126,6 +1126,22 @@ input:disabled {
   line-height: 1.7;
 }
 
+.feed-intro .refresh-feed {
+  margin-top: 24px;
+}
+
+.refresh-feed .primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.refresh-feed .primary:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
 .feed-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
