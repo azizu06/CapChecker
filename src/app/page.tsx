@@ -1,19 +1,46 @@
 import { TriangleAlert } from "lucide-react";
+import Link from "next/link";
 
-import { FeedCard } from "@/components/feed/feed-card";
+import { FeedExplorer } from "@/components/feed/feed-explorer";
 import { RefreshFeedButton } from "@/components/refresh-feed-button";
 import type { CatalogItem } from "@/domain/feed";
 import { getCatalogRepository } from "@/server/feed/catalog-repository";
 
 export const dynamic = "force-dynamic";
 
-export default async function FeedHome() {
+export default async function FeedHome({
+  searchParams,
+}: {
+  searchParams: Promise<{ feedState?: string }>;
+}) {
   let items: CatalogItem[] = [];
   let failed = false;
+  const { feedState } = await searchParams;
+  const fixtureState =
+    process.env.NODE_ENV !== "production" &&
+    process.env.CAPCHECK_FEED_MODE === "fixture"
+      ? feedState
+      : undefined;
 
   try {
     const repository = await getCatalogRepository();
     items = await repository.listItems();
+    if (fixtureState === "empty") items = [];
+    if (fixtureState === "error") failed = true;
+    if (fixtureState === "unavailable" && items[0]) {
+      items = [{ ...items[0], url: null }];
+    }
+    if (fixtureState === "long" && items[0]) {
+      const longValue = "metadata".repeat(60);
+      items = [
+        {
+          ...items[0],
+          title: longValue,
+          channelTitle: longValue,
+          tldr: longValue,
+        },
+      ];
+    }
   } catch {
     failed = true;
   }
@@ -40,6 +67,9 @@ export default async function FeedHome() {
               We couldn&rsquo;t reach the verified-video catalog. Please refresh
               in a moment.
             </p>
+            <Link className="feed-state-action" href="/">
+              Try feed again
+            </Link>
           </div>
         </div>
       ) : items.length === 0 ? (
@@ -53,13 +83,7 @@ export default async function FeedHome() {
           </div>
         </div>
       ) : (
-        <ul className="feed-grid" aria-label="Verified videos">
-          {items.map((item) => (
-            <li key={item.id}>
-              <FeedCard item={item} />
-            </li>
-          ))}
-        </ul>
+        <FeedExplorer items={items} />
       )}
     </main>
   );

@@ -107,6 +107,86 @@ test("verified feed lists vetted cards and opens the detail embed", async ({
   await expect(page.locator(".feed-card").first()).toBeVisible();
 });
 
+test("searches, filters, resets, and recovers across every feed state", async ({
+  page,
+}, testInfo) => {
+  if (testInfo.project.name === "mobile-chromium") {
+    await page.setViewportSize({ width: 375, height: 812 });
+  }
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const runtimeErrors: string[] = [];
+  page.on("console", (message) => {
+    if (
+      message.type() === "error" &&
+      !message.text().startsWith("Failed to load resource:")
+    ) {
+      runtimeErrors.push(message.text());
+    }
+  });
+  page.on("pageerror", (error) => runtimeErrors.push(error.message));
+
+  await page.goto("/");
+  const initialCardCount = await page.locator(".feed-card").count();
+  expect(initialCardCount).toBeGreaterThanOrEqual(8);
+  expect(initialCardCount).toBeLessThanOrEqual(9);
+  const search = page.getByRole("searchbox", { name: /search verified videos/i });
+  await search.fill("tax brackets");
+  await expect(page.locator(".feed-card")).toHaveCount(1);
+  await expect(page.getByText("Source: YouTube")).toBeVisible();
+  await page.getByRole("button", { name: /clear search/i }).click();
+
+  for (const category of [
+    "Investing",
+    "Credit",
+    "Taxes",
+    "Budgeting",
+    "Retirement",
+  ]) {
+    const control = page.getByRole("button", { name: category, exact: true });
+    await control.click();
+    await expect(control).toHaveAttribute("aria-pressed", "true");
+    expect(await page.locator(".feed-card").count()).toBeGreaterThan(0);
+  }
+  await page.getByRole("button", { name: /reset filters/i }).click();
+  await expect(page.getByRole("button", { name: "All", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+
+  await search.fill("definitely-no-video");
+  await expect(page.getByRole("status")).toContainText("No videos match");
+  await page.getByRole("button", { name: /show all videos/i }).click();
+  await expect(page.locator(".feed-card")).toHaveCount(initialCardCount);
+
+  await search.focus();
+  await expect(search).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "All", exact: true })).toBeFocused();
+
+  await page.goto("/?feedState=empty");
+  await expect(page.getByText("No vetted videos yet.")).toBeVisible();
+  await page.goto("/?feedState=error");
+  await expect(page.locator(".feed-state[role='alert']")).toContainText(
+    "temporarily unavailable",
+  );
+  await page.getByRole("link", { name: /try feed again/i }).click();
+  await expect(page.locator(".feed-card")).toHaveCount(initialCardCount);
+
+  await page.goto("/?feedState=unavailable");
+  await expect(page.getByText("Video unavailable")).toBeVisible();
+  await page.goto("/feed/does-not-exist");
+  await expect(page.getByText(/couldn't find that video/i)).toBeVisible();
+  await page.getByRole("link", { name: /back to feed/i }).click();
+
+  await page.goto("/?feedState=long");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  expect(runtimeErrors).toEqual([]);
+});
+
 test("refreshes twice with truthful counts, reloads the feed, and retries safely", async ({
   page,
 }, testInfo) => {
@@ -130,6 +210,10 @@ test("refreshes twice with truthful counts, reloads the feed, and retries safely
     }
   });
   await page.goto("/");
+  await expect(page.locator(".feed-explorer")).toHaveAttribute(
+    "data-ready",
+    "true",
+  );
   const button = page.locator(".refresh-feed button");
   await button.focus();
   await expect(button).toBeFocused();

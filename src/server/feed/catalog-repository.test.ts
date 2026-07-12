@@ -24,7 +24,7 @@ describe("row <-> CatalogItem mapping", () => {
     const row = catalogItemToRow(secondItem) as CatalogItemRow;
     const naiveTimestamp = { ...row, analyzed_at: "2026-07-11 15:00:00+00" };
     expect(rowToCatalogItem(naiveTimestamp).analyzedAt).toBe(
-      secondItem.analyzedAt,
+      "2026-07-11T15:00:00.000Z",
     );
   });
 

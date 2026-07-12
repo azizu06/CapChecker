@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { FIXTURE_CATALOG_ITEMS } from "../fixtures/feed";
-import { CatalogItemSchema, RefreshRunSchema } from "./feed";
+import {
+  FEED_CATEGORIES,
+  CatalogItemSchema,
+  RefreshRunSchema,
+} from "./feed";
 
 describe("CatalogItemSchema", () => {
   const [item] = FIXTURE_CATALOG_ITEMS;
@@ -12,10 +16,35 @@ describe("CatalogItemSchema", () => {
     }
   });
 
+  it("provides a coherent six-to-ten item catalog across every feed category", () => {
+    expect(FIXTURE_CATALOG_ITEMS.length).toBeGreaterThanOrEqual(6);
+    expect(FIXTURE_CATALOG_ITEMS.length).toBeLessThanOrEqual(10);
+    expect(new Set(FIXTURE_CATALOG_ITEMS.map((item) => item.category))).toEqual(
+      new Set(FEED_CATEGORIES),
+    );
+
+    for (const item of FIXTURE_CATALOG_ITEMS) {
+      expect(item.url).toContain(item.youtubeVideoId);
+      expect(item.thumbnailUrl).toContain(item.youtubeVideoId);
+      expect(item.scorecard.source.kind).toBe("url");
+      if (item.scorecard.source.kind !== "url") {
+        throw new Error("Feed fixtures must use URL scorecard sources");
+      }
+      expect(item.scorecard.source.url).toContain(item.youtubeVideoId);
+      expect(item.scorecard.source.title).toBe(item.title);
+    }
+  });
+
   it("rejects a category outside the approved set", () => {
     expect(
       CatalogItemSchema.safeParse({ ...item, category: "crypto" }).success,
     ).toBe(false);
+  });
+
+  it("requires the UUID identity used by persisted catalog rows", () => {
+    expect(CatalogItemSchema.safeParse({ ...item, id: "fixture-only-id" }).success).toBe(
+      false,
+    );
   });
 
   it("rejects a cap score that drifts from the embedded scorecard", () => {
