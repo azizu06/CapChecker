@@ -1,15 +1,14 @@
 import {
   ExternalLink,
-  FileText,
-  Search,
+  Play,
   ShieldCheck,
-  Video,
 } from "lucide-react";
 
 import type { Scorecard } from "@/domain/analysis";
 import { formatTimestamp } from "@/lib/format-timestamp";
 
 import { ClaimCard } from "./claim-card";
+import { HowItWorks } from "./how-it-works";
 import { CountUp } from "./react-bits/count-up";
 import { ResultsTabs, type ResultsTab } from "./results-tabs";
 import { ScoreMeter } from "./score-meter";
@@ -30,7 +29,15 @@ const trustRank = { primary: 4, high: 3, medium: 2, low: 1 };
 
 const displayUrl = (url: string) => url.replace(/^https?:\/\//, "");
 
-export function ScorecardView({ scorecard }: { scorecard: Scorecard }) {
+export function ScorecardView({
+  scorecard,
+  onRunAgain,
+  onCheckAnother,
+}: {
+  scorecard: Scorecard;
+  onRunAgain(): void;
+  onCheckAnother(): void;
+}) {
   const strongest = scorecard.verifications
     .flatMap((item) => item.evidence)
     .sort((a, b) => trustRank[b.trustTier] - trustRank[a.trustTier])[0];
@@ -164,98 +171,79 @@ export function ScorecardView({ scorecard }: { scorecard: Scorecard }) {
 
   return (
     <div className="main">
-      <p className="source-line">
-        <Video aria-hidden="true" />
-        Checked: <b>{sourceTitle}</b>
-        {scorecard.source.kind === "url" ? (
-          <a
-            href={scorecard.source.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open the checked video (opens in new tab)"
+      <div className="result-grid">
+        <div className="result-content">
+          <section
+            className="score-section"
+            aria-labelledby="result-title"
+            aria-roledescription="Cap Score"
           >
-            {displayUrl(scorecard.source.url)}
-            <ExternalLink aria-hidden="true" />
-          </a>
-        ) : (
-          <span className="file-name">{scorecard.source.fileName}</span>
-        )}
-        <span className="when">· just now</span>
-      </p>
-
-      <section
-        className="panel score-header"
-        aria-labelledby="result-title"
-        aria-roledescription="Cap Score"
-      >
-        <div className="score-left">
-          <div
-            className={`score-num ${tone}`}
-            aria-label={`Cap Score ${scorecard.capScore} out of 100`}
-          >
-            <CountUp to={scorecard.capScore} />
-          </div>
-          <h2 id="result-title" className={tone}>
-            {labels[scorecard.capLabel]}
-          </h2>
-          <ScoreMeter score={scorecard.capScore} />
+            <div className="score-left">
+              <div
+                className={`score-num ${tone}`}
+                aria-label={`Cap Score ${scorecard.capScore} out of 100`}
+              >
+                <CountUp to={scorecard.capScore} />
+              </div>
+              <h2 id="result-title" className={tone}>
+                {labels[scorecard.capLabel]}
+              </h2>
+              <ScoreMeter score={scorecard.capScore} />
+            </div>
+            <div className="score-right">
+              <p className="summary">{scorecard.summary}</p>
+              {strongest && (
+                <span className="strongest">
+                  <ShieldCheck aria-hidden="true" />
+                  Strongest source:{" "}
+                  <a
+                    href={strongest.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Open strongest source: ${strongest.title} (opens in new tab)`}
+                  >
+                    {strongest.publisher} — {strongest.title}
+                    <ExternalLink aria-hidden="true" />
+                  </a>
+                </span>
+              )}
+            </div>
+          </section>
+          <ResultsTabs tabs={tabs} />
         </div>
-        <div className="score-right">
-          <p className="summary">{scorecard.summary}</p>
-          {strongest && (
-            <span className="strongest">
-              <ShieldCheck aria-hidden="true" />
-              Strongest source:{" "}
+
+        <aside className="source-rail" aria-label="Checked video">
+          <div className="video-facade" aria-hidden="true">
+            <Play />
+          </div>
+          <div className="source-details">
+            <span>Checked: <b>{sourceTitle}</b></span>
+            {scorecard.source.kind === "url" ? (
               <a
-                href={strongest.url}
+                href={scorecard.source.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Open strongest source: ${strongest.title} (opens in new tab)`}
+                aria-label="Open the checked video (opens in new tab)"
               >
-                {strongest.publisher} — {strongest.title}
+                {displayUrl(scorecard.source.url)}
                 <ExternalLink aria-hidden="true" />
               </a>
-            </span>
-          )}
-        </div>
-      </section>
-
-      <ResultsTabs tabs={tabs} />
-
-      <div className="how">
-        <h2>How the Cap Score works</h2>
-        <div className="how-grid">
-          <div>
-            <FileText aria-hidden="true" />
-            <b>Claims get extracted</b>
-            <p>
-              CapCheck transcribes the video and pulls out every checkable
-              statement — facts and predictions, with timestamps.
-            </p>
+            ) : (
+              <span className="file-name">{scorecard.source.fileName}</span>
+            )}
+            <span className="when">· just now</span>
           </div>
-          <div>
-            <Search aria-hidden="true" />
-            <b>Evidence gets checked</b>
-            <p>
-              Primary evidence is preferred. Evidence may be high, medium, or
-              low trust—or unavailable.
-            </p>
+          <div className="result-actions" aria-label="Completed result actions">
+            <button className="ghost" type="button" onClick={onRunAgain}>
+              Run again
+            </button>
+            <button className="ghost" type="button" onClick={onCheckAnother}>
+              Check another
+            </button>
           </div>
-          <div>
-            <ShieldCheck aria-hidden="true" />
-            <b>The score adds up</b>
-            <p>
-              Verdict weights determine the score. Prediction-heavy videos have
-              a minimum score of 30; hype is shown separately and does not add points.
-            </p>
-          </div>
-        </div>
-        <div className="app-footer">
-          <span className="disclaimer">
-            CapCheck verifies claims — it isn&rsquo;t financial advice.
-          </span>
-        </div>
+        </aside>
       </div>
+      <HowItWorks />
     </div>
   );
 }

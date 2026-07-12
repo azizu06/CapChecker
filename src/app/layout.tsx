@@ -1,24 +1,25 @@
 import type { Metadata } from "next";
-import { Baloo_2, Geist_Mono, Nunito } from "next/font/google";
+import { Geist_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 
 import { SiteHeader } from "@/components/site-header";
 
-const balooDisplay = Baloo_2({
+const instrumentDisplay = Instrument_Sans({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const nunitoBody = Nunito({
+const instrumentBody = Instrument_Sans({
   variable: "--font-body",
   subsets: ["latin"],
-  weight: ["300", "400", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${balooDisplay.variable} ${nunitoBody.variable} ${geistMono.variable} antialiased`}
+      className={`${instrumentDisplay.variable} ${instrumentBody.variable} ${geistMono.variable} antialiased`}
     >
       <body>
         <SiteHeader />
